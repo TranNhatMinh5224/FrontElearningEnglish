@@ -33,7 +33,7 @@ export default function OtpResetPassword() {
       const newOtp = [...otp];
       newOtp[index] = "";
       setOtp(newOtp);
-      setErrorMessage(""); // Xóa lỗi khi người dùng bắt đầu nhập lại
+      // Không xóa error message ngay, để người dùng thấy số lần thử còn lại
       return;
     }
 
@@ -43,7 +43,14 @@ export default function OtpResetPassword() {
     const newOtp = [...otp];
     newOtp[index] = digit;
     setOtp(newOtp);
-    setErrorMessage(""); // Xóa lỗi khi người dùng bắt đầu nhập lại
+    
+    // Chỉ xóa error message khi người dùng đã nhập đủ 6 số (sẵn sàng verify lại)
+    // Không xóa ngay khi bắt đầu nhập để giữ message từ backend
+    const fullCode = newOtp.join("");
+    if (fullCode.length === 6) {
+      // Khi đã nhập đủ 6 số, xóa error để chuẩn bị cho lần verify mới
+      setErrorMessage("");
+    }
 
     // Auto focus sang ô tiếp theo
     if (digit && index < 5) {
@@ -82,7 +89,8 @@ export default function OtpResetPassword() {
     if (pastedData.length === 6) {
       setOtp(pastedData.split(""));
       inputRefs.current[5]?.focus();
-      setErrorMessage(""); // Xóa lỗi khi paste
+      // Xóa error message khi paste đủ 6 số để chuẩn bị verify
+      setErrorMessage("");
     }
   };
 
@@ -119,8 +127,13 @@ export default function OtpResetPassword() {
         const errorMsg = res.data?.message || "Mã OTP không đúng hoặc đã hết hạn.";
         clearOtp(); // Xóa các số khi nhập sai
 
-        // Kiểm tra xem có phải do quá số lần thử không
-        if (errorMsg.includes("quá") || errorMsg.includes("5 lần") || errorMsg.includes("lần thử") || errorMsg.includes("đã hết")) {
+        // Kiểm tra chính xác message về giới hạn số lần thử
+        // Backend trả về: "Bạn đã nhập sai OTP quá 5 lần. Vui lòng yêu cầu mã OTP mới"
+        // Chỉ bắt khi có từ "quá" và "lần" cùng nhau (không phải "lần thử" trong "Còn X lần thử")
+        const isMaxAttemptsReached = errorMsg.includes("quá") && errorMsg.includes("lần") && 
+                                     (errorMsg.includes("5 lần") || errorMsg.includes("quá 5"));
+        
+        if (isMaxAttemptsReached) {
           setMaxAttemptsReached(true);
           setErrorMessage("Bạn đã nhập sai quá 5 lần. Vui lòng yêu cầu mã OTP mới.");
           setTimeout(() => {
@@ -136,8 +149,13 @@ export default function OtpResetPassword() {
 
       const msg = err.response?.data?.message || "Mã OTP không đúng hoặc đã hết hạn.";
 
-      // Kiểm tra xem có phải do quá số lần thử không
-      if (msg.includes("quá") || msg.includes("5 lần") || msg.includes("lần thử") || msg.includes("đã hết")) {
+      // Kiểm tra chính xác message về giới hạn số lần thử
+      // Backend trả về: "Bạn đã nhập sai OTP quá 5 lần. Vui lòng yêu cầu mã OTP mới"
+      // Chỉ bắt khi có từ "quá" và "lần" cùng nhau (không phải "lần thử" trong "Còn X lần thử")
+      const isMaxAttemptsReached = msg.includes("quá") && msg.includes("lần") && 
+                                   (msg.includes("5 lần") || msg.includes("quá 5"));
+      
+      if (isMaxAttemptsReached) {
         setMaxAttemptsReached(true);
         setErrorMessage("Bạn đã nhập sai quá 5 lần. Vui lòng yêu cầu mã OTP mới.");
         setTimeout(() => {
