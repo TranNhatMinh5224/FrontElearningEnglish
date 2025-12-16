@@ -1,0 +1,5 @@
+.suggested-courses-section h2 {
+    font-size: 22px;
+    margin-bottom: 20px;
+    color: var(--color-text-primary, #1f2937);
+}

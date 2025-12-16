@@ -1,8 +1,9 @@
 import axios from "axios";
 import { tokenStorage } from "../Utils/tokenStorage";
+import { API_BASE_URL, AUTH_REFRESH_URL } from "./apiConfig";
 
 const axiosClient = axios.create({
-  baseURL: "http://localhost:5029/api", // 🔁 đổi theo backend bạn
+  baseURL: API_BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },
@@ -60,7 +61,7 @@ axiosClient.interceptors.response.use(
 
         // Call refresh API with both refreshToken and current (expired) accessToken
         const res = await axios.post(
-          "http://localhost:5029/api/auth/refresh-token",
+          AUTH_REFRESH_URL,
           { refreshToken, accessToken: expiredAccessToken }
         );
 

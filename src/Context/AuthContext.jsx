@@ -26,6 +26,8 @@ export const AuthProvider = ({ children }) => {
         const userData = res.data.data;
         // Backend trả về displayName hoặc fullName
         userData.fullName = userData.displayName || userData.fullName || `${userData.firstName} ${userData.lastName}`.trim();
+        // Lưu avatarUrl vào user object
+        userData.avatarUrl = userData.avatarUrl || null;
         setUser(userData);
         setRoles(userData.roles?.map((r) => r.name) || []);
         setIsAuthenticated(true);
@@ -45,7 +47,8 @@ export const AuthProvider = ({ children }) => {
 
       // Parse user data
       user.fullName = user.displayName || user.fullName || `${user.firstName} ${user.lastName}`.trim();
-      
+      user.avatarUrl = user.avatarUrl || null;
+
       tokenStorage.setTokens({ accessToken, refreshToken });
       setUser(user);
       setRoles(user.roles?.map((r) => r.name) || []);
@@ -89,6 +92,20 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // ===== REFRESH USER =====
+  const refreshUser = async () => {
+    try {
+      const response = await authService.getProfile();
+      const userData = response.data.data;
+      userData.fullName = userData.displayName || userData.fullName || `${userData.firstName} ${userData.lastName}`.trim();
+      userData.avatarUrl = userData.avatarUrl || null;
+      setUser(userData);
+      setRoles(userData.roles?.map((r) => r.name) || []);
+    } catch (error) {
+      console.error("Error refreshing user:", error);
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -100,6 +117,7 @@ export const AuthProvider = ({ children }) => {
         login,
         loginAsGuest,
         logout,
+        refreshUser,
       }}
     >
       {!loading && children}

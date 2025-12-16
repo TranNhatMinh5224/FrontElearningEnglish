@@ -1,0 +1,42 @@
+.course-card {
+    background: var(--color-bg-primary, white);
+    border-radius: 16px;
+    box-shadow: 0 10px 20px var(--shadow-sm, rgba(0, 0, 0, 0.08));
+    overflow: hidden;
+}
+
+.course-card img {
+    width: 100%;
+    height: 140px;
+    object-fit: cover;
+}
+
+.course-info {
+    padding: 14px;
+}
+
+.course-info h3 {
+    font-size: 16px;
+    margin-bottom: 10px;
+    color: var(--color-text-primary, #1f2937);
+}
+
+.progress {
+    background: var(--color-border-light, #e5e7eb);
+    height: 6px;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    background: var(--color-secondary-cyan, #41d6e3);
+}
+
+.progress-text {
+    font-size: 12px;
+    color: var(--color-text-secondary, #6b7280);
+    margin-top: 4px;
+    display: block;
+    text-align: right;
+}

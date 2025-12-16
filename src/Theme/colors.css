@@ -1,0 +1,60 @@
+/**
+ * Theme Colors - CSS Variables
+ * Import file này vào index.css hoặc App.css để sử dụng CSS variables
+ */
+
+:root {
+    /* Primary Colors */
+    --color-primary-main: #7a3df0;
+    --color-primary-light: #9d6ff5;
+    --color-primary-dark: #5d2eb8;
+    --color-primary-gradient: linear-gradient(90deg, #6fd5e0, #d447b6);
+    --color-primary-gradient-light: linear-gradient(90deg, #8cdcf8, #d447b6);
+
+    /* Secondary Colors */
+    --color-secondary-cyan: #41d6e3;
+    --color-secondary-pink: #d946ef;
+    --color-secondary-purple: #7a3df0;
+    --color-secondary-cyan-light: #6fd5e0;
+    --color-secondary-pink-main: #d447b6;
+
+    /* Background Colors */
+    --color-bg-primary: #ffffff;
+    --color-bg-secondary: #f6f8fb;
+    --color-bg-auth: #f8dede;
+    --color-bg-light: #e0f7fa;
+    --color-bg-white: #ffffff;
+
+    /* Text Colors */
+    --color-text-primary: #1f2937;
+    --color-text-secondary: #6b7280;
+    --color-text-tertiary: #9ca3af;
+    --color-text-white: #ffffff;
+    --color-text-dark: #4d3b00;
+
+    /* Border Colors */
+    --color-border-light: #e5e7eb;
+    --color-border-medium: #d1d5db;
+    --color-border-dark: #9ca3af;
+
+    /* Social Colors */
+    --color-social-google: #ffffff;
+    --color-social-facebook: #1877f2;
+    --color-social-guest: #000000;
+
+    /* Status Colors */
+    --color-status-error: #ef4444;
+    --color-status-success: #10b981;
+    --color-status-warning: #f59e0b;
+    --color-status-info: #3b82f6;
+
+    /* Shadow */
+    --shadow-sm: rgba(0, 0, 0, 0.08);
+    --shadow-md: rgba(0, 0, 0, 0.15);
+    --shadow-lg: rgba(0, 0, 0, 0.2);
+    --shadow-xl: rgba(0, 0, 0, 0.25);
+
+    /* Special Colors */
+    --color-special-streak: #ffe089;
+    --color-special-streak-text: #4d3b00;
+}

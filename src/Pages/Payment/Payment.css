@@ -1,0 +1,136 @@
+.payment-container {
+    min-height: 100vh;
+    background: var(--color-bg-secondary, #f6f8fb);
+    padding: 40px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.payment-header {
+    width: 100%;
+    max-width: 600px;
+    margin-bottom: 20px;
+}
+
+.back-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: none;
+    border: none;
+    color: var(--color-text-primary, #1f2937);
+    font-size: 16px;
+    cursor: pointer;
+    padding: 8px 0;
+    transition: opacity 0.2s ease;
+}
+
+.back-button:hover {
+    opacity: 0.7;
+}
+
+.payment-card {
+    background: var(--color-bg-primary, white);
+    border-radius: 20px;
+    padding: 40px;
+    max-width: 600px;
+    width: 100%;
+    box-shadow: 0 10px 24px var(--shadow-sm, rgba(0, 0, 0, 0.08));
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.payment-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--color-text-primary, #1f2937);
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.payment-loading {
+    padding: 60px 20px;
+    color: var(--color-text-secondary, #6b7280);
+    font-size: 16px;
+    text-align: center;
+}
+
+.payment-error {
+    padding: 60px 20px;
+    color: var(--color-status-error, #ef4444);
+    font-size: 16px;
+    text-align: center;
+}
+
+.qr-code-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 30px;
+}
+
+.qr-code {
+    width: 300px;
+    height: 300px;
+    border: 1px solid var(--color-border-light, #e5e7eb);
+    border-radius: 12px;
+    padding: 20px;
+    background: white;
+}
+
+.payment-logos {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin-bottom: 40px;
+}
+
+.payment-logo {
+    font-size: 16px;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 8px;
+}
+
+.payment-logo.vietqr {
+    color: #dc2626;
+    background: rgba(220, 38, 38, 0.1);
+}
+
+.payment-logo.napas {
+    color: #16a34a;
+    background: rgba(22, 163, 74, 0.1);
+}
+
+.payment-instructions {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.instruction-step {
+    font-size: 15px;
+    color: var(--color-text-primary, #1f2937);
+    line-height: 1.6;
+    padding: 12px 16px;
+    background: var(--color-bg-secondary, #f6f8fb);
+    border-radius: 8px;
+}
+
+@media (max-width: 768px) {
+    .payment-card {
+        padding: 30px 20px;
+    }
+
+    .qr-code {
+        width: 250px;
+        height: 250px;
+    }
+
+    .payment-logos {
+        gap: 20px;
+    }
+}

@@ -40,7 +40,8 @@
 .main-header__nav {
   display: flex;
   justify-content: center;
-  gap: 52px;  /* khoảng cách giữa các menu */
+  gap: 52px;
+  /* khoảng cách giữa các menu */
 }
 
 .nav-item {
@@ -53,6 +54,8 @@
   padding: 10px 18px;
   border-radius: 12px;
   transition: 0.22s ease;
+  text-decoration: none;
+  color: #fff;
 }
 
 .nav-item:hover {
@@ -88,7 +91,7 @@
   border-radius: 20px;
   font-size: 14px;
   font-weight: 600;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
 }
 
 /* =========================================================
@@ -116,6 +119,15 @@
   place-items: center;
   font-weight: 700;
   font-size: 16px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
 }
 
 .user-info {
@@ -143,7 +155,7 @@
   color: #fff;
   border-radius: 14px;
   padding: 12px;
-  box-shadow: 0 12px 28px rgba(0,0,0,0.25);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
   z-index: 999;
   animation: fadeDown 0.18s ease;
 }
@@ -174,7 +186,7 @@
 
 .divider {
   height: 1px;
-  background: rgba(255,255,255,0.35);
+  background: rgba(255, 255, 255, 0.35);
   margin: 8px 0;
 }
 
@@ -184,6 +196,7 @@
     opacity: 0;
     transform: translateY(-6px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);

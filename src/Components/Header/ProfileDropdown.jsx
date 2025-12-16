@@ -5,23 +5,32 @@ import { useAuth } from "../../Context/AuthContext";
 
 export default function ProfileDropdown() {
   const navigate = useNavigate();
-  const { user, roles, isGuest, logout } = useAuth();
+  const { user: authUser, roles, isGuest, logout } = useAuth();
   const [open, setOpen] = useState(false);
 
   const isTeacher = roles.includes("Teacher");
   const isAdmin = roles.includes("Admin");
-  const isPremium = user?.teacherSubscription?.subscriptionType === "Premium";
+  const isPremium = authUser?.teacherSubscription?.subscriptionType === "Premium";
+
+  // Use user from auth context (includes avatarUrl)
+  const user = authUser;
 
   return (
     <div className="profile-wrapper">
       {/* AVATAR */}
       <div className="profile-trigger" onClick={() => setOpen(!open)}>
         <div className="avatar">
-          {isGuest ? "👤" : user?.fullName?.charAt(0)}
+          {isGuest ? (
+            "👤"
+          ) : user?.avatarUrl ? (
+            <img src={user.avatarUrl} alt="Avatar" className="avatar-img" />
+          ) : (
+            user?.fullName?.charAt(0)
+          )}
         </div>
         {!isGuest && (
           <div className="user-info">
-            <span className="name">{user.fullName}</span>
+            <span className="name">{user?.fullName}</span>
             <span className="role">Học sinh</span>
           </div>
         )}

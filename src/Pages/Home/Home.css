@@ -1,77 +1,7 @@
 .home-container {
   padding: 30px 40px;
-  background: #f6f8fb;
+  background: var(--color-bg-secondary, #f6f8fb);
   min-height: calc(100vh - 80px);
-}
-
-/* ===== WELCOME ===== */
-.home-welcome h1 {
-  font-size: 28px;
-  font-weight: 700;
-}
-
-.home-welcome p {
-  color: #6b7280;
-  margin-top: 6px;
-}
-
-/* ===== SECTION ===== */
-.home-section {
-  margin-top: 40px;
-}
-
-.home-section h2 {
-  font-size: 22px;
-  margin-bottom: 20px;
-}
-
-/* ===== COURSES ===== */
-.course-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
-}
-
-.course-card {
-  background: white;
-  border-radius: 16px;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
-  overflow: hidden;
-}
-
-.course-card img {
-  width: 100%;
-  height: 140px;
-  object-fit: cover;
-}
-
-.course-info {
-  padding: 14px;
-}
-
-.course-info h3 {
-  font-size: 16px;
-  margin-bottom: 10px;
-}
-
-.progress {
-  background: #e5e7eb;
-  height: 6px;
-  border-radius: 6px;
-  overflow: hidden;
-}
-
-.progress-bar {
-  height: 100%;
-  background: #41d6e3;
-}
-
-.progress-text {
-  font-size: 12px;
-  color: #6b7280;
-  margin-top: 4px;
-  display: block;
-  text-align: right;
 }
 
 /* ===== BOTTOM ===== */
@@ -82,110 +12,14 @@
   margin-top: 50px;
 }
 
-/* ===== SUGGEST ===== */
-.suggest-box h2 {
-  margin-bottom: 20px;
+@media (max-width: 1024px) {
+  .home-bottom {
+    grid-template-columns: 1fr;
+  }
 }
 
-.suggest-item {
-  background: white;
-  border-radius: 14px;
-  padding: 16px;
-  display: flex;
-  align-items: center;
-  margin-bottom: 14px;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
-}
-
-.suggest-icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  background: #e0f7fa;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
-  margin-right: 14px;
-}
-
-.suggest-text h4 {
-  font-size: 15px;
-}
-
-.suggest-text span {
-  font-size: 13px;
-  color: #6b7280;
-}
-
-.play-btn {
-  margin-left: auto;
-  border: none;
-  background: #d946ef;
-  color: white;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  cursor: pointer;
-}
-
-/* ===== UPGRADE ===== */
-.upgrade-box {
-  background: white;
-  border-radius: 20px;
-  padding: 24px;
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
-}
-
-.upgrade-box h2 {
-  margin-bottom: 10px;
-}
-
-.upgrade-box p {
-  font-size: 14px;
-  color: #6b7280;
-  margin-bottom: 20px;
-}
-
-.package-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-}
-
-.package-card {
-  border-radius: 16px;
-  padding: 18px;
-  border: 1px solid #e5e7eb;
-}
-
-.package-card.highlight {
-  border: 2px solid #d946ef;
-}
-
-.package-card h3 {
-  margin-bottom: 6px;
-}
-
-.package-card strong {
-  display: block;
-  margin: 12px 0;
-  font-size: 18px;
-}
-
-.upgrade-btn {
-  width: 100%;
-  border: none;
-  padding: 10px;
-  border-radius: 20px;
-  color: white;
-  cursor: pointer;
-}
-
-.upgrade-btn.blue {
-  background: #41d6e3;
-}
-
-.upgrade-btn.pink {
-  background: #d946ef;
+@media (max-width: 768px) {
+  .home-container {
+    padding: 20px;
+  }
 }

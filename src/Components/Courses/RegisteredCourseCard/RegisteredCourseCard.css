@@ -1,0 +1,71 @@
+.registered-course-card {
+    background: var(--color-bg-primary, white);
+    border-radius: 16px;
+    box-shadow: 0 4px 12px var(--shadow-sm, rgba(0, 0, 0, 0.08));
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.registered-course-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px var(--shadow-md, rgba(0, 0, 0, 0.12));
+}
+
+.registered-course-card img {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+}
+
+.course-info {
+    padding: 16px;
+}
+
+.course-info h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--color-text-primary, #1f2937);
+    margin: 0 0 12px 0;
+}
+
+.progress-wrapper {
+    margin-bottom: 12px;
+}
+
+.progress {
+    background: var(--color-border-light, #e5e7eb);
+    height: 6px;
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 4px;
+}
+
+.progress-bar {
+    height: 100%;
+    background: var(--color-secondary-cyan, #41d6e3);
+    transition: width 0.3s ease;
+}
+
+.progress-text {
+    font-size: 12px;
+    color: var(--color-text-secondary, #6b7280);
+    display: block;
+    text-align: right;
+}
+
+.continue-btn {
+    width: 100%;
+    padding: 10px;
+    background: var(--color-secondary-cyan, #41d6e3);
+    color: var(--color-text-white, white);
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s ease, background 0.2s ease;
+}
+
+.continue-btn:hover {
+    opacity: 0.9;
+}

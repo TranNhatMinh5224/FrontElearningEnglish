@@ -1,0 +1,33 @@
+.my-courses-section {
+    margin-top: 40px;
+}
+
+.my-courses-section h2 {
+    font-size: 22px;
+    margin-bottom: 20px;
+    color: var(--color-text-primary, #1f2937);
+}
+
+.course-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+@media (max-width: 1200px) {
+    .course-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .course-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .course-grid {
+        grid-template-columns: 1fr;
+    }
+}

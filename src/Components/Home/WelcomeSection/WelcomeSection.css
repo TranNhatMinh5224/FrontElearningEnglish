@@ -1,0 +1,10 @@
+.welcome-section h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--color-text-primary, #1f2937);
+}
+
+.welcome-section p {
+    color: var(--color-text-secondary, #6b7280);
+    margin-top: 6px;
+}
