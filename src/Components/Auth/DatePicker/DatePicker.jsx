@@ -1,0 +1,148 @@
+import React, { useState, useEffect } from "react";
+import ScrollPicker from "../ScrollPicker/ScrollPicker";
+import "./DatePicker.css";
+
+export default function DatePicker({ value, onChange, disabled = false, hasError = false }) {
+    const [day, setDay] = useState("");
+    const [month, setMonth] = useState("");
+    const [year, setYear] = useState("");
+
+    // Parse date value (ISO string or Date object)
+    useEffect(() => {
+        if (value) {
+            const date = new Date(value);
+            if (!isNaN(date.getTime())) {
+                setDay(date.getDate().toString());
+                setMonth((date.getMonth() + 1).toString());
+                setYear(date.getFullYear().toString());
+            }
+        } else {
+            setDay("");
+            setMonth("");
+            setYear("");
+        }
+    }, [value]);
+
+    // Get days in month
+    const getDaysInMonth = (m, y) => {
+        if (!m || !y) return 31;
+        return new Date(parseInt(y), parseInt(m), 0).getDate();
+    };
+
+    // Generate options
+    const generateDays = () => {
+        const maxDays = getDaysInMonth(month, year);
+        return Array.from({ length: maxDays }, (_, i) => ({
+            value: (i + 1).toString(),
+            label: (i + 1).toString(),
+        }));
+    };
+
+    const generateMonths = () => {
+        return Array.from({ length: 12 }, (_, i) => ({
+            value: (i + 1).toString(),
+            label: (i + 1).toString(),
+        }));
+    };
+
+    const generateYears = () => {
+        const currentYear = new Date().getFullYear();
+        return Array.from({ length: 100 }, (_, i) => {
+            const y = currentYear - i;
+            return {
+                value: y.toString(),
+                label: y.toString(),
+            };
+        });
+    };
+
+    // Handle changes
+    const handleDayChange = (newDay) => {
+        setDay(newDay);
+        if (newDay && month && year) {
+            const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(newDay));
+            onChange(date);
+        }
+    };
+
+    const handleMonthChange = (newMonth) => {
+        setMonth(newMonth);
+
+        // Adjust day if current day exceeds days in new month
+        if (day && newMonth && year) {
+            const maxDays = getDaysInMonth(newMonth, year);
+            if (parseInt(day) > maxDays) {
+                setDay("");
+                onChange(null);
+            } else {
+                const date = new Date(parseInt(year), parseInt(newMonth) - 1, parseInt(day));
+                onChange(date);
+            }
+        } else {
+            if (day) setDay("");
+            onChange(null);
+        }
+    };
+
+    const handleYearChange = (newYear) => {
+        setYear(newYear);
+
+        if (month && newYear) {
+            if (day) {
+                const maxDays = getDaysInMonth(month, newYear);
+                if (parseInt(day) > maxDays) {
+                    setDay("");
+                    onChange(null);
+                } else {
+                    const date = new Date(parseInt(newYear), parseInt(month) - 1, parseInt(day));
+                    onChange(date);
+                }
+            } else {
+                onChange(null);
+            }
+        } else {
+            if (day) setDay("");
+            onChange(null);
+        }
+    };
+
+    return (
+        <div className="date-picker-container">
+            <div className="date-picker-scroll-wrapper">
+                <ScrollPicker
+                    options={generateDays()}
+                    value={day}
+                    onChange={handleDayChange}
+                    disabled={disabled || !month || !year}
+                    placeholder="Ngày"
+                    hasError={hasError}
+                />
+                <span className="date-picker-label">Ngày</span>
+            </div>
+
+            <div className="date-picker-scroll-wrapper">
+                <ScrollPicker
+                    options={generateMonths()}
+                    value={month}
+                    onChange={handleMonthChange}
+                    disabled={disabled}
+                    placeholder="Tháng"
+                    hasError={hasError}
+                />
+                <span className="date-picker-label">Tháng</span>
+            </div>
+
+            <div className="date-picker-scroll-wrapper">
+                <ScrollPicker
+                    options={generateYears()}
+                    value={year}
+                    onChange={handleYearChange}
+                    disabled={disabled}
+                    placeholder="Năm"
+                    hasError={hasError}
+                />
+                <span className="date-picker-label">Năm</span>
+            </div>
+        </div>
+    );
+}

@@ -20,6 +20,12 @@ export default function EditProfile() {
         bio: "",
     });
 
+    const [errors, setErrors] = useState({
+        lastName: "",
+        firstName: "",
+        phoneNumber: "",
+    });
+
     useEffect(() => {
         const fetchProfile = async () => {
             try {
@@ -48,12 +54,39 @@ export default function EditProfile() {
             [name]: value,
         }));
         setError("");
+
+        // Real-time validation for firstName and lastName
+        if (name === "firstName" || name === "lastName") {
+            let error = "";
+            if (value.length > 20) {
+                error = `${name === "firstName" ? "Tên" : "Họ"} không được vượt quá 20 ký tự`;
+            }
+            setErrors((prev) => ({
+                ...prev,
+                [name]: error,
+            }));
+        }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError("");
         setSuccess(false);
+
+        // Validate form
+        const newErrors = {
+            firstName: formData.firstName.length > 20 ? "Tên không được vượt quá 20 ký tự" : "",
+            lastName: formData.lastName.length > 20 ? "Họ không được vượt quá 20 ký tự" : "",
+            phoneNumber: "",
+        };
+
+        setErrors(newErrors);
+
+        // Check if there are any errors
+        if (newErrors.firstName || newErrors.lastName) {
+            return;
+        }
+
         setLoading(true);
 
         try {
@@ -103,7 +136,10 @@ export default function EditProfile() {
                                 value={formData.lastName}
                                 onChange={handleChange}
                                 placeholder="Nhập họ"
+                                maxLength={20}
+                                className={errors.lastName ? "error" : ""}
                             />
+                            {errors.lastName && <span className="input-error">{errors.lastName}</span>}
                         </div>
 
                         <div className="form-group">
@@ -115,7 +151,10 @@ export default function EditProfile() {
                                 value={formData.firstName}
                                 onChange={handleChange}
                                 placeholder="Nhập tên"
+                                maxLength={20}
+                                className={errors.firstName ? "error" : ""}
                             />
+                            {errors.firstName && <span className="input-error">{errors.firstName}</span>}
                         </div>
 
                         <div className="form-group">

@@ -21,6 +21,7 @@
     box-sizing: border-box;
     transition: 0.25s;
     font-family: inherit;
+    text-align: left;
 }
 
 .input-field::placeholder {
@@ -63,10 +64,15 @@
     justify-content: center;
     width: 24px;
     height: 24px;
+    transition: color 0.2s ease;
 }
 
 .password-toggle-btn:hover {
     color: #6b7280;
+}
+
+.password-toggle-btn:active {
+    transform: translateY(-50%) scale(0.95);
 }
 
 .input-field-error {
@@ -75,4 +81,5 @@
     font-size: 13px;
     margin-top: 6px;
     margin-left: 4px;
+    text-align: left;
 }

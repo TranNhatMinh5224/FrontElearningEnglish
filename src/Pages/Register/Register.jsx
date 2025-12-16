@@ -1,116 +1,242 @@
 import React, { useState } from "react";
-import "../Register/Register.css";
+import "./Register.css";
 import Header from "../../Components/Header/LogoHeader";
 import { useNavigate } from "react-router-dom";
 import { authService } from "../../Services/authService";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { InputField, DatePicker, SelectField } from "../../Components/Auth";
 
 export default function Register() {
   const navigate = useNavigate();
 
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [day, setDay] = useState("");
-  const [month, setMonth] = useState("");
-  const [year, setYear] = useState("");
-  const [gender, setGender] = useState("");
-  const [error, setError] = useState("");
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    phoneNumber: "",
+    dateOfBirth: null,
+    gender: "",
+  });
+
+  const [errors, setErrors] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    phoneNumber: "",
+    dateOfBirth: "",
+    gender: "",
+  });
+
+  const [generalError, setGeneralError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [passwordMatchError, setPasswordMatchError] = useState("");
 
-  const getDaysInMonth = (m, y) => {
-    if (!m) return 31;
-    return new Date(y || 2000, m, 0).getDate();
-  };
-
-  const calculateAge = (d, m, y) => {
-    if (!d || !m || !y) return null;
-    const today = new Date();
-    const birth = new Date(y, m - 1, d);
-    let age = today.getFullYear() - birth.getFullYear();
-    const diff =
-      today.getMonth() - birth.getMonth() ||
-      today.getDate() - birth.getDate();
-    if (diff < 0) age--;
-    return age;
-  };
-
-const handleRegister = async () => {
-  setError("");
-
-  // Validation
-  if (!firstName || !lastName || !email || !password || !confirmPassword || !phoneNumber) {
-    setError("Vui lòng điền đầy đủ thông tin");
-    return;
-  }
-
-  // Validate phone number (Vietnam: 10 digits, starts with 0)
-  const phoneRegex = /^0[0-9]{9}$/;
-  if (!phoneRegex.test(phoneNumber)) {
-    if (phoneNumber.length < 10) {
-      setError("Số điện thoại phải có đúng 10 chữ số");
-    } else if (phoneNumber.length > 10) {
-      setError("Số điện thoại không được vượt quá 10 chữ số");
-    } else if (!phoneNumber.startsWith("0")) {
-      setError("Số điện thoại phải bắt đầu bằng số 0");
-    } else {
-      setError("Số điện thoại không hợp lệ");
+  // Validation functions
+  const validateEmail = (email) => {
+    if (!email) {
+      return "Vui lòng nhập email";
     }
-    return;
-  }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return "Email không hợp lệ, email phải có định dạng example@example.com";
+    }
+    return "";
+  };
 
-  if (password !== confirmPassword) {
-    setError("Mật khẩu xác nhận không khớp");
-    return;
-  }
+  const validatePassword = (password) => {
+    if (!password) {
+      return "Vui lòng nhập mật khẩu";
+    }
+    if (password.length < 6) {
+      return "Mật khẩu phải có ít nhất 6 ký tự";
+    }
+    if (password.length > 20) {
+      return "Mật khẩu không được vượt quá 20 ký tự";
+    }
+    if (!/[A-Z]/.test(password)) {
+      return "Mật khẩu phải có ít nhất một chữ hoa";
+    }
+    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+      return "Mật khẩu phải có ít nhất một ký tự đặc biệt";
+    }
+    return "";
+  };
 
-  const age = calculateAge(day, month, year);
-  if (age === null) {
-    setError("Vui lòng chọn đầy đủ ngày sinh");
-    return;
-  }
+  const validatePhoneNumber = (phone) => {
+    if (!phone) {
+      return "Vui lòng nhập số điện thoại";
+    }
+    const phoneRegex = /^0[0-9]{9}$/;
+    if (!phoneRegex.test(phone)) {
+      if (phone.length < 10) {
+        return "Số điện thoại phải có đúng 10 chữ số";
+      } else if (phone.length > 10) {
+        return "Số điện thoại không được vượt quá 10 chữ số";
+      } else if (!phone.startsWith("0")) {
+        return "Số điện thoại phải bắt đầu bằng số 0";
+      } else {
+        return "Số điện thoại không hợp lệ";
+      }
+    }
+    return "";
+  };
 
-  if (age < 5) {
-    setError("Ứng dụng dành cho trẻ từ 5 tuổi trở lên");
-    return;
-  }
+  const validateDateOfBirth = (date) => {
+    if (!date) {
+      return "Vui lòng chọn ngày sinh";
+    }
+    const today = new Date();
+    const birthDate = new Date(date);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    if (age < 5) {
+      return "Ứng dụng dành cho trẻ từ 5 tuổi trở lên";
+    }
+    return "";
+  };
 
-  // Call API Register
-  setLoading(true);
-  try {
-    const dateOfBirth = new Date(year, month - 1, day);
-    const isMale = gender === "male";
+  // Handle input changes with validation
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
 
-    await authService.register({
-      firstName,
-      lastName,
-      email,
-      password,
-      phoneNumber,
-      dateOfBirth,
-      isMale,
-    });
+    setGeneralError("");
 
-    // 🎉 CHUYỂN ĐÚNG ROUTE OTP
-    alert("Đăng ký thành công! Mã OTP đã được gửi tới email của bạn.");
+    // Real-time validation
+    if (name === "email") {
+      setErrors((prev) => ({
+        ...prev,
+        email: validateEmail(value),
+      }));
+    } else if (name === "password") {
+      const passwordError = validatePassword(value);
+      setErrors((prev) => ({
+        ...prev,
+        password: passwordError,
+        confirmPassword: formData.confirmPassword && value !== formData.confirmPassword
+          ? "Mật khẩu không khớp"
+          : prev.confirmPassword,
+      }));
+    } else if (name === "confirmPassword") {
+      setErrors((prev) => ({
+        ...prev,
+        confirmPassword: value !== formData.password ? "Mật khẩu không khớp" : "",
+      }));
+    } else if (name === "phoneNumber") {
+      setErrors((prev) => ({
+        ...prev,
+        phoneNumber: validatePhoneNumber(value),
+      }));
+    }
+  };
 
-    navigate("/otp", {
-      state: { email }, // truyền email sang OTP
-    });
+  // Handle date change
+  const handleDateChange = (date) => {
+    setFormData((prev) => ({
+      ...prev,
+      dateOfBirth: date,
+    }));
 
-  } catch (err) {
-    setError(err.response?.data?.message || "Đăng ký thất bại. Vui lòng thử lại.");
-  } finally {
-    setLoading(false);
-  }
-};
+    setGeneralError("");
+    setErrors((prev) => ({
+      ...prev,
+      dateOfBirth: validateDateOfBirth(date),
+    }));
+  };
 
+  // Handle gender change
+  const handleGenderChange = (e) => {
+    const value = e.target.value;
+    setFormData((prev) => ({
+      ...prev,
+      gender: value,
+    }));
+
+    setGeneralError("");
+    setErrors((prev) => ({
+      ...prev,
+      gender: value ? "" : "Vui lòng chọn giới tính",
+    }));
+  };
+
+  // Handle form submission
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    setGeneralError("");
+
+    // Validate all fields
+    const validationErrors = {
+      firstName: !formData.firstName ? "Vui lòng nhập tên" : formData.firstName.length > 20 ? "Tên không được vượt quá 20 ký tự" : "",
+      lastName: !formData.lastName ? "Vui lòng nhập họ" : formData.lastName.length > 20 ? "Họ không được vượt quá 20 ký tự" : "",
+      email: validateEmail(formData.email),
+      password: validatePassword(formData.password),
+      confirmPassword: formData.confirmPassword
+        ? (formData.password !== formData.confirmPassword ? "Mật khẩu không khớp" : "")
+        : "Vui lòng xác nhận mật khẩu",
+      phoneNumber: validatePhoneNumber(formData.phoneNumber),
+      dateOfBirth: validateDateOfBirth(formData.dateOfBirth),
+      gender: formData.gender ? "" : "Vui lòng chọn giới tính",
+    };
+
+    setErrors(validationErrors);
+
+    // Check if there are any errors
+    if (Object.values(validationErrors).some((error) => error)) {
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await authService.register({
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        password: formData.password,
+        phoneNumber: formData.phoneNumber,
+        dateOfBirth: formData.dateOfBirth,
+        isMale: formData.gender === "male",
+      });
+
+      // Lưu thông tin đăng ký vào sessionStorage để có thể gửi lại OTP
+      const registerData = {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        password: formData.password,
+        phoneNumber: formData.phoneNumber,
+        dateOfBirth: formData.dateOfBirth,
+        isMale: formData.gender === "male",
+      };
+      sessionStorage.setItem("pendingRegisterData", JSON.stringify(registerData));
+
+      // Navigate to OTP page
+      navigate("/otp", {
+        state: { email: formData.email },
+      });
+    } catch (err) {
+      setGeneralError(
+        err.response?.data?.message || "Đăng ký thất bại. Vui lòng thử lại."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Gender options
+  const genderOptions = [
+    { value: "male", label: "Nam" },
+    { value: "female", label: "Nữ" },
+  ];
 
   return (
     <div className="auth-container">
@@ -119,189 +245,124 @@ const handleRegister = async () => {
       <div className="auth-card">
         <h1 className="auth-title">Tạo tài khoản của bạn</h1>
 
-        {/* Error message */}
-        {error && (
-          <div style={{ color: "red", marginBottom: "15px", fontSize: "14px" }}>
-            {error}
-          </div>
+        {/* General error message */}
+        {generalError && (
+          <div className="auth-error-message">{generalError}</div>
         )}
 
-        {/* NAME */}
-        <div className="row">
-          <input 
-            className="auth-input" 
-            placeholder="First name"
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
-            disabled={loading}
-          />
-          <input 
-            className="auth-input" 
-            placeholder="Last name"
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-            disabled={loading}
-          />
-        </div>
+        <form onSubmit={handleRegister}>
+          {/* Name Row */}
+          <div className="form-row">
+            <InputField
+              type="text"
+              name="firstName"
+              placeholder="Tên"
+              value={formData.firstName}
+              onChange={handleInputChange}
+              error={errors.firstName}
+              disabled={loading}
+              maxLength={20}
+            />
+            <InputField
+              type="text"
+              name="lastName"
+              placeholder="Họ"
+              value={formData.lastName}
+              onChange={handleInputChange}
+              error={errors.lastName}
+              disabled={loading}
+              maxLength={20}
+            />
+          </div>
 
-        {/* BASIC INFO */}
-        <input 
-          className="auth-input" 
-          placeholder="Email"
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          disabled={loading}
-        />
-        {/* Password */}
-        <div className="password-wrapper">
-          <input 
-            className="auth-input" 
+          {/* Email */}
+          <InputField
+            type="email"
+            name="email"
+            placeholder="Email"
+            value={formData.email}
+            onChange={handleInputChange}
+            error={errors.email}
+            disabled={loading}
+          />
+
+          {/* Password */}
+          <InputField
+            type="password"
+            name="password"
             placeholder="Tạo mật khẩu"
-            type={showPassword ? "text" : "password"}
-            value={password}
-            onChange={(e) => {
-              setPassword(e.target.value);
-              if (confirmPassword && e.target.value !== confirmPassword) {
-                setPasswordMatchError("Mật khẩu không khớp");
-              } else {
-                setPasswordMatchError("");
-              }
-            }}
+            value={formData.password}
+            onChange={handleInputChange}
+            error={errors.password}
             disabled={loading}
+            showPasswordToggle={true}
+            showPassword={showPassword}
+            onTogglePassword={() => setShowPassword(!showPassword)}
           />
-          <span
-            className="toggle-password"
-            onClick={() => setShowPassword(!showPassword)}
-          >
-            {showPassword ? <FaEyeSlash /> : <FaEye />}
-          </span>
-        </div>
 
-        {/* Confirm Password */}
-        <div className="password-wrapper">
-          <input 
-            className="auth-input" 
+          {/* Confirm Password */}
+          <InputField
+            type="password"
+            name="confirmPassword"
             placeholder="Xác nhận mật khẩu"
-            type={showConfirmPassword ? "text" : "password"}
-            value={confirmPassword}
-            onChange={(e) => {
-              setConfirmPassword(e.target.value);
-              if (password && e.target.value !== password) {
-                setPasswordMatchError("Mật khẩu không khớp");
-              } else {
-                setPasswordMatchError("");
-              }
-            }}
+            value={formData.confirmPassword}
+            onChange={handleInputChange}
+            error={errors.confirmPassword}
+            disabled={loading}
+            showPasswordToggle={true}
+            showPassword={showConfirmPassword}
+            onTogglePassword={() => setShowConfirmPassword(!showConfirmPassword)}
+          />
+
+          {/* Phone Number */}
+          <InputField
+            type="tel"
+            name="phoneNumber"
+            placeholder="Số điện thoại"
+            value={formData.phoneNumber}
+            onChange={handleInputChange}
+            error={errors.phoneNumber}
             disabled={loading}
           />
-          <span
-            className="toggle-password"
-            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-          >
-            {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
-          </span>
-        </div>
 
-        {/* Password match error */}
-        {passwordMatchError && (
-          <div style={{ color: "#ff4d4f", fontSize: "13px", marginTop: "-8px", marginBottom: "8px" }}>
-            {passwordMatchError}
-          </div>
-        )}
-        <input 
-          className="auth-input" 
-          placeholder="Số điện thoại"
-          value={phoneNumber}
-          onChange={(e) => setPhoneNumber(e.target.value)}
-          disabled={loading}
-        />
-
-        {/* DOB + GENDER */}
-        <div className="row">
-          <div className="select-wrapper">
-            <select
-              className="auth-input"
-              value={day}
-              onChange={(e) => setDay(e.target.value)}
-            >
-              <option value="">Date</option>
-              {Array.from(
-                { length: getDaysInMonth(month, year) },
-                (_, i) => (
-                  <option key={i + 1} value={i + 1}>
-                    {i + 1}
-                  </option>
-                )
+          {/* Date of Birth and Gender Row */}
+          <div className="form-row date-gender-row">
+            <div className="date-picker-wrapper">
+              <DatePicker
+                value={formData.dateOfBirth}
+                onChange={handleDateChange}
+                disabled={loading}
+                hasError={!!errors.dateOfBirth}
+              />
+              {errors.dateOfBirth && (
+                <span className="input-field-error">{errors.dateOfBirth}</span>
               )}
-            </select>
-            <span className="select-arrow">▼</span>
+            </div>
+
+            <div className="gender-wrapper">
+              <SelectField
+                name="gender"
+                value={formData.gender}
+                onChange={handleGenderChange}
+                options={genderOptions}
+                placeholder="Giới tính"
+                error={errors.gender}
+                disabled={loading}
+              />
+            </div>
           </div>
 
-          <div className="select-wrapper">
-            <select
-              className="auth-input"
-              value={month}
-              onChange={(e) => {
-                setMonth(e.target.value);
-                setDay("");
-              }}
-            >
-              <option value="">Month</option>
-              {Array.from({ length: 12 }, (_, i) => (
-                <option key={i + 1} value={i + 1}>
-                  {i + 1}
-                </option>
-              ))}
-            </select>
-            <span className="select-arrow">▼</span>
-          </div>
+          {/* Submit Button */}
+          <button
+            className="auth-btn primary"
+            type="submit"
+            disabled={loading}
+          >
+            {loading ? "Đang đăng ký..." : "Đăng ký"}
+          </button>
+        </form>
 
-          <div className="select-wrapper">
-            <select
-              className="auth-input"
-              value={year}
-              onChange={(e) => {
-                setYear(e.target.value);
-                setDay("");
-              }}
-            >
-              <option value="">Year</option>
-              {Array.from({ length: 100 }, (_, i) => {
-                const y = new Date().getFullYear() - i;
-                return (
-                  <option key={y} value={y}>
-                    {y}
-                  </option>
-                );
-              })}
-            </select>
-            <span className="select-arrow">▼</span>
-          </div>
-
-          <div className="select-wrapper">
-            <select
-              className="auth-input"
-              value={gender}
-              onChange={(e) => setGender(e.target.value)}
-            >
-              <option value="">Gender</option>
-              <option value="male">Nam</option>
-              <option value="female">Nữ</option>
-           
-            </select>
-            <span className="select-arrow">▼</span>
-          </div>
-        </div>
-
-        <button 
-          className="auth-btn primary" 
-          onClick={handleRegister}
-          disabled={loading}
-        >
-          {loading ? "Đang đăng ký..." : "Đăng ký"}
-        </button>
-
+        {/* Footer */}
         <p className="auth-footer">
           Đã có tài khoản?{" "}
           <span className="auth-link" onClick={() => navigate("/login")}>
@@ -312,4 +373,3 @@ const handleRegister = async () => {
     </div>
   );
 }
-

@@ -13,18 +13,20 @@ export default function InputField({
     onTogglePassword,
     showPassword = false,
     name,
+    maxLength,
 }) {
     return (
         <div className="input-field-wrapper">
             <div className={`input-field-container ${error ? "error" : ""}`}>
                 <input
-                    type={showPasswordToggle && !showPassword ? "password" : type}
+                    type={showPasswordToggle ? (showPassword ? "text" : "password") : type}
                     className="input-field"
                     placeholder={placeholder}
                     value={value}
                     onChange={onChange}
                     disabled={disabled}
                     name={name}
+                    maxLength={maxLength !== undefined ? maxLength : (showPasswordToggle ? 20 : undefined)}
                 />
                 {showPasswordToggle && (
                     <button

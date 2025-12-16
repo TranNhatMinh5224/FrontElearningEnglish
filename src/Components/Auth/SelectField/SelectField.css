@@ -1,0 +1,23 @@
+.select-field-wrapper {
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+.select-field-container {
+    position: relative;
+    width: 100%;
+}
+
+.select-field-container.error .scroll-picker-container {
+    border-color: #ef4444;
+    background: #fef2f2;
+}
+
+.select-field-error {
+    display: block;
+    color: #ef4444;
+    font-size: 13px;
+    margin-top: 6px;
+    margin-left: 4px;
+    text-align: left;
+}

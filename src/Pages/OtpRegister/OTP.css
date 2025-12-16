@@ -44,15 +44,28 @@
   transition: 0.2s;
 }
 
-.otp-input:focus {
+.otp-input:focus:not(:disabled) {
   border-color: #7f56d9;
   box-shadow: 0 0 5px rgba(127, 86, 217, 0.3);
+}
+
+.otp-input:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+  opacity: 0.6;
 }
 
 .otp-error {
   color: #e44;
   margin-bottom: 10px;
   font-size: 14px;
+  min-height: 20px;
+  text-align: left;
+}
+
+.otp-error-max {
+  color: #d32f2f;
+  font-weight: 600;
 }
 
 .otp-btn {
@@ -66,10 +79,18 @@
   font-size: 17px;
   cursor: pointer;
   transition: 0.2s;
+  font-weight: 600;
 }
 
-.otp-btn:hover {
+.otp-btn:hover:not(:disabled) {
   opacity: 0.85;
+  transform: translateY(-1px);
+}
+
+.otp-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .otp-resend {
@@ -79,7 +100,23 @@
 }
 
 .resend-btn {
+  background: none;
+  border: none;
   color: #d447b6;
   cursor: pointer;
   font-weight: 600;
+  padding: 0;
+  font-size: 14px;
+  transition: opacity 0.2s ease;
+  text-decoration: underline;
+}
+
+.resend-btn:hover:not(:disabled) {
+  opacity: 0.8;
+}
+
+.resend-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  text-decoration: none;
 }

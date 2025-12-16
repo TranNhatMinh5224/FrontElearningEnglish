@@ -51,6 +51,7 @@
     border-radius: 8px;
     margin-bottom: 24px;
     font-size: 14px;
+    text-align: left;
 }
 
 .success-message {
@@ -62,6 +63,7 @@
     font-size: 14px;
     font-weight: 500;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    text-align: left;
 }
 
 .form-group {
@@ -125,6 +127,26 @@
 .form-group textarea {
     resize: vertical;
     min-height: 100px;
+}
+
+.form-group input.error,
+.form-group textarea.error {
+    border-color: var(--color-status-error, #ef4444);
+}
+
+.form-group input.error:focus,
+.form-group textarea.error:focus {
+    border-color: var(--color-status-error, #ef4444);
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+}
+
+.input-error {
+    display: block;
+    color: var(--color-status-error, #ef4444);
+    font-size: 13px;
+    margin-top: 6px;
+    margin-left: 4px;
+    text-align: left;
 }
 
 .form-actions {
