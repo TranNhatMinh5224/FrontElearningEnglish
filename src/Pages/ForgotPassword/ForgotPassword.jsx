@@ -8,6 +8,7 @@ export default function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSendOTP = async () => {
   setError("");
@@ -18,6 +19,7 @@ export default function ForgotPassword() {
     return;
   }
 
+  setLoading(true);
   try {
     const res = await authService.forgotPassword({ email });
 
@@ -36,6 +38,8 @@ export default function ForgotPassword() {
 
     const msg = err.response?.data?.message || "Email không hợp lệ.";
     setError(msg);
+  } finally {
+    setLoading(false);
   }
 };
 
@@ -56,13 +60,14 @@ export default function ForgotPassword() {
           placeholder="email@example.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          disabled={loading}
         />
 
         {error && <p className="forgot-error">{error}</p>}
         {success && <p className="forgot-success">{success}</p>}
 
-        <button className="forgot-btn" onClick={handleSendOTP}>
-          Gửi mã OTP
+        <button className="forgot-btn" onClick={handleSendOTP} disabled={loading}>
+          {loading ? "Đang gửi..." : "Gửi mã OTP"}
         </button>
 
         <p className="forgot-back" onClick={() => navigate("/login")}>

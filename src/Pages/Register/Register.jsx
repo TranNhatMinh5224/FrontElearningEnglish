@@ -3,6 +3,7 @@ import "../Register/Register.css";
 import Header from "../../Components/Header/LogoHeader";
 import { useNavigate } from "react-router-dom";
 import { authService } from "../../Services/authService";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -19,6 +20,9 @@ export default function Register() {
   const [gender, setGender] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [passwordMatchError, setPasswordMatchError] = useState("");
 
   const getDaysInMonth = (m, y) => {
     if (!m) return 31;
@@ -149,22 +153,62 @@ const handleRegister = async () => {
           onChange={(e) => setEmail(e.target.value)}
           disabled={loading}
         />
-        <input 
-          className="auth-input" 
-          placeholder="Tạo mật khẩu"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          disabled={loading}
-        />
-        <input 
-          className="auth-input" 
-          placeholder="Xác nhận mật khẩu"
-          type="password"
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-          disabled={loading}
-        />
+        {/* Password */}
+        <div className="password-wrapper">
+          <input 
+            className="auth-input" 
+            placeholder="Tạo mật khẩu"
+            type={showPassword ? "text" : "password"}
+            value={password}
+            onChange={(e) => {
+              setPassword(e.target.value);
+              if (confirmPassword && e.target.value !== confirmPassword) {
+                setPasswordMatchError("Mật khẩu không khớp");
+              } else {
+                setPasswordMatchError("");
+              }
+            }}
+            disabled={loading}
+          />
+          <span
+            className="toggle-password"
+            onClick={() => setShowPassword(!showPassword)}
+          >
+            {showPassword ? <FaEyeSlash /> : <FaEye />}
+          </span>
+        </div>
+
+        {/* Confirm Password */}
+        <div className="password-wrapper">
+          <input 
+            className="auth-input" 
+            placeholder="Xác nhận mật khẩu"
+            type={showConfirmPassword ? "text" : "password"}
+            value={confirmPassword}
+            onChange={(e) => {
+              setConfirmPassword(e.target.value);
+              if (password && e.target.value !== password) {
+                setPasswordMatchError("Mật khẩu không khớp");
+              } else {
+                setPasswordMatchError("");
+              }
+            }}
+            disabled={loading}
+          />
+          <span
+            className="toggle-password"
+            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+          >
+            {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+          </span>
+        </div>
+
+        {/* Password match error */}
+        {passwordMatchError && (
+          <div style={{ color: "#ff4d4f", fontSize: "13px", marginTop: "-8px", marginBottom: "8px" }}>
+            {passwordMatchError}
+          </div>
+        )}
         <input 
           className="auth-input" 
           placeholder="Số điện thoại"

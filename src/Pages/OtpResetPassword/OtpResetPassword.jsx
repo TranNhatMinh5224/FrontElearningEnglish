@@ -66,10 +66,36 @@ export default function OtpResetPassword() {
       if (res.data?.success) {
         navigate("/reset-password", { state: { email, otpCode: code } });
       } else {
-        setErrorMessage(res.data?.message || "Mã OTP không hợp lệ.");
+        const errorMsg = res.data?.message || "Mã OTP không hợp lệ.";
+        setErrorMessage(errorMsg);
+        
+        // Xóa hết OTP để nhập lại
+        setOtp(["", "", "", "", "", ""]);
+        setTimeout(() => inputRefs.current[0]?.focus(), 100);
+
+        // Kiểm tra hết lần thử → quay về forgot-password
+        if (errorMsg.includes("quá") || errorMsg.includes("5 lần")) {
+          setTimeout(() => {
+            alert("Bạn đã nhập sai quá 5 lần. Vui lòng yêu cầu mã OTP mới.");
+            navigate("/forgot-password");
+          }, 1500);
+        }
       }
     } catch (err) {
-      setErrorMessage(err.response?.data?.message || "Mã OTP không hợp lệ.");
+      const msg = err.response?.data?.message || "Mã OTP không hợp lệ.";
+      setErrorMessage(msg);
+      
+      // Xóa hết OTP để nhập lại
+      setOtp(["", "", "", "", "", ""]);
+      setTimeout(() => inputRefs.current[0]?.focus(), 100);
+
+      // Kiểm tra hết lần thử → quay về forgot-password
+      if (msg.includes("quá") || msg.includes("5 lần")) {
+        setTimeout(() => {
+          alert("Bạn đã nhập sai quá 5 lần. Vui lòng yêu cầu mã OTP mới.");
+          navigate("/forgot-password");
+        }, 1500);
+      }
     }
   };
 
