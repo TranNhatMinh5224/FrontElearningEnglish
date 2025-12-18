@@ -1,5 +1,5 @@
 .home-container {
-  padding: 30px 40px;
+  padding: 30px 80px;
   padding-top: calc(30px + 70px);
   background: var(--color-bg-secondary, #f6f8fb);
   min-height: calc(100vh - 70px);
@@ -21,6 +21,7 @@
 
 @media (max-width: 768px) {
   .home-container {
-    padding: 20px;
+    padding: 20px 30px;
+    padding-top: calc(20px + 70px);
   }
 }

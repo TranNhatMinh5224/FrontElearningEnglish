@@ -2,6 +2,7 @@ import React from "react";
 import "./UpgradeCard.css";
 
 export default function UpgradeCard({
+    teacherPackageId,
     packageType,
     title,
     description,
@@ -22,7 +23,7 @@ export default function UpgradeCard({
             <strong>{price}</strong>
             <button
                 className="upgrade-btn"
-                onClick={(e) => onUpgradeClick?.(e, packageType)}
+                onClick={(e) => onUpgradeClick?.(e, teacherPackageId, packageType)}
             >
                 Nâng cấp
             </button>

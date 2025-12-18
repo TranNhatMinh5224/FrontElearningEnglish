@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import UpgradeCard from "../UpgradeCard/UpgradeCard";
+import { teacherPackageService } from "../../../Services/teacherPackageService";
 import "./AccountUpgradeSection.css";
 
 export default function AccountUpgradeSection({
@@ -8,20 +9,69 @@ export default function AccountUpgradeSection({
     onPackageLeave,
     onUpgradeClick,
 }) {
-    const packages = [
-        {
-            packageType: "vip",
-            title: "VIP",
-            description: "Tham gia vào bài học cao cấp",
-            price: "299.000đ/tháng",
-        },
-        {
-            packageType: "premium",
-            title: "Premium",
-            description: "Trở thành giáo viên",
-            price: "399.000đ/tháng",
-        },
-    ];
+    const [packages, setPackages] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
+
+    useEffect(() => {
+        const fetchPackages = async () => {
+            try {
+                setLoading(true);
+                const response = await teacherPackageService.getAll();
+                const packagesData = response.data?.data || [];
+                
+                // Map API data to component format
+                const mappedPackages = packagesData.map((pkg) => ({
+                    teacherPackageId: pkg.teacherPackageId,
+                    packageType: pkg.packageName?.toLowerCase() || "",
+                    title: pkg.packageName || "",
+                    description: `Gói ${pkg.packageName} Teacher Package`,
+                    price: `${pkg.price?.toLocaleString("vi-VN") || 0}đ/tháng`,
+                    level: pkg.level || "",
+                }));
+                
+                setPackages(mappedPackages);
+                setError("");
+            } catch (err) {
+                console.error("Error fetching teacher packages:", err);
+                setError("Không thể tải danh sách gói nâng cấp");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchPackages();
+    }, []);
+
+    if (loading) {
+        return (
+            <div className="account-upgrade-section">
+                <h2>Nâng cấp tài khoản</h2>
+                <p>
+                    Mở khoá toàn bộ tính năng, tham gia lớp học và đồng hành cùng học sinh
+                    tốt hơn
+                </p>
+                <div className="package-grid">
+                    <div style={{ textAlign: "center", padding: "20px" }}>Đang tải...</div>
+                </div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="account-upgrade-section">
+                <h2>Nâng cấp tài khoản</h2>
+                <p>
+                    Mở khoá toàn bộ tính năng, tham gia lớp học và đồng hành cùng học sinh
+                    tốt hơn
+                </p>
+                <div className="package-grid">
+                    <div style={{ textAlign: "center", padding: "20px", color: "red" }}>{error}</div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="account-upgrade-section">
@@ -33,13 +83,14 @@ export default function AccountUpgradeSection({
             <div className="package-grid">
                 {packages.map((pkg) => (
                     <UpgradeCard
-                        key={pkg.packageType}
+                        key={pkg.teacherPackageId}
+                        teacherPackageId={pkg.teacherPackageId}
                         packageType={pkg.packageType}
                         title={pkg.title}
                         description={pkg.description}
                         price={pkg.price}
-                        isSelected={selectedPackage === pkg.packageType}
-                        onMouseEnter={() => onPackageHover?.(pkg.packageType)}
+                        isSelected={selectedPackage === pkg.teacherPackageId}
+                        onMouseEnter={() => onPackageHover?.(pkg.teacherPackageId)}
                         onMouseLeave={onPackageLeave}
                         onUpgradeClick={onUpgradeClick}
                     />

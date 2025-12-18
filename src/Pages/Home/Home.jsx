@@ -14,23 +14,22 @@ import WelcomeFooter from "../../Components/Welcome/WelcomeFooter";
 export default function Home() {
   const { user, isGuest } = useAuth();
   const navigate = useNavigate();
-  const [selectedPackage, setSelectedPackage] = useState(null); // null, 'vip', hoặc 'premium'
+  const [selectedPackage, setSelectedPackage] = useState(null); // null hoặc teacherPackageId
 
   const displayName = isGuest ? "bạn" : user?.fullName || "bạn";
 
-  const handlePackageHover = (packageType) => {
-    setSelectedPackage(packageType);
+  const handlePackageHover = (teacherPackageId) => {
+    setSelectedPackage(teacherPackageId);
   };
 
   const handlePackageLeave = () => {
-    // Giữ nguyên selected package khi hover ra (hoặc có thể set về null nếu muốn)
-    // setSelectedPackage(null);
+    setSelectedPackage(null);
   };
 
-  const handleUpgradeClick = (e, packageType) => {
+  const handleUpgradeClick = (e, teacherPackageId, packageType) => {
     e.stopPropagation(); // Ngăn event bubble lên package card
-    // Navigate đến trang thanh toán với package type
-    navigate(`/payment?package=${packageType}`);
+    // Navigate đến trang thanh toán với teacherPackageId
+    navigate(`/payment?packageId=${teacherPackageId}&package=${packageType}`);
   };
 
   return (

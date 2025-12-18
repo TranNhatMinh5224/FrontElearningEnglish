@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./MyCourses.css";
 import MainHeader from "../../Components/Header/MainHeader";
@@ -7,6 +7,8 @@ import RegisteredCourseCard from "../../Components/Courses/RegisteredCourseCard/
 import PublicCourseCard from "../../Components/Courses/PublicCourseCard/PublicCourseCard";
 import { FaSearch, FaPlus } from "react-icons/fa";
 import { enrollmentService } from "../../Services/enrollmentService";
+import { courseService } from "../../Services/courseService";
+import mochiKhoaHocImage from "../../Assets/Logo/mochi-khoahoc.jpg";
 
 export default function MyCourses() {
     const navigate = useNavigate();
@@ -14,67 +16,86 @@ export default function MyCourses() {
     const [searchQuery, setSearchQuery] = useState("");
     const [registeredCourses, setRegisteredCourses] = useState([]);
     const [publicCourses, setPublicCourses] = useState([]);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
 
-    // Mock data - sau này sẽ thay thế bằng API call
-    React.useEffect(() => {
-        // TODO: Gọi API để lấy registered courses và public courses
-        // const fetchCourses = async () => {
-        //   try {
-        //     const registeredRes = await enrollmentService.getMyCourses();
-        //     const publicRes = await courseService.getSystemCourses();
-        //     setRegisteredCourses(registeredRes.data.data);
-        //     setPublicCourses(publicRes.data.data);
-        //   } catch (error) {
-        //     console.error("Error fetching courses:", error);
-        //   }
-        // };
-        // fetchCourses();
+    useEffect(() => {
+        const fetchCourses = async () => {
+            try {
+                setLoading(true);
+                setError("");
+
+                // 1. Lấy danh sách khóa học đã đăng ký
+                const registeredRes = await enrollmentService.getMyCourses();
+                const registeredData = registeredRes.data?.data || [];
+                
+                const mappedRegisteredCourses = registeredData.map((course) => ({
+                    id: course.courseId,
+                    title: course.title,
+                    imageUrl: course.imageUrl && course.imageUrl.trim() !== "" 
+                        ? course.imageUrl 
+                        : mochiKhoaHocImage,
+                    progress: Math.round(course.progressPercentage || 0),
+                }));
+
+                // 2. Lấy danh sách khóa học hệ thống và lọc chỉ lấy isFeatured = true
+                const publicRes = await courseService.getSystemCourses();
+                const publicData = publicRes.data?.data || [];
+                
+                const featuredCourses = publicData.filter(
+                    (course) => course.isFeatured === true
+                );
+                
+                const mappedPublicCourses = featuredCourses.map((course) => ({
+                    id: course.courseId,
+                    title: course.title,
+                    imageUrl: course.imageUrl && course.imageUrl.trim() !== "" 
+                        ? course.imageUrl 
+                        : mochiKhoaHocImage,
+                }));
+
+                setRegisteredCourses(mappedRegisteredCourses);
+                setPublicCourses(mappedPublicCourses);
+            } catch (err) {
+                console.error("Error fetching courses:", err);
+                setError("Không thể tải danh sách khóa học");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchCourses();
     }, []);
 
     const handleJoinClass = async (classCode) => {
         try {
-            setLoading(true);
-            // TODO: Gọi API để join class
-            // await enrollmentService.joinByClassCode({ classCode });
-            console.log("Joining class with code:", classCode);
+            await enrollmentService.joinByClassCode({ classCode });
             setIsModalOpen(false);
             // Refresh courses list
+            const registeredRes = await enrollmentService.getMyCourses();
+            const registeredData = registeredRes.data?.data || [];
+            const mappedRegisteredCourses = registeredData.map((course) => ({
+                id: course.courseId,
+                title: course.title,
+                imageUrl: course.imageUrl && course.imageUrl.trim() !== "" 
+                    ? course.imageUrl 
+                    : mochiKhoaHocImage,
+                progress: Math.round(course.progressPercentage || 0),
+            }));
+            setRegisteredCourses(mappedRegisteredCourses);
         } catch (error) {
             console.error("Error joining class:", error);
             alert("Không thể tham gia lớp học. Vui lòng kiểm tra lại mã lớp.");
-        } finally {
-            setLoading(false);
         }
     };
 
     const handleContinueCourse = (course) => {
-        // Navigate to course detail or learning page
         navigate(`/course/${course.id}`);
     };
 
     const handleStartCourse = (course) => {
-        // Navigate to course detail or enroll
         navigate(`/course/${course.id}`);
     };
-
-    // Mock data
-    const mockRegisteredCourses = [
-        { id: 1, title: "IELTS 6.5", progress: 40 },
-        { id: 2, title: "IELTS 6.5", progress: 40 },
-        { id: 3, title: "IELTS 6.5", progress: 40 },
-        { id: 4, title: "IELTS 6.5", progress: 40 },
-    ];
-
-    const mockPublicCourses = [
-        { id: 5, title: "IELTS 6.5" },
-        { id: 6, title: "IELTS 6.5" },
-        { id: 7, title: "IELTS 6.5" },
-        { id: 8, title: "IELTS 6.5" },
-    ];
-
-    const displayRegisteredCourses = registeredCourses.length > 0 ? registeredCourses : mockRegisteredCourses;
-    const displayPublicCourses = publicCourses.length > 0 ? publicCourses : mockPublicCourses;
 
     return (
         <>
@@ -104,30 +125,50 @@ export default function MyCourses() {
 
                 {/* Registered Courses */}
                 <section className="courses-section">
-                    <h2>Khoá học đã đăng ký.</h2>
-                    <div className="courses-grid">
-                        {displayRegisteredCourses.map((course) => (
-                            <RegisteredCourseCard
-                                key={course.id}
-                                course={course}
-                                onContinue={handleContinueCourse}
-                            />
-                        ))}
-                    </div>
+                    <h2>Khoá học đã đăng ký</h2>
+                    {loading ? (
+                        <div className="loading-message">Đang tải khóa học...</div>
+                    ) : error ? (
+                        <div className="error-message">{error}</div>
+                    ) : registeredCourses.length > 0 ? (
+                        <div className="course-grid-wrapper">
+                            <div className="course-grid">
+                                {registeredCourses.map((course) => (
+                                    <RegisteredCourseCard
+                                        key={course.id}
+                                        course={course}
+                                        onContinue={handleContinueCourse}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="no-courses-message">Chưa có khóa học đã đăng ký</div>
+                    )}
                 </section>
 
                 {/* Public Courses */}
                 <section className="courses-section">
                     <h2>Khoá học công khai</h2>
-                    <div className="courses-grid">
-                        {displayPublicCourses.map((course) => (
-                            <PublicCourseCard
-                                key={course.id}
-                                course={course}
-                                onStart={handleStartCourse}
-                            />
-                        ))}
-                    </div>
+                    {loading ? (
+                        <div className="loading-message">Đang tải khóa học...</div>
+                    ) : error ? (
+                        <div className="error-message">{error}</div>
+                    ) : publicCourses.length > 0 ? (
+                        <div className="course-grid-wrapper">
+                            <div className="course-grid">
+                                {publicCourses.map((course) => (
+                                    <PublicCourseCard
+                                        key={course.id}
+                                        course={course}
+                                        onStart={handleStartCourse}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="no-courses-message">Chưa có khóa học công khai</div>
+                    )}
                 </section>
             </div>
 

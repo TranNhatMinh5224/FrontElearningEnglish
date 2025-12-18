@@ -3,3 +3,41 @@
     margin-bottom: 20px;
     color: var(--color-text-primary, #1f2937);
 }
+
+.suggested-courses-list {
+    max-height: calc(3 * (44px + 14px + 16px * 2)); /* 3 cards với margin và padding */
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 5px;
+    /* Ẩn scrollbar nhưng vẫn cho phép scroll */
+    scrollbar-width: thin; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+}
+
+/* Ẩn scrollbar cho Chrome, Safari và Opera */
+.suggested-courses-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.suggested-courses-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.suggested-courses-list::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+}
+
+.suggested-courses-list::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+.loading-message,
+.error-message,
+.no-courses-message {
+    text-align: center;
+    padding: 20px;
+    color: var(--color-text-secondary, #6b7280);
+    font-size: 14px;
+}

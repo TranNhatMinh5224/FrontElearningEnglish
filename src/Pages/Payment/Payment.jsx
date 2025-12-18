@@ -8,7 +8,8 @@ import { FaArrowLeft } from "react-icons/fa";
 export default function Payment() {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
-    const packageType = searchParams.get("package"); // 'vip' hoặc 'premium'
+    const packageId = searchParams.get("packageId"); // teacherPackageId từ Home
+    const packageType = searchParams.get("package"); // fallback: packageType string
 
     const [qrCode, setQrCode] = useState("");
     const [loading, setLoading] = useState(true);
@@ -20,14 +21,24 @@ export default function Payment() {
                 setLoading(true);
                 setError("");
 
-                // 1. Lấy danh sách packages để tìm packageId
-                const packagesResponse = await teacherPackageService.getAll();
-                const packages = packagesResponse.data.data || [];
+                let selectedPackage = null;
 
-                // Tìm package dựa trên packageType (so sánh với PackageName)
-                const selectedPackage = packages.find(
-                    (pkg) => pkg.packageName?.toLowerCase().includes(packageType?.toLowerCase() || "")
-                );
+                // Nếu có packageId, sử dụng trực tiếp
+                if (packageId) {
+                    const packagesResponse = await teacherPackageService.getAll();
+                    const packages = packagesResponse.data?.data || [];
+                    selectedPackage = packages.find(
+                        (pkg) => pkg.teacherPackageId === parseInt(packageId)
+                    );
+                } 
+                // Nếu không có packageId, tìm theo packageType (backward compatibility)
+                else if (packageType) {
+                    const packagesResponse = await teacherPackageService.getAll();
+                    const packages = packagesResponse.data?.data || [];
+                    selectedPackage = packages.find(
+                        (pkg) => pkg.packageName?.toLowerCase().includes(packageType?.toLowerCase() || "")
+                    );
+                }
 
                 if (!selectedPackage) {
                     setError("Không tìm thấy gói đăng ký");
@@ -35,17 +46,17 @@ export default function Payment() {
                     return;
                 }
 
-                // 2. Tạo payment với ProductType = TeacherPackage (thường là enum value, cần kiểm tra backend)
+                // 2. Tạo payment với ProductType = TeacherPackage
                 const paymentResponse = await paymentService.processPayment({
                     ProductId: selectedPackage.teacherPackageId,
-                    typeproduct: "TeacherPackage" // Cần kiểm tra enum value chính xác từ backend
+                    typeproduct: "TeacherPackage"
                 });
 
                 const paymentId = paymentResponse.data.data.paymentId;
 
                 // 3. Tạo PayOS link để lấy QR code
                 const payOsResponse = await paymentService.createPayOsLink(paymentId);
-                const qrCodeUrl = payOsResponse.data.data.qrCode; // Cần kiểm tra response structure
+                const qrCodeUrl = payOsResponse.data.data.qrCode;
 
                 setQrCode(qrCodeUrl);
                 setLoading(false);
@@ -56,13 +67,13 @@ export default function Payment() {
             }
         };
 
-        if (packageType) {
+        if (packageId || packageType) {
             processPayment();
         } else {
             setError("Không tìm thấy loại gói đăng ký");
             setLoading(false);
         }
-    }, [packageType]);
+    }, [packageId, packageType]);
 
     const handleBack = () => {
         navigate("/home");

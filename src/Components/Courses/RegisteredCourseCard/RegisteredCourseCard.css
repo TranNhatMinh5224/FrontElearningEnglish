@@ -4,6 +4,8 @@
     box-shadow: 0 4px 12px var(--shadow-sm, rgba(0, 0, 0, 0.08));
     overflow: hidden;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    flex-shrink: 0;
+    width: 260px;
 }
 
 .registered-course-card:hover {
@@ -13,7 +15,7 @@
 
 .registered-course-card img {
     width: 100%;
-    height: 160px;
+    height: 140px;
     object-fit: cover;
 }
 
@@ -26,6 +28,11 @@
     font-weight: 600;
     color: var(--color-text-primary, #1f2937);
     margin: 0 0 12px 0;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .progress-wrapper {

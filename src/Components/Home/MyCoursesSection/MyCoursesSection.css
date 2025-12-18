@@ -8,26 +8,62 @@
     color: var(--color-text-primary, #1f2937);
 }
 
-.course-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 20px;
+.course-grid-wrapper {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    margin: 0 auto;
 }
 
-@media (max-width: 1200px) {
-    .course-grid {
-        grid-template-columns: repeat(3, 1fr);
+.course-grid {
+    display: flex;
+    gap: 28px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 0 40px 15px 40px;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    position: relative;
+    justify-content: flex-start;
+    align-items: center;
+    width: 100%;
+    /* Ẩn scrollbar nhưng vẫn cho phép scroll */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+}
+
+/* Ẩn scrollbar cho Chrome, Safari và Opera */
+.course-grid::-webkit-scrollbar {
+    display: none;
+}
+
+.loading-message,
+.error-message,
+.no-courses-message {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--color-text-secondary, #6b7280);
+    font-size: 16px;
+}
+
+@media (max-width: 1024px) {
+    .course-card {
+        width: 220px;
     }
 }
 
 @media (max-width: 768px) {
+    .course-card {
+        width: 200px;
+    }
+    
     .course-grid {
-        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
     }
 }
 
 @media (max-width: 480px) {
-    .course-grid {
-        grid-template-columns: 1fr;
+    .course-card {
+        width: 180px;
     }
 }
