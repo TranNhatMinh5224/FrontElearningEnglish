@@ -98,6 +98,7 @@ export const API_ENDPOINTS = {
         STATISTICS: "/user/flashcard-review/statistics",
         GET_REVIEW_LIST: "/user/flashcard-review/review-list",
         UPDATE_REVIEW: "/user/flashcard-review/update-review",
+        START_MODULE: (moduleId) => `/user/flashcard-review/start-module/${moduleId}`,
     },
     // Essays
     ESSAYS: {

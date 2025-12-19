@@ -1,0 +1,74 @@
+.flashcard-completion-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    padding: 60px 40px;
+    text-align: center;
+}
+
+.completion-icon {
+    margin-bottom: 30px;
+    animation: scaleIn 0.5s ease-out;
+}
+
+@keyframes scaleIn {
+    from {
+        transform: scale(0);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.completion-title {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--color-text-primary, #1f2937);
+    margin: 0 0 20px 0;
+}
+
+.completion-message {
+    font-size: 18px;
+    color: var(--color-text-secondary, #6b7280);
+    line-height: 1.6;
+    margin: 0 0 40px 0;
+    max-width: 600px;
+}
+
+.completion-back-button {
+    padding: 14px 40px;
+    background: var(--color-secondary-cyan, #41d6e3);
+    color: white;
+    border: none;
+    border-radius: 30px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.completion-back-button:hover {
+    background: var(--color-secondary-cyan-dark, #35c4d0);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(65, 214, 227, 0.4);
+}
+
+@media (max-width: 768px) {
+    .flashcard-completion-screen {
+        padding: 40px 20px;
+        min-height: 50vh;
+    }
+
+    .completion-title {
+        font-size: 24px;
+    }
+
+    .completion-message {
+        font-size: 16px;
+    }
+}
+

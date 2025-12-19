@@ -27,6 +27,14 @@ const flashcardReviewService = {
     getStatistics: async () => {
         return await axiosClient.get(API_ENDPOINTS.FLASHCARD_REVIEW.STATISTICS);
     },
+
+    /**
+     * Bắt đầu học module - thêm tất cả flashcard vào hệ thống ôn tập
+     * @param {number} moduleId - ID của module
+     */
+    startModule: async (moduleId) => {
+        return await axiosClient.post(API_ENDPOINTS.FLASHCARD_REVIEW.START_MODULE(moduleId));
+    },
 };
 
 export { flashcardReviewService };
