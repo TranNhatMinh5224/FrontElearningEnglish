@@ -67,6 +67,7 @@ export const API_ENDPOINTS = {
     },
     // Lessons
     LESSONS: {
+        GET_BY_COURSE: (courseId) => `/user/lessons/course/${courseId}`,
         GET_BY_LECTURE: (lectureId) => `/user/lessons/lecture/${lectureId}`,
         GET_BY_ID: (lessonId) => `/user/lessons/${lessonId}`,
     },

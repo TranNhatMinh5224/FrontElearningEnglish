@@ -1,0 +1,49 @@
+.course-learn-header {
+    background: var(--color-primary-gradient, linear-gradient(90deg, #6fd5e0, #d447b6));
+    border-radius: 20px;
+    padding: 24px 32px;
+    margin-bottom: 24px;
+    box-shadow: 0 8px 24px rgba(111, 213, 224, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.course-learn-header::before,
+.course-learn-header::after {
+    content: "";
+    position: absolute;
+    width: 120px;
+    height: 120px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    top: -40px;
+}
+
+.course-learn-header::before {
+    left: -40px;
+}
+
+.course-learn-header::after {
+    right: -40px;
+}
+
+.course-learn-header h1 {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--color-text-white, white);
+    margin: 0;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+}
+
+@media (max-width: 768px) {
+    .course-learn-header {
+        padding: 20px 24px;
+    }
+
+    .course-learn-header h1 {
+        font-size: 24px;
+    }
+}
+
