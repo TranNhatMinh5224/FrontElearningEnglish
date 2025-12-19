@@ -6,6 +6,6 @@ export const courseService = {
     
     getCourseById: (courseId) => axiosClient.get(API_ENDPOINTS.COURSES.GET_BY_ID(courseId)),
     
-    searchCourses: (data) => axiosClient.post(API_ENDPOINTS.COURSES.SEARCH, data),
+    searchCourses: (keyword) => axiosClient.get(API_ENDPOINTS.COURSES.SEARCH, { params: { keyword } }),
 };
 

@@ -1,27 +1,35 @@
 .account-upgrade-section {
-    background: var(--color-bg-primary, white);
-    border-radius: 20px;
-    padding: 24px;
-    box-shadow: 0 10px 24px var(--shadow-sm, rgba(0, 0, 0, 0.08));
+    background: transparent;
+    padding: 0;
+    position: sticky;
+    top: calc(70px + 30px); /* Header height + padding */
+    align-self: flex-start;
 }
 
 .account-upgrade-section h2 {
-    font-size: 22px;
-    margin-bottom: 10px;
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 8px;
     color: var(--color-text-primary, #1f2937);
 }
 
 .account-upgrade-section p {
-    font-size: 14px;
+    font-size: 12px;
     color: var(--color-text-secondary, #6b7280);
-    margin-bottom: 20px;
-    line-height: 1.5;
+    margin-bottom: 14px;
+    line-height: 1.4;
 }
 
 .package-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 12px;
+    gap: 8px;
+}
+
+@media (max-width: 1024px) {
+    .account-upgrade-section {
+        position: static;
+    }
 }
 
 @media (max-width: 768px) {

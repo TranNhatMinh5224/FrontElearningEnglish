@@ -1,36 +1,32 @@
 .suggested-courses-section h2 {
-    font-size: 22px;
-    margin-bottom: 20px;
+    font-size: 26px;
+    margin-bottom: 24px;
     color: var(--color-text-primary, #1f2937);
+    font-weight: 700;
 }
 
-.suggested-courses-list {
-    max-height: calc(3 * (44px + 14px + 16px * 2)); /* 3 cards với margin và padding */
-    overflow-y: auto;
-    overflow-x: hidden;
-    padding-right: 5px;
-    /* Ẩn scrollbar nhưng vẫn cho phép scroll */
-    scrollbar-width: thin; /* Firefox */
-    -ms-overflow-style: none; /* IE and Edge */
+.suggested-courses-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
 }
 
-/* Ẩn scrollbar cho Chrome, Safari và Opera */
-.suggested-courses-list::-webkit-scrollbar {
-    width: 6px;
+@media (max-width: 1200px) {
+    .suggested-courses-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
 }
 
-.suggested-courses-list::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 10px;
+@media (max-width: 992px) {
+    .suggested-courses-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
-.suggested-courses-list::-webkit-scrollbar-thumb {
-    background: #888;
-    border-radius: 10px;
-}
-
-.suggested-courses-list::-webkit-scrollbar-thumb:hover {
-    background: #555;
+@media (max-width: 576px) {
+    .suggested-courses-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 .loading-message,

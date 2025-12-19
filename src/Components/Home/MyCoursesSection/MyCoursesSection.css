@@ -45,7 +45,6 @@
     color: var(--color-text-secondary, #6b7280);
     font-size: 16px;
 }
-
 @media (max-width: 1024px) {
     .course-card {
         width: 220px;

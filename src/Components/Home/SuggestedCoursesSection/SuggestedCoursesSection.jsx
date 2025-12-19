@@ -1,19 +1,25 @@
 import React, { useState, useEffect } from "react";
 import SuggestedCourseCard from "../SuggestedCourseCard/SuggestedCourseCard";
 import { courseService } from "../../../Services/courseService";
+import { enrollmentService } from "../../../Services/enrollmentService";
 import { mochiKhoaHoc as mochiKhoaHocImage } from "../../../Assets";
+import { useAuth } from "../../../Context/AuthContext";
 import "./SuggestedCoursesSection.css";
 
 export default function SuggestedCoursesSection({ courses = [] }) {
     const [systemCourses, setSystemCourses] = useState([]);
+    const [enrolledCourseIds, setEnrolledCourseIds] = useState(new Set());
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const { isGuest } = useAuth();
 
     useEffect(() => {
-        const fetchSystemCourses = async () => {
+        const fetchData = async () => {
             try {
                 setLoading(true);
                 setError(null);
+                
+                // Fetch system courses
                 const response = await courseService.getSystemCourses();
                 
                 if (response.data?.success && response.data?.data) {
@@ -22,12 +28,27 @@ export default function SuggestedCoursesSection({ courses = [] }) {
                         id: course.courseId,
                         courseId: course.courseId,
                         title: course.title,
-                        skill: "Hệ thống",
                         imageUrl: course.imageUrl && course.imageUrl.trim() !== "" 
                             ? course.imageUrl 
                             : mochiKhoaHocImage,
+                        price: course.price || 0,
                     }));
                     setSystemCourses(mappedCourses);
+
+                    // Fetch enrolled courses if user is authenticated
+                    if (!isGuest) {
+                        try {
+                            const enrolledResponse = await enrollmentService.getMyCourses();
+                            const enrolledData = enrolledResponse.data?.data || [];
+                            const enrolledIds = new Set(
+                                enrolledData.map((course) => course.courseId)
+                            );
+                            setEnrolledCourseIds(enrolledIds);
+                        } catch (enrollError) {
+                            console.error("Error fetching enrolled courses:", enrollError);
+                            // Continue without enrollment data
+                        }
+                    }
                 } else {
                     setSystemCourses([]);
                 }
@@ -40,8 +61,8 @@ export default function SuggestedCoursesSection({ courses = [] }) {
             }
         };
 
-        fetchSystemCourses();
-    }, []);
+        fetchData();
+    }, [isGuest]);
 
     // Use systemCourses from API, fallback to prop courses, then empty array
     const displayCourses = systemCourses.length > 0 
@@ -58,9 +79,13 @@ export default function SuggestedCoursesSection({ courses = [] }) {
             ) : error ? (
                 <div className="error-message">{error}</div>
             ) : displayCourses.length > 0 ? (
-                <div className="suggested-courses-list">
+                <div className="suggested-courses-grid">
                     {displayCourses.map((course, index) => (
-                        <SuggestedCourseCard key={course.id || index} course={course} />
+                        <SuggestedCourseCard
+                            key={course.id || index}
+                            course={course}
+                            isEnrolled={enrolledCourseIds.has(course.courseId || course.id)}
+                        />
                     ))}
                 </div>
             ) : (
