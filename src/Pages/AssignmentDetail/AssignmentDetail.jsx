@@ -27,6 +27,7 @@ export default function AssignmentDetail() {
     const [selectedAssessment, setSelectedAssessment] = useState(null);
     const [showInfoModal, setShowInfoModal] = useState(false);
     const [notification, setNotification] = useState({ isOpen: false, type: "info", message: "" });
+    const [inProgressQuizzes, setInProgressQuizzes] = useState({});
 
     useEffect(() => {
         const fetchData = async () => {
@@ -94,6 +95,123 @@ export default function AssignmentDetail() {
         return titleLower.includes("essay") || titleLower.includes("luận") || titleLower.includes("viết");
     });
 
+    // Check for in-progress quiz attempts from localStorage and verify with backend
+    useEffect(() => {
+        const checkInProgressQuizzes = async () => {
+            if (quizzes.length === 0 || loading) {
+                console.log("⏸️ [AssignmentDetail] Skipping check - quizzes.length:", quizzes.length, "loading:", loading);
+                return;
+            }
+
+            console.log("🔍 [AssignmentDetail] Checking in-progress quizzes for", quizzes.length, "quizzes");
+            
+            const progressMap = {};
+
+            // For each quiz assessment, check localStorage first, then verify with backend
+            for (const assessment of quizzes) {
+                try {
+                    console.log("🔎 [AssignmentDetail] Checking assessment:", assessment.assessmentId, assessment.title);
+                    
+                    // Get quiz by assessment
+                    const quizResponse = await quizService.getByAssessment(assessment.assessmentId);
+                    if (!quizResponse.data?.success || !quizResponse.data?.data || quizResponse.data.data.length === 0) {
+                        console.log("⚠️ [AssignmentDetail] No quiz found for assessment:", assessment.assessmentId);
+                        continue;
+                    }
+
+                    const quiz = quizResponse.data.data[0];
+                    const quizId = quiz.quizId || quiz.QuizId;
+                    console.log("📝 [AssignmentDetail] Quiz ID:", quizId);
+
+                    // Check localStorage first
+                    const savedProgressKey = `quiz_in_progress_${quizId}`;
+                    const savedProgress = localStorage.getItem(savedProgressKey);
+                    
+                    if (savedProgress) {
+                        try {
+                            const progress = JSON.parse(savedProgress);
+                            const attemptId = progress.attemptId;
+                            
+                            if (attemptId) {
+                                console.log("💾 [AssignmentDetail] Found saved progress in localStorage, verifying with backend:", attemptId);
+                                
+                                // Verify attempt is still valid by calling resume API (not getById because it doesn't exist for user)
+                                try {
+                                    const resumeResponse = await quizAttemptService.resume(attemptId);
+                                    console.log("📥 [AssignmentDetail] RESUME API response:", resumeResponse.data);
+                                    
+                                    if (resumeResponse.data?.success && resumeResponse.data?.data) {
+                                        const attempt = resumeResponse.data.data;
+                                        const status = attempt.Status || attempt.status;
+                                        console.log("📊 [AssignmentDetail] Attempt status:", status);
+                                        
+                                        // Status 1 = InProgress
+                                        if (status === 1) {
+                                            const verifiedProgress = {
+                                                quizId,
+                                                attemptId,
+                                                courseId,
+                                                lessonId,
+                                                moduleId,
+                                                startedAt: attempt.StartedAt || attempt.startedAt,
+                                                status: status,
+                                                assessmentId: assessment.assessmentId
+                                            };
+                                            
+                                            progressMap[assessment.assessmentId] = verifiedProgress;
+                                            
+                                            // Update localStorage with verified data
+                                            localStorage.setItem(savedProgressKey, JSON.stringify(verifiedProgress));
+                                            console.log("✅ [AssignmentDetail] Verified in-progress attempt:", attemptId);
+                                        } else {
+                                            // Attempt đã submit, xóa khỏi localStorage
+                                            localStorage.removeItem(savedProgressKey);
+                                            console.log("🗑️ [AssignmentDetail] Attempt already submitted, removed from localStorage. Status:", status);
+                                        }
+                                    } else {
+                                        // Attempt không tồn tại hoặc không thể resume, xóa khỏi localStorage
+                                        localStorage.removeItem(savedProgressKey);
+                                        console.log("🗑️ [AssignmentDetail] Resume failed, removed from localStorage");
+                                    }
+                                } catch (err) {
+                                    console.error("❌ [AssignmentDetail] Error verifying attempt:", attemptId, err);
+                                    console.error("Error details:", {
+                                        message: err.message,
+                                        response: err.response?.data,
+                                        status: err.response?.status
+                                    });
+                                    
+                                    // Nếu không verify được (404, 400, etc.), xóa khỏi localStorage
+                                    if (err.response?.status === 404 || err.response?.status === 400) {
+                                        localStorage.removeItem(savedProgressKey);
+                                        console.log("🗑️ [AssignmentDetail] Attempt not found or submitted (", err.response?.status, "), removed from localStorage");
+                                    }
+                                }
+                            }
+                        } catch (err) {
+                            console.error("❌ [AssignmentDetail] Error parsing saved progress:", err);
+                            localStorage.removeItem(savedProgressKey);
+                        }
+                    } else {
+                        console.log("❌ [AssignmentDetail] No saved progress in localStorage for quizId:", quizId);
+                    }
+                } catch (err) {
+                    console.error("❌ [AssignmentDetail] Error checking assessment:", assessment.assessmentId, err);
+                    console.error("Error details:", {
+                        message: err.message,
+                        response: err.response?.data,
+                        status: err.response?.status
+                    });
+                }
+            }
+
+            console.log("📊 [AssignmentDetail] Final in-progress quizzes map:", progressMap);
+            setInProgressQuizzes(progressMap);
+        };
+
+        checkInProgressQuizzes();
+    }, [quizzes.length, loading, courseId, lessonId, moduleId]); // eslint-disable-line react-hooks/exhaustive-deps
+
     const handleQuizClick = (assessment) => {
         setSelectedAssessment(assessment);
         setShowInfoModal(true);
@@ -104,40 +222,90 @@ export default function AssignmentDetail() {
         setShowInfoModal(true);
     };
 
-    const handleStartQuiz = async (assessmentData) => {
+    const handleStartQuiz = async (assessmentData, isNewAttempt = false) => {
         try {
+            console.log("🚀 [AssignmentDetail] handleStartQuiz called:", { assessmentData, isNewAttempt });
+            
             // If attemptId is already provided from modal, use it
-            if (assessmentData.attemptId && assessmentData.quizId) {
+            if (assessmentData.attemptId && assessmentData.quizId && !isNewAttempt) {
+                console.log("✅ [AssignmentDetail] Using provided attemptId:", assessmentData.attemptId);
                 navigate(`/course/${courseId}/lesson/${lessonId}/module/${moduleId}/quiz/${assessmentData.quizId}/attempt/${assessmentData.attemptId}`);
                 return;
             }
 
-            // Otherwise, get quiz and start attempt
+            // Get quiz
             const quizResponse = await quizService.getByAssessment(assessmentData.assessmentId);
-            if (quizResponse.data?.success && quizResponse.data?.data && quizResponse.data.data.length > 0) {
-                const quiz = quizResponse.data.data[0];
-                const quizId = quiz.quizId || quiz.QuizId;
-                
-                // Start quiz attempt
-                const attemptResponse = await quizAttemptService.start(quizId);
-                if (attemptResponse.data?.success && attemptResponse.data?.data) {
-                    const attemptId = attemptResponse.data.data.attemptId || attemptResponse.data.data.AttemptId;
-                    // Navigate to quiz page với attemptId
-                    navigate(`/course/${courseId}/lesson/${lessonId}/module/${moduleId}/quiz/${quizId}/attempt/${attemptId}`);
-                } else {
-                    setNotification({
-                        isOpen: true,
-                        type: "error",
-                        message: attemptResponse.data?.message || "Không thể bắt đầu làm quiz"
-                    });
+            if (!quizResponse.data?.success || !quizResponse.data?.data || quizResponse.data.data.length === 0) {
+                console.error("❌ [AssignmentDetail] Failed to get quiz for assessment:", assessmentData.assessmentId);
+                setNotification({
+                    isOpen: true,
+                    type: "error",
+                    message: "Không thể tải thông tin quiz"
+                });
+                return;
+            }
+
+            const quiz = quizResponse.data.data[0];
+            const quizId = quiz.quizId || quiz.QuizId;
+            console.log("📝 [AssignmentDetail] Quiz ID:", quizId);
+
+            // Nếu không phải attempt mới và có in-progress attempt, dùng nó
+            if (!isNewAttempt) {
+                const progress = inProgressQuizzes[assessmentData.assessmentId];
+                if (progress && progress.attemptId) {
+                    console.log("✅ [AssignmentDetail] Found in-progress attempt, navigating to:", progress.attemptId);
+                    navigate(`/course/${courseId}/lesson/${lessonId}/module/${moduleId}/quiz/${progress.quizId}/attempt/${progress.attemptId}`);
+                    return;
                 }
             }
+
+            // Start new quiz attempt
+            console.log("🆕 [AssignmentDetail] Starting new quiz attempt for quizId:", quizId);
+            const attemptResponse = await quizAttemptService.start(quizId);
+            console.log("📥 [AssignmentDetail] START API response:", attemptResponse.data);
+            
+            if (attemptResponse.data?.success && attemptResponse.data?.data) {
+                const attemptId = attemptResponse.data.data.attemptId || attemptResponse.data.data.AttemptId;
+                console.log("✅ [AssignmentDetail] New attempt created:", attemptId);
+                // Navigate to quiz page với attemptId
+                navigate(`/course/${courseId}/lesson/${lessonId}/module/${moduleId}/quiz/${quizId}/attempt/${attemptId}`);
+            } else {
+                console.error("❌ [AssignmentDetail] START API failed:", attemptResponse.data);
+                setNotification({
+                    isOpen: true,
+                    type: "error",
+                    message: attemptResponse.data?.message || "Không thể bắt đầu làm quiz"
+                });
+            }
         } catch (err) {
-            console.error("Error starting quiz:", err);
+            console.error("❌ [AssignmentDetail] Error starting quiz:", err);
+            console.error("Error details:", {
+                message: err.message,
+                response: err.response?.data,
+                status: err.response?.status,
+                stack: err.stack
+            });
             setNotification({
                 isOpen: true,
                 type: "error",
                 message: err.response?.data?.message || "Không thể bắt đầu làm quiz"
+            });
+        }
+    };
+
+    const handleContinueQuiz = async (assessment) => {
+        const progress = inProgressQuizzes[assessment.assessmentId];
+        console.log("▶️ [AssignmentDetail] handleContinueQuiz called:", { assessment, progress });
+        
+        if (progress && progress.attemptId) {
+            console.log("✅ [AssignmentDetail] Navigating to in-progress attempt:", progress.attemptId);
+            navigate(`/course/${courseId}/lesson/${lessonId}/module/${moduleId}/quiz/${progress.quizId}/attempt/${progress.attemptId}`);
+        } else {
+            console.error("❌ [AssignmentDetail] No in-progress attempt found for assessment:", assessment.assessmentId);
+            setNotification({
+                isOpen: true,
+                type: "error",
+                message: "Không tìm thấy bài quiz đang làm"
             });
         }
     };
@@ -226,6 +394,8 @@ export default function AssignmentDetail() {
                                                 key={assessment.assessmentId}
                                                 assessment={assessment}
                                                 onClick={() => handleQuizClick(assessment)}
+                                                onContinue={() => handleContinueQuiz(assessment)}
+                                                hasInProgress={!!inProgressQuizzes[assessment.assessmentId]}
                                             />
                                         ))}
                                     </div>

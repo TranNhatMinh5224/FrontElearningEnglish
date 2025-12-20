@@ -16,10 +16,19 @@ export default function AssessmentInfoModal({
     const [essay, setEssay] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const [inProgressAttempt, setInProgressAttempt] = useState(null);
+    const [checkingProgress, setCheckingProgress] = useState(false);
 
     useEffect(() => {
         if (isOpen && assessment) {
             fetchAssessmentDetails();
+        } else {
+            // Reset state when modal closes
+            setQuiz(null);
+            setEssay(null);
+            setInProgressAttempt(null);
+            setError("");
+            setCheckingProgress(false);
         }
     }, [isOpen, assessment]);
 
@@ -40,10 +49,69 @@ export default function AssessmentInfoModal({
                 try {
                     const quizResponse = await quizService.getByAssessment(assessment.assessmentId);
                     if (quizResponse.data?.success && quizResponse.data?.data && quizResponse.data.data.length > 0) {
-                        setQuiz(quizResponse.data.data[0]); // Lấy quiz đầu tiên
+                        const quizData = quizResponse.data.data[0];
+                        setQuiz(quizData); // Lấy quiz đầu tiên
+                        
+                        // Check for in-progress attempt
+                        setCheckingProgress(true);
+                        const quizId = quizData.quizId || quizData.QuizId;
+                        console.log("🔍 [AssessmentInfoModal] Checking in-progress attempt for quizId:", quizId);
+                        
+                        const savedProgress = localStorage.getItem(`quiz_in_progress_${quizId}`);
+                        if (savedProgress) {
+                            try {
+                                const progress = JSON.parse(savedProgress);
+                                if (progress.attemptId) {
+                                    console.log("💾 [AssessmentInfoModal] Found saved progress, verifying with backend:", progress.attemptId);
+                                    
+                                    // Verify attempt is still valid by calling resume API
+                                    try {
+                                        const resumeResponse = await quizAttemptService.resume(progress.attemptId);
+                                        console.log("📥 [AssessmentInfoModal] RESUME API response:", resumeResponse.data);
+                                        
+                                        if (resumeResponse.data?.success && resumeResponse.data?.data) {
+                                            const attempt = resumeResponse.data.data;
+                                            const status = attempt.Status || attempt.status;
+                                            console.log("📊 [AssessmentInfoModal] Attempt status:", status);
+                                            
+                                            if (status === 1) { // InProgress
+                                                setInProgressAttempt(progress);
+                                                console.log("✅ [AssessmentInfoModal] In-progress attempt verified:", progress.attemptId);
+                                            } else {
+                                                localStorage.removeItem(`quiz_in_progress_${quizId}`);
+                                                console.log("🗑️ [AssessmentInfoModal] Attempt already submitted, removed from localStorage");
+                                            }
+                                        } else {
+                                            localStorage.removeItem(`quiz_in_progress_${quizId}`);
+                                            console.log("🗑️ [AssessmentInfoModal] Resume failed, removed from localStorage");
+                                        }
+                                    } catch (err) {
+                                        console.error("❌ [AssessmentInfoModal] Error verifying attempt:", err);
+                                        console.error("Error details:", {
+                                            message: err.message,
+                                            response: err.response?.data,
+                                            status: err.response?.status
+                                        });
+                                        
+                                        // Nếu 404 hoặc 400, xóa khỏi localStorage
+                                        if (err.response?.status === 404 || err.response?.status === 400) {
+                                            localStorage.removeItem(`quiz_in_progress_${quizId}`);
+                                            console.log("🗑️ [AssessmentInfoModal] Attempt not found or submitted, removed from localStorage");
+                                        }
+                                    }
+                                }
+                            } catch (err) {
+                                console.error("❌ [AssessmentInfoModal] Error parsing saved progress:", err);
+                                localStorage.removeItem(`quiz_in_progress_${quizId}`);
+                            }
+                        } else {
+                            console.log("❌ [AssessmentInfoModal] No saved progress in localStorage for quizId:", quizId);
+                        }
+                        setCheckingProgress(false);
                     }
                 } catch (err) {
-                    console.error("Error fetching quiz:", err);
+                    console.error("❌ [AssessmentInfoModal] Error fetching quiz:", err);
+                    setCheckingProgress(false);
                 }
             } else if (isEssay) {
                 // Lấy essay theo assessmentId
@@ -102,10 +170,25 @@ export default function AssessmentInfoModal({
         });
     };
 
-    const handleStart = async () => {
+    const handleStart = async (isNewAttempt = true) => {
         if (quiz) {
             try {
                 setLoading(true);
+                
+                // Nếu không phải attempt mới và có in-progress attempt, dùng nó
+                if (!isNewAttempt && inProgressAttempt && inProgressAttempt.attemptId) {
+                    console.log("▶️ [AssessmentInfoModal] Continuing in-progress attempt:", inProgressAttempt.attemptId);
+                    onStartQuiz({
+                        ...assessment,
+                        attemptId: inProgressAttempt.attemptId,
+                        quizId: inProgressAttempt.quizId,
+                    });
+                    onClose();
+                    return;
+                }
+                
+                // Start new quiz attempt
+                console.log("🆕 [AssessmentInfoModal] Starting new quiz attempt");
                 const response = await quizAttemptService.start(quiz.quizId || quiz.QuizId);
                 if (response.data?.success && response.data?.data) {
                     const attemptData = response.data.data;
@@ -125,7 +208,7 @@ export default function AssessmentInfoModal({
                     setLoading(false);
                 }
             } catch (err) {
-                console.error("Error starting quiz:", err);
+                console.error("❌ [AssessmentInfoModal] Error starting quiz:", err);
                 setError(err.response?.data?.message || "Không thể bắt đầu làm quiz");
                 setLoading(false);
             }
@@ -322,14 +405,26 @@ export default function AssessmentInfoModal({
                             >
                                 Hủy
                             </button>
-                            <button
-                                type="button"
-                                className={`modal-btn assessment-start-btn ${isQuiz ? "btn-quiz" : "btn-essay"}`}
-                                onClick={handleStart}
-                                disabled={loading || (!quiz && !essay)}
-                            >
-                                {loading ? "Đang tải..." : (isQuiz ? "Bắt đầu làm Quiz" : "Bắt đầu viết Essay")}
-                            </button>
+                            <div className="assessment-action-buttons">
+                                {isQuiz && inProgressAttempt && (
+                                    <button
+                                        type="button"
+                                        className="modal-btn assessment-continue-btn"
+                                        onClick={() => handleStart(false)}
+                                        disabled={loading || checkingProgress}
+                                    >
+                                        {loading || checkingProgress ? "Đang tải..." : "Tiếp tục làm"}
+                                    </button>
+                                )}
+                                <button
+                                    type="button"
+                                    className={`modal-btn assessment-start-btn ${isQuiz ? "btn-quiz" : "btn-essay"}`}
+                                    onClick={() => handleStart(true)}
+                                    disabled={loading || checkingProgress || (!quiz && !essay)}
+                                >
+                                    {loading || checkingProgress ? "Đang tải..." : (isQuiz ? "Bắt đầu làm Quiz" : "Bắt đầu viết Essay")}
+                                </button>
+                            </div>
                         </div>
                     </>
                 )}

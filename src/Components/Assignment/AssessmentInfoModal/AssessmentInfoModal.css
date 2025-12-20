@@ -121,6 +121,25 @@
     justify-content: flex-end;
 }
 
+.assessment-action-buttons {
+    display: flex;
+    gap: 12px;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.assessment-continue-btn {
+    background: var(--color-secondary-cyan, #41d6e3);
+    color: var(--color-text-white, white);
+    border: none;
+    min-width: 160px;
+}
+
+.assessment-continue-btn:hover {
+    background: var(--color-secondary-cyan-dark, #2fb8c4);
+    opacity: 0.9;
+}
+
 .assessment-start-btn {
     min-width: 160px;
 }

@@ -144,16 +144,56 @@ export default function QuizDetail() {
             // QUAN TRỌNG: Nếu đã có attemptId trong URL, CHỈ gọi resume, KHÔNG gọi start
             // Điều này tránh infinite loop khi navigate
             if (attemptId) {
-                console.log("Has attemptId in URL, calling resume API...");
+                console.log("🔍 [QuizDetail] Has attemptId in URL:", attemptId);
+                console.log("🔍 [QuizDetail] Calling resume API directly...");
+                
                 try {
+                    // Call resume API directly (it will check status internally)
                     const resumeResponse = await quizAttemptService.resume(attemptId);
-                    console.log("Resume API response:", resumeResponse.data);
+                    console.log("📥 [QuizDetail] RESUME API response:", resumeResponse.data);
                     
                     if (resumeResponse.data?.success && resumeResponse.data?.data) {
                         attempt = resumeResponse.data.data;
-                        console.log("✓ Resume successful");
+                        console.log("✅ [QuizDetail] Resume successful");
+                        
+                        // Check status from resumed attempt
+                        const status = attempt.Status || attempt.status;
+                        console.log("📊 [QuizDetail] Attempt status from resume:", status);
+                        
+                        // Status 1 = InProgress, 2 = Submitted, 3 = Graded, etc.
+                        if (status !== 1) {
+                            // Attempt đã submit hoặc không còn InProgress
+                            console.error("❌ [QuizDetail] Attempt is not in progress. Status:", status);
+                            console.error("❌ [QuizDetail] Attempt details:", {
+                                attemptId,
+                                status,
+                                submittedAt: attempt.SubmittedAt || attempt.submittedAt,
+                                startedAt: attempt.StartedAt || attempt.startedAt
+                            });
+                            setError("Bài quiz này đã được nộp. Vui lòng quay lại danh sách bài tập để làm quiz mới.");
+                            setLoading(false);
+                            return;
+                        }
+                        
+                        // Lưu quiz attempt vào localStorage để có thể tiếp tục sau
+                        const attemptIdToSave = attempt.attemptId || attempt.AttemptId;
+                        const quizIdToSave = attempt.quizId || attempt.QuizId || quizId;
+                        if (attemptIdToSave && quizIdToSave) {
+                            const quizProgress = {
+                                quizId: quizIdToSave,
+                                attemptId: attemptIdToSave,
+                                courseId,
+                                lessonId,
+                                moduleId,
+                                startedAt: attempt.StartedAt || attempt.startedAt,
+                                status: attempt.Status || attempt.status
+                            };
+                            localStorage.setItem(`quiz_in_progress_${quizIdToSave}`, JSON.stringify(quizProgress));
+                            console.log("💾 [QuizDetail] Quiz progress saved to localStorage for quizId:", quizIdToSave);
+                        }
                     } else {
-                        console.log("✗ Resume failed:", resumeResponse.data?.message);
+                        console.error("❌ [QuizDetail] Resume failed:", resumeResponse.data?.message);
+                        console.error("❌ [QuizDetail] Resume response:", resumeResponse.data);
                         // Nếu resume fail, có thể attempt đã submit hoặc không tồn tại
                         // KHÔNG tự động start mới khi đã có attemptId trong URL
                         // Chỉ báo lỗi và để user quyết định
@@ -162,9 +202,24 @@ export default function QuizDetail() {
                         return;
                     }
                 } catch (err) {
-                    console.error("✗ Resume API error:", err);
-                    console.error("Error details:", err.response?.data);
-                    setError(err.response?.data?.message || "Không thể tiếp tục làm bài. Vui lòng thử lại.");
+                    console.error("❌ [QuizDetail] Resume API error:", err);
+                    console.error("❌ [QuizDetail] Error details:", {
+                        message: err.message,
+                        response: err.response?.data,
+                        status: err.response?.status,
+                        url: err.config?.url,
+                        method: err.config?.method,
+                        stack: err.stack
+                    });
+                    
+                    // Check if error is because attempt is already submitted or not found
+                    if (err.response?.status === 400) {
+                        setError("Bài quiz này đã được nộp hoặc không thể tiếp tục. Vui lòng quay lại danh sách bài tập để làm quiz mới.");
+                    } else if (err.response?.status === 404) {
+                        setError("Không tìm thấy bài quiz này. Có thể attempt đã bị xóa hoặc không tồn tại. Vui lòng quay lại danh sách bài tập để làm quiz mới.");
+                    } else {
+                        setError(err.response?.data?.message || "Không thể tiếp tục làm bài. Vui lòng thử lại.");
+                    }
                     setLoading(false);
                     return;
                 }
@@ -181,7 +236,22 @@ export default function QuizDetail() {
                         const newAttemptId = attempt.AttemptId || attempt.attemptId;
                         const newQuizId = attempt.QuizId || attempt.quizId || quizId;
                         
-                        console.log("✓ Start successful, newAttemptId:", newAttemptId);
+                        console.log("✅ [QuizDetail] Start successful, newAttemptId:", newAttemptId);
+                        
+                        // Lưu quiz attempt vào localStorage để có thể tiếp tục sau
+                        if (newAttemptId && newQuizId) {
+                            const quizProgress = {
+                                quizId: newQuizId,
+                                attemptId: newAttemptId,
+                                courseId,
+                                lessonId,
+                                moduleId,
+                                startedAt: attempt.StartedAt || attempt.startedAt,
+                                status: attempt.Status || attempt.status
+                            };
+                            localStorage.setItem(`quiz_in_progress_${newQuizId}`, JSON.stringify(quizProgress));
+                            console.log("💾 [QuizDetail] Quiz progress saved to localStorage for quizId:", newQuizId);
+                        }
                         
                         // QUAN TRỌNG: Chỉ navigate một lần khi start thành công
                         // Reset fetchedKeyRef để useEffect có thể fetch lại với attemptId mới
@@ -649,6 +719,13 @@ export default function QuizDetail() {
                 
                 // Save result to localStorage
                 localStorage.setItem(`quiz_result_${currentAttemptId}`, JSON.stringify(resultData));
+                
+                // Xóa quiz progress khỏi localStorage vì đã submit
+                const quizIdToRemove = quizAttempt?.quizId || quizAttempt?.QuizId || quizId;
+                if (quizIdToRemove) {
+                    localStorage.removeItem(`quiz_in_progress_${quizIdToRemove}`);
+                    console.log("🗑️ [QuizDetail] Quiz progress removed from localStorage (submitted) for quizId:", quizIdToRemove);
+                }
                 
                 // Navigate to results page with result data
                 setTimeout(() => {
