@@ -3,32 +3,7 @@
   min-height: 100vh;
   background: #ffffff;
   position: relative;
-}
-
-/* =========================================================
-   LOGO Ở GÓC BÊN TRÁI
-========================================================= */
-.welcome-logo {
-  position: fixed;
-  top: 20px;
-  left: 20px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  z-index: 1000;
-}
-
-.welcome-logo-img {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-.welcome-logo-text {
-  color: #333;
-  font-size: 20px;
-  font-weight: 600;
+  padding-top: 70px; /* Account for fixed header */
 }
 
 /* =========================================================

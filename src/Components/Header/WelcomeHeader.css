@@ -1,0 +1,94 @@
+/* =========================================================
+   WELCOME HEADER - Similar to MainHeader but simplified
+========================================================= */
+.welcome-header {
+  height: 70px;
+  padding: 0 !important;
+  background: linear-gradient(90deg, #6fd5e0, #d447b6) !important;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Override Bootstrap navbar */
+.welcome-header.navbar {
+  background: linear-gradient(90deg, #6fd5e0, #d447b6) !important;
+}
+
+/* Bootstrap container inside header */
+.welcome-header .container-fluid {
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* =========================================================
+   LEFT: Logo
+========================================================= */
+.welcome-header__left {
+  display: flex;
+  align-items: center;
+}
+
+/* Override LogoHeader styles when inside WelcomeHeader */
+.welcome-header__left .header {
+  cursor: pointer;
+}
+
+.welcome-header__left .header-title {
+  color: #fff !important;
+}
+
+/* =========================================================
+   RIGHT: Login and Register buttons
+========================================================= */
+.welcome-header__right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.welcome-header__btn {
+  padding: 10px 24px;
+  border-radius: 20px;
+  font-size: 15px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.22s ease;
+  white-space: nowrap;
+}
+
+.welcome-header__btn--login {
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+}
+
+.welcome-header__btn--login:hover {
+  background: rgba(255, 255, 255, 0.28);
+  transform: translateY(-1px);
+}
+
+.welcome-header__btn--register {
+  background: #fff;
+  color: #d447b6;
+}
+
+.welcome-header__btn--register:hover {
+  background: rgba(255, 255, 255, 0.95);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .welcome-header__btn {
+    padding: 8px 18px;
+    font-size: 14px;
+  }
+  
+  .welcome-header__right {
+    gap: 8px;
+  }
+}
+
