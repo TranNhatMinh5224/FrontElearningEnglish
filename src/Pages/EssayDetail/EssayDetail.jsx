@@ -261,13 +261,13 @@ export default function EssayDetail() {
         }
 
         // Validate minimum length (backend requires at least 50 characters)
-        if (textContent.trim().length < 50) {
-            setNotification({
-                isOpen: true,
-                type: "error",
-                message: "Nội dung essay phải có ít nhất 50 ký tự. Hiện tại bạn đã nhập " + textContent.trim().length + " ký tự."
-            });
-            return;
+            if (textContent.trim().length < 10) {
+                setNotification({
+                    isOpen: true,
+                    type: "error",
+                    message: "Nội dung essay phải có ít nhất 10 ký tự. Hiện tại bạn đã nhập " + textContent.trim().length + " ký tự."
+                });
+                return;
         }
 
         // Validate maximum length (backend allows max 10000 characters)

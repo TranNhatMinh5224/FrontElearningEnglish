@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { FaGripVertical, FaArrowUp, FaArrowDown } from "react-icons/fa";
+import { Card, Alert } from "react-bootstrap";
 import "./OrderingQuestion.css";
 
 export default function OrderingQuestion({ question, answer, onChange }) {
@@ -74,26 +75,25 @@ export default function OrderingQuestion({ question, answer, onChange }) {
 
     return (
         <div className="ordering-question">
-            <div className="ordering-instructions">
-                <p>Sắp xếp các mục theo thứ tự đúng bằng cách kéo thả hoặc sử dụng nút mũi tên</p>
-            </div>
-
+            <Alert variant="info" className="ordering-instructions py-2 px-3 mb-3">
+                <p className="mb-0">Sắp xếp các mục theo thứ tự đúng bằng cách kéo thả hoặc sử dụng nút mũi tên</p>
+            </Alert>
             <div className="ordering-list">
                 {orderedOptions.map((option, index) => {
                     const optionId = option.optionId || option.OptionId || option.answerOptionId || option.AnswerOptionId;
                     const optionText = option.optionText || option.OptionText || option.text || option.Text;
                     const optionMedia = option.mediaUrl || option.MediaUrl;
-
                     return (
-                        <div
+                        <Card
                             key={optionId || index}
-                            className="ordering-item"
+                            className="ordering-item mb-2"
                             draggable
                             onDragStart={(e) => handleDragStart(e, index)}
                             onDragOver={handleDragOver}
                             onDrop={(e) => handleDrop(e, index)}
+                            style={{ cursor: "move" }}
                         >
-                            <div className="ordering-item-content">
+                            <Card.Body className="ordering-item-content">
                                 <div className="ordering-item-handle">
                                     <FaGripVertical />
                                 </div>
@@ -134,8 +134,8 @@ export default function OrderingQuestion({ question, answer, onChange }) {
                                         <FaArrowDown />
                                     </button>
                                 </div>
-                            </div>
-                        </div>
+                            </Card.Body>
+                        </Card>
                     );
                 })}
             </div>

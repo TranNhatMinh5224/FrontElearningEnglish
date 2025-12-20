@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { FaClock } from "react-icons/fa";
+import { Card, ProgressBar } from "react-bootstrap";
 import "./QuizTimer.css";
 
 export default function QuizTimer({ timeLimit, remainingTime, onTimeUp }) {
@@ -35,49 +36,55 @@ export default function QuizTimer({ timeLimit, remainingTime, onTimeUp }) {
     // Nếu không có timeLimit, hiển thị "Không giới hạn"
     if (!timeLimit || timeLimit === null) {
         return (
-            <div className="quiz-timer">
-                <div className="timer-header">
-                    <FaClock className="timer-icon" />
-                    <span className="timer-label">Thời gian còn lại</span>
-                </div>
-                <div className="timer-display">Không giới hạn</div>
-            </div>
+            <Card className="quiz-timer">
+                <Card.Body>
+                    <div className="timer-header">
+                        <FaClock className="timer-icon" />
+                        <span className="timer-label">Thời gian còn lại</span>
+                    </div>
+                    <div className="timer-display">Không giới hạn</div>
+                </Card.Body>
+            </Card>
         );
     }
 
     // Nếu có timeLimit nhưng remainingTime chưa được tính, hiển thị loading
     if (remainingTime === null || remainingTime === undefined) {
         return (
-            <div className="quiz-timer">
-                <div className="timer-header">
-                    <FaClock className="timer-icon" />
-                    <span className="timer-label">Thời gian còn lại</span>
-                </div>
-                <div className="timer-display">Đang tính...</div>
-            </div>
+            <Card className="quiz-timer">
+                <Card.Body>
+                    <div className="timer-header">
+                        <FaClock className="timer-icon" />
+                        <span className="timer-label">Thời gian còn lại</span>
+                    </div>
+                    <div className="timer-display">Đang tính...</div>
+                </Card.Body>
+            </Card>
         );
     }
 
     return (
-        <div className={`quiz-timer ${isDanger ? "danger" : isWarning ? "warning" : ""}`}>
-            <div className="timer-header">
-                <FaClock className="timer-icon" />
-                <span className="timer-label">Thời gian còn lại</span>
-            </div>
-            <div className="timer-display">
-                {formatTime(remainingTime)}
-            </div>
-            {timeLimit > 0 && (
-                <div className="timer-progress">
-                    <div
-                        className="timer-progress-bar"
-                        style={{
-                            width: `${Math.max(0, Math.min(100, (remainingTime / timeLimit) * 100))}%`
-                        }}
-                    />
+        <Card className={`quiz-timer${isDanger ? " danger" : isWarning ? " warning" : ""}`}>
+            <Card.Body>
+                <div className="timer-header">
+                    <FaClock className="timer-icon" />
+                    <span className="timer-label">Thời gian còn lại</span>
                 </div>
-            )}
-        </div>
+                <div className="timer-display">
+                    {formatTime(remainingTime)}
+                </div>
+                {timeLimit > 0 && (
+                    <div className="timer-progress">
+                        <div
+                            className="timer-progress-bar"
+                            style={{
+                                width: `${Math.max(0, Math.min(100, (remainingTime / timeLimit) * 100))}%`
+                            }}
+                        />
+                    </div>
+                )}
+            </Card.Body>
+        </Card>
     );
 }
 

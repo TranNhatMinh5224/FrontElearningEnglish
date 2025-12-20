@@ -1,11 +1,12 @@
+
 import React from "react";
 import { FaEdit } from "react-icons/fa";
+import { Card, Button, Row, Col } from "react-bootstrap";
 import "./EssayCard.css";
 
 export default function EssayCard({ assessment, onClick }) {
     const formatTimeLimit = (timeLimit) => {
         if (!timeLimit) return "Không giới hạn";
-        // timeLimit format: "00:35:00" (HH:mm:ss)
         const parts = timeLimit.split(":");
         if (parts.length === 3) {
             const hours = parseInt(parts[0]);
@@ -19,45 +20,50 @@ export default function EssayCard({ assessment, onClick }) {
     };
 
     return (
-        <div className="essay-card" onClick={onClick}>
-            <div className="essay-card-content">
-                <div className="essay-icon-wrapper">
-                    <div className="essay-icon">
-                        <FaEdit />
-                    </div>
-                </div>
-                <div className="essay-info">
-                    <h3 className="essay-title">{assessment.title}</h3>
-                    {assessment.description && (
-                        <p className="essay-description">{assessment.description}</p>
-                    )}
-                    <div className="essay-meta">
-                        {assessment.timeLimit && (
-                            <span className="essay-meta-item">
-                                Thời gian: {formatTimeLimit(assessment.timeLimit)}
-                            </span>
+        <Card className="essay-card" onClick={onClick} style={{ cursor: "pointer" }}>
+            <Card.Body>
+                <Row className="align-items-center">
+                    <Col xs="auto">
+                        <div className="essay-icon-wrapper">
+                            <div className="essay-icon">
+                                <FaEdit size={32} />
+                            </div>
+                        </div>
+                    </Col>
+                    <Col>
+                        <Card.Title className="essay-title">{assessment.title}</Card.Title>
+                        {assessment.description && (
+                            <Card.Text className="essay-description">{assessment.description}</Card.Text>
                         )}
-                        {assessment.totalPoints && (
-                            <span className="essay-meta-item">
-                                Điểm: {assessment.totalPoints}
-                            </span>
-                        )}
-                    </div>
-                </div>
-                <div className="essay-action">
-                    <button 
-                        className="essay-start-btn"
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            onClick();
-                        }}
-                    >
-                        <FaEdit />
-                        <span>Bắt đầu Viết Essay</span>
-                    </button>
-                </div>
-            </div>
-        </div>
+                        <div className="essay-meta">
+                            {assessment.timeLimit && (
+                                <span className="essay-meta-item me-3">
+                                    Thời gian: {formatTimeLimit(assessment.timeLimit)}
+                                </span>
+                            )}
+                            {assessment.totalPoints && (
+                                <span className="essay-meta-item">
+                                    Điểm: {assessment.totalPoints}
+                                </span>
+                            )}
+                        </div>
+                    </Col>
+                    <Col xs="auto">
+                        <Button
+                            variant="primary"
+                            className="essay-start-btn d-flex align-items-center"
+                            onClick={e => {
+                                e.stopPropagation();
+                                onClick();
+                            }}
+                        >
+                            <FaEdit className="me-2" />
+                            Bắt đầu Viết Essay
+                        </Button>
+                    </Col>
+                </Row>
+            </Card.Body>
+        </Card>
     );
 }
 

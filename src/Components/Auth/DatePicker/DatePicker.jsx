@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import ScrollPicker from "../ScrollPicker/ScrollPicker";
+import { Row, Col } from "react-bootstrap";
 import "./DatePicker.css";
 
 export default function DatePicker({ value, onChange, disabled = false, hasError = false }) {
@@ -107,8 +108,8 @@ export default function DatePicker({ value, onChange, disabled = false, hasError
     };
 
     return (
-        <div className="date-picker-container">
-            <div className="date-picker-scroll-wrapper">
+        <Row className="date-picker-container">
+            <Col className="date-picker-scroll-wrapper">
                 <ScrollPicker
                     options={generateDays()}
                     value={day}
@@ -118,9 +119,8 @@ export default function DatePicker({ value, onChange, disabled = false, hasError
                     hasError={hasError}
                 />
                 <span className="date-picker-label">Ngày</span>
-            </div>
-
-            <div className="date-picker-scroll-wrapper">
+            </Col>
+            <Col className="date-picker-scroll-wrapper">
                 <ScrollPicker
                     options={generateMonths()}
                     value={month}
@@ -130,9 +130,8 @@ export default function DatePicker({ value, onChange, disabled = false, hasError
                     hasError={hasError}
                 />
                 <span className="date-picker-label">Tháng</span>
-            </div>
-
-            <div className="date-picker-scroll-wrapper">
+            </Col>
+            <Col className="date-picker-scroll-wrapper">
                 <ScrollPicker
                     options={generateYears()}
                     value={year}
@@ -142,7 +141,7 @@ export default function DatePicker({ value, onChange, disabled = false, hasError
                     hasError={hasError}
                 />
                 <span className="date-picker-label">Năm</span>
-            </div>
-        </div>
+            </Col>
+        </Row>
     );
 }

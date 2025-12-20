@@ -1,9 +1,4 @@
-.question-card {
-    background: var(--color-bg-primary, white);
-    border-radius: 16px;
-    padding: 24px;
-    margin-bottom: 20px;
-}
+
 
 .question-header {
     display: flex;

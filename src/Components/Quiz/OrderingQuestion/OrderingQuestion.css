@@ -22,19 +22,9 @@
     gap: 12px;
 }
 
-.ordering-item {
-    border: 2px solid var(--color-border-light, #e5e7eb);
-    border-radius: 12px;
-    background: var(--color-bg-primary, white);
-    cursor: move;
-    transition: all 0.2s ease;
-}
 
-.ordering-item:hover {
-    border-color: var(--color-secondary-cyan, #41d6e3);
-    background: rgba(65, 214, 227, 0.05);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
+
+
 
 .ordering-item:active {
     cursor: grabbing;

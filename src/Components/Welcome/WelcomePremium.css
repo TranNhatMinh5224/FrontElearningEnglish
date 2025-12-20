@@ -1,78 +1,10 @@
-.welcome-premium {
-  background: #f8f9fa;
-  padding: 80px 40px;
-}
-
-.premium-content {
-  max-width: 1000px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  gap: 40px;
-}
-
-.premium-header {
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.premium-title {
-  font-size: 36px;
-  font-weight: 800;
-  color: #1f2937;
-  margin: 0;
-}
-
+/* Giữ lại các style đặc biệt nếu cần cho hiệu ứng gradient hoặc badge hot, còn lại đã dùng react-bootstrap */
 .premium-subtitle {
-  font-size: 28px;
-  font-weight: 700;
   background: linear-gradient(90deg, #6fd5e0, #d447b6);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  margin: 0;
 }
-
-.premium-badge {
-  background: linear-gradient(90deg, #6fd5e0, #d447b6);
-  color: #ffffff;
-  padding: 8px 24px;
-  border-radius: 20px;
-  font-size: 14px;
-  font-weight: 600;
-  width: fit-content;
-  margin: 0 auto;
-}
-
-.premium-plans {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 32px;
-  margin-top: 24px;
-}
-
-.plan-card {
-  background: #ffffff;
-  border-radius: 20px;
-  padding: 32px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-  position: relative;
-  transition: all 0.3s ease;
-  border: 2px solid transparent;
-}
-
-.plan-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-}
-
-.plan-card.featured {
-  border-color: #7a3df0;
-  box-shadow: 0 8px 32px rgba(122, 61, 240, 0.2);
-}
-
 .plan-badge-hot {
   position: absolute;
   top: -12px;
@@ -85,19 +17,6 @@
   font-weight: 700;
   text-transform: uppercase;
 }
-
-.plan-header {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  margin-bottom: 24px;
-  padding-bottom: 24px;
-  border-bottom: 2px solid #f3f4f6;
-}
-
-.plan-label {
-  font-size: 18px;
-  font-weight: 600;
   color: #6b7280;
 }
 

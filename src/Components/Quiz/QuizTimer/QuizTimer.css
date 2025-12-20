@@ -1,30 +1,8 @@
-.quiz-timer {
-    background: var(--color-bg-primary, white);
-    border-radius: 16px;
-    padding: 20px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    border: 2px solid var(--color-border-light, #e5e7eb);
-}
 
-.quiz-timer.warning {
-    border-color: var(--color-status-warning, #f59e0b);
-    background: rgba(245, 158, 11, 0.05);
-}
 
-.quiz-timer.danger {
-    border-color: var(--color-status-error, #ef4444);
-    background: rgba(239, 68, 68, 0.05);
-    animation: pulse 1s infinite;
-}
 
-@keyframes pulse {
-    0%, 100% {
-        opacity: 1;
-    }
-    50% {
-        opacity: 0.8;
-    }
-}
+
+
 
 .timer-header {
     display: flex;

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Form } from "react-bootstrap";
+import { Form, Card } from "react-bootstrap";
 import "./FillBlankQuestion.css";
 
 export default function FillBlankQuestion({ question, answer, onChange }) {
@@ -45,19 +45,19 @@ export default function FillBlankQuestion({ question, answer, onChange }) {
                         const optionId = option.optionId || option.OptionId || option.answerOptionId || option.AnswerOptionId;
                         const optionText = option.optionText || option.OptionText || option.text || option.Text;
                         const selected = selectedOptionId === optionId;
-
                         return (
-                            <div
+                            <Card
                                 key={optionId || index}
-                                className={`option-item ${selected ? "selected" : ""}`}
+                                className={`option-item${selected ? " selected" : ""}`}
                                 onClick={() => setSelectedOptionId(optionId)}
+                                style={{ cursor: "pointer", borderColor: selected ? "#41d6e3" : undefined }}
                             >
-                                <div className="option-content">
+                                <Card.Body className="option-content">
                                     <span className="option-label">
                                         {String.fromCharCode(65 + index)}. {optionText}
                                     </span>
-                                </div>
-                            </div>
+                                </Card.Body>
+                            </Card>
                         );
                     })}
                 </div>

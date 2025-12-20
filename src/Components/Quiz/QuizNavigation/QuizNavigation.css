@@ -1,10 +1,4 @@
-.quiz-navigation {
-    background: var(--color-bg-primary, white);
-    border-radius: 16px;
-    padding: 20px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    border: 2px solid var(--color-border-light, #e5e7eb);
-}
+
 
 .navigation-header {
     display: flex;

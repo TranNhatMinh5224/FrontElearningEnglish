@@ -4,6 +4,7 @@ import MatchingQuestion from "../MatchingQuestion/MatchingQuestion";
 import OrderingQuestion from "../OrderingQuestion/OrderingQuestion";
 import FillBlankQuestion from "../FillBlankQuestion/FillBlankQuestion";
 import TrueFalseQuestion from "../TrueFalseQuestion/TrueFalseQuestion";
+import { Card, Row, Col, Badge } from "react-bootstrap";
 import "./QuestionCard.css";
 
 export default function QuestionCard({ question, answer, onChange, questionNumber, totalQuestions }) {
@@ -76,48 +77,51 @@ export default function QuestionCard({ question, answer, onChange, questionNumbe
 
     if (!question) {
         return (
-            <div className="question-card">
-                <div className="no-question-message">Không có câu hỏi</div>
-            </div>
+            <Card className="question-card">
+                <Card.Body>
+                    <div className="no-question-message">Không có câu hỏi</div>
+                </Card.Body>
+            </Card>
         );
     }
 
     return (
-        <div className="question-card">
-            <div className="question-header">
-                <div className="question-number">
-                    Câu {questionNumber}/{totalQuestions}
-                </div>
-                <div className="question-points">
-                    {question.points || question.Points || 0} điểm
-                </div>
-            </div>
-
-            <div className="question-content">
-                <div className="question-text">
-                    {question.questionText || question.QuestionText || question.stemText || question.StemText || "Câu hỏi"}
-                </div>
-
-                {(question.mediaUrl || question.MediaUrl) && (
-                    <div className="question-media">
-                        {(() => {
-                            const mediaUrl = question.mediaUrl || question.MediaUrl;
-                            if (mediaUrl.includes('.mp4') || mediaUrl.includes('.webm')) {
-                                return <video src={mediaUrl} controls className="media-element" />;
-                            } else if (mediaUrl.includes('.mp3') || mediaUrl.includes('.wav')) {
-                                return <audio src={mediaUrl} controls className="media-element" />;
-                            } else {
-                                return <img src={mediaUrl} alt="Question media" className="media-element" />;
-                            }
-                        })()}
+        <Card className="question-card">
+            <Card.Body>
+                <Row className="question-header align-items-center">
+                    <Col xs="auto" className="question-number">
+                        Câu {questionNumber}/{totalQuestions}
+                    </Col>
+                    <Col xs="auto" className="question-points">
+                        <Badge bg="info" className="px-3 py-2">
+                            {question.points || question.Points || 0} điểm
+                        </Badge>
+                    </Col>
+                </Row>
+                <div className="question-content">
+                    <div className="question-text">
+                        {question.questionText || question.QuestionText || question.stemText || question.StemText || "Câu hỏi"}
                     </div>
-                )}
-
-                <div className="question-answer-section">
-                    {renderQuestion()}
+                    {(question.mediaUrl || question.MediaUrl) && (
+                        <div className="question-media">
+                            {(() => {
+                                const mediaUrl = question.mediaUrl || question.MediaUrl;
+                                if (mediaUrl.includes('.mp4') || mediaUrl.includes('.webm')) {
+                                    return <video src={mediaUrl} controls className="media-element" />;
+                                } else if (mediaUrl.includes('.mp3') || mediaUrl.includes('.wav')) {
+                                    return <audio src={mediaUrl} controls className="media-element" />;
+                                } else {
+                                    return <img src={mediaUrl} alt="Question media" className="media-element" />;
+                                }
+                            })()}
+                        </div>
+                    )}
+                    <div className="question-answer-section">
+                        {renderQuestion()}
+                    </div>
                 </div>
-            </div>
-        </div>
+            </Card.Body>
+        </Card>
     );
 }
 

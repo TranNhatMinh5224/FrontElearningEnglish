@@ -1,4 +1,6 @@
+
 import React from "react";
+import { Row, Col, Card } from "react-bootstrap";
 import "./TrueFalseQuestion.css";
 
 export default function TrueFalseQuestion({ question, answer, onChange }) {
@@ -27,24 +29,34 @@ export default function TrueFalseQuestion({ question, answer, onChange }) {
 
     return (
         <div className="true-false-question">
-            <div className="true-false-options">
+            <Row className="true-false-options">
                 {trueOptionId && (
-                    <div
-                        className={`true-false-option ${answer === trueOptionId ? "selected" : ""}`}
-                        onClick={() => handleChange(trueOptionId)}
-                    >
-                        <span className="option-label">{trueText}</span>
-                    </div>
+                    <Col>
+                        <Card
+                            className={`true-false-option${answer === trueOptionId ? " selected" : ""}`}
+                            onClick={() => handleChange(trueOptionId)}
+                            style={{ cursor: "pointer", borderColor: answer === trueOptionId ? "#41d6e3" : undefined }}
+                        >
+                            <Card.Body className="d-flex align-items-center justify-content-center p-3">
+                                <span className="option-label">{trueText}</span>
+                            </Card.Body>
+                        </Card>
+                    </Col>
                 )}
                 {falseOptionId && (
-                    <div
-                        className={`true-false-option ${answer === falseOptionId ? "selected" : ""}`}
-                        onClick={() => handleChange(falseOptionId)}
-                    >
-                        <span className="option-label">{falseText}</span>
-                    </div>
+                    <Col>
+                        <Card
+                            className={`true-false-option${answer === falseOptionId ? " selected" : ""}`}
+                            onClick={() => handleChange(falseOptionId)}
+                            style={{ cursor: "pointer", borderColor: answer === falseOptionId ? "#41d6e3" : undefined }}
+                        >
+                            <Card.Body className="d-flex align-items-center justify-content-center p-3">
+                                <span className="option-label">{falseText}</span>
+                            </Card.Body>
+                        </Card>
+                    </Col>
                 )}
-            </div>
+            </Row>
         </div>
     );
 }

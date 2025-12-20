@@ -1,16 +1,4 @@
-.date-picker-container {
-  display: flex;
-  gap: 12px;
-  width: 100%;
-}
 
-.date-picker-scroll-wrapper {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-}
 
 .date-picker-label {
   font-size: 12px;

@@ -1,4 +1,5 @@
 import React from "react";
+import { Card, Alert } from "react-bootstrap";
 import "./MultipleChoiceQuestion.css";
 
 export default function MultipleChoiceQuestion({ question, answer, onChange, multiple = false }) {
@@ -28,9 +29,9 @@ export default function MultipleChoiceQuestion({ question, answer, onChange, mul
     return (
         <div className="multiple-choice-question">
             {multiple && (
-                <div className="multiple-answers-hint">
+                <Alert variant="info" className="multiple-answers-hint py-2 px-3 mb-3">
                     <span className="hint-text">(Có thể chọn nhiều đáp án)</span>
-                </div>
+                </Alert>
             )}
             <div className="options-list">
                 {options.map((option, index) => {
@@ -38,14 +39,14 @@ export default function MultipleChoiceQuestion({ question, answer, onChange, mul
                     const optionText = option.optionText || option.OptionText || option.text || option.Text;
                     const optionMedia = option.mediaUrl || option.MediaUrl;
                     const selected = isSelected(optionId);
-
                     return (
-                        <div
+                        <Card
                             key={optionId || index}
-                            className={`option-item ${selected ? "selected" : ""}`}
+                            className={`option-item${selected ? " selected" : ""}`}
                             onClick={() => handleChange(optionId)}
+                            style={{ cursor: "pointer", borderColor: selected ? "#41d6e3" : undefined }}
                         >
-                            <div className="option-content">
+                            <Card.Body className="option-content">
                                 <span className="option-label">
                                     {String.fromCharCode(65 + index)}. {optionText}
                                 </span>
@@ -60,8 +61,8 @@ export default function MultipleChoiceQuestion({ question, answer, onChange, mul
                                         )}
                                     </div>
                                 )}
-                            </div>
-                        </div>
+                            </Card.Body>
+                        </Card>
                     );
                 })}
             </div>
