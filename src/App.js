@@ -24,6 +24,7 @@ import FlashCardDetail from "./Pages/FlashCardDetail/FlashCardDetail";
 import AssignmentDetail from "./Pages/AssignmentDetail/AssignmentDetail";
 import QuizDetail from "./Pages/QuizDetail/QuizDetail";
 import QuizResults from "./Pages/QuizResults/QuizResults";
+import EssayDetail from "./Pages/EssayDetail/EssayDetail";
 
 
 function App() {
@@ -55,6 +56,7 @@ function App() {
         <Route path="/course/:courseId/lesson/:lessonId/module/:moduleId/assignment" element={<AssignmentDetail />} />
         <Route path="/course/:courseId/lesson/:lessonId/module/:moduleId/quiz/:quizId/attempt/:attemptId/results" element={<QuizResults />} />
         <Route path="/course/:courseId/lesson/:lessonId/module/:moduleId/quiz/:quizId/attempt/:attemptId" element={<QuizDetail />} />
+        <Route path="/course/:courseId/lesson/:lessonId/module/:moduleId/essay/:essayId" element={<EssayDetail />} />
         <Route path="/course/:courseId/lesson/:lessonId/module/:moduleId" element={<LectureDetail />} />
       </Routes>
     </BrowserRouter>

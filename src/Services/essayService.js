@@ -6,6 +6,6 @@ export const essayService = {
     
     getById: (essayId) => axiosClient.get(API_ENDPOINTS.ESSAYS.GET_BY_ID(essayId)),
     
-    getByAssessment: (assessmentId) => axiosClient.get(`/user/essays/assessment/${assessmentId}`),
+    getByAssessment: (assessmentId) => axiosClient.get(API_ENDPOINTS.ESSAYS.GET_BY_ASSESSMENT(assessmentId)),
 };
 

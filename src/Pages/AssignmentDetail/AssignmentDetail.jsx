@@ -310,10 +310,41 @@ export default function AssignmentDetail() {
         }
     };
 
-    const handleStartEssay = async (assessment) => {
-        // Chỉ hiển thị thông báo, không navigate
-        console.log("Start essay for assessment:", assessment);
-        // TODO: Có thể thêm logic khác ở đây nếu cần
+    const handleStartEssay = async (assessmentData) => {
+        try {
+            console.log("🚀 [AssignmentDetail] handleStartEssay called:", assessmentData);
+            
+            // If essayId is already provided from modal, use it directly
+            if (assessmentData.essayId) {
+                console.log("✅ [AssignmentDetail] Using provided essayId:", assessmentData.essayId);
+                navigate(`/course/${courseId}/lesson/${lessonId}/module/${moduleId}/essay/${assessmentData.essayId}`);
+                return;
+            }
+            
+            // Otherwise, get essay by assessment
+            const essayResponse = await essayService.getByAssessment(assessmentData.assessmentId);
+            if (essayResponse.data?.success && essayResponse.data?.data && essayResponse.data.data.length > 0) {
+                const essay = essayResponse.data.data[0];
+                const essayId = essay.essayId || essay.EssayId;
+                console.log("✅ [AssignmentDetail] Found essay, navigating to EssayDetail:", essayId);
+                
+                // Navigate to essay detail page
+                navigate(`/course/${courseId}/lesson/${lessonId}/module/${moduleId}/essay/${essayId}`);
+            } else {
+                setNotification({
+                    isOpen: true,
+                    type: "error",
+                    message: "Không tìm thấy thông tin essay"
+                });
+            }
+        } catch (err) {
+            console.error("❌ [AssignmentDetail] Error starting essay:", err);
+            setNotification({
+                isOpen: true,
+                type: "error",
+                message: err.response?.data?.message || "Không thể bắt đầu làm essay"
+            });
+        }
     };
 
     const handleBackClick = () => {

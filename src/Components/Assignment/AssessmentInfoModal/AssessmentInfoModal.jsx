@@ -214,9 +214,17 @@ export default function AssessmentInfoModal({
                 setLoading(false);
             }
         } else if (essay) {
-            // Navigate to essay page
-            onStartEssay(assessment);
-            onClose();
+            // Navigate to essay page with essayId
+            const essayId = essay.essayId || essay.EssayId;
+            if (essayId) {
+                onStartEssay({
+                    ...assessment,
+                    essayId: essayId
+                });
+                onClose();
+            } else {
+                setError("Không tìm thấy thông tin essay");
+            }
         }
     };
 

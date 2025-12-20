@@ -108,6 +108,7 @@ export const API_ENDPOINTS = {
     ESSAYS: {
         GET_BY_LESSON: (lessonId) => `/user/essays/lesson/${lessonId}`,
         GET_BY_ID: (essayId) => `/user/essays/${essayId}`,
+        GET_BY_ASSESSMENT: (assessmentId) => `/user/essays/assessment/${assessmentId}`,
     },
     // Essay Submissions
     ESSAY_SUBMISSIONS: {
