@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Button, Row, Col } from "react-bootstrap";
 import { FaQuestionCircle, FaEdit, FaClock, FaCheckCircle, FaTimesCircle, FaList, FaRedo, FaRandom } from "react-icons/fa";
 import { quizAttemptService } from "../../../Services/quizAttemptService";
 import { essayService } from "../../../Services/essayService";
@@ -398,32 +399,32 @@ export default function AssessmentInfoModal({
                         </div>
 
                         <div className="assessment-info-footer">
-                            <button
-                                type="button"
-                                className="modal-btn modal-btn-cancel"
-                                onClick={onClose}
-                            >
-                                Hủy
-                            </button>
-                            <div className="assessment-action-buttons">
+                            <div className="footer-buttons-vertical">
                                 {isQuiz && inProgressAttempt && (
-                                    <button
-                                        type="button"
-                                        className="modal-btn assessment-continue-btn"
+                                    <Button
+                                        variant="primary"
+                                        className="assessment-continue-btn w-100"
                                         onClick={() => handleStart(false)}
                                         disabled={loading || checkingProgress}
                                     >
                                         {loading || checkingProgress ? "Đang tải..." : "Tiếp tục làm"}
-                                    </button>
+                                    </Button>
                                 )}
-                                <button
-                                    type="button"
-                                    className={`modal-btn assessment-start-btn ${isQuiz ? "btn-quiz" : "btn-essay"}`}
+                                <Button
+                                    variant="primary"
+                                    className={`assessment-start-btn ${isQuiz ? "btn-quiz" : "btn-essay"} w-100`}
                                     onClick={() => handleStart(true)}
                                     disabled={loading || checkingProgress || (!quiz && !essay)}
                                 >
                                     {loading || checkingProgress ? "Đang tải..." : (isQuiz ? "Bắt đầu làm Quiz" : "Bắt đầu viết Essay")}
-                                </button>
+                                </Button>
+                                <Button
+                                    variant="outline-secondary"
+                                    className="footer-cancel-btn w-100"
+                                    onClick={onClose}
+                                >
+                                    Hủy
+                                </Button>
                             </div>
                         </div>
                     </>
