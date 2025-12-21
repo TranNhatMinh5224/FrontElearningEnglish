@@ -16,7 +16,7 @@ import "./EssayDetail.css";
 export default function EssayDetail() {
     const { courseId, lessonId, moduleId, essayId } = useParams();
     const navigate = useNavigate();
-    
+
     const [essay, setEssay] = useState(null);
     const [course, setCourse] = useState(null);
     const [lesson, setLesson] = useState(null);
@@ -25,17 +25,24 @@ export default function EssayDetail() {
     const [error, setError] = useState("");
     const [submitting, setSubmitting] = useState(false);
     const [uploadingFile, setUploadingFile] = useState(false);
-    
+
+    // Submission state
+    const [currentSubmission, setCurrentSubmission] = useState(null);
+    const [isUpdating, setIsUpdating] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
+
     // Form state
     const [textContent, setTextContent] = useState("");
     const [selectedFile, setSelectedFile] = useState(null);
     const [filePreview, setFilePreview] = useState(null);
     const [attachmentTempKey, setAttachmentTempKey] = useState(null);
     const [attachmentType, setAttachmentType] = useState(null);
-    
+    const [existingAttachmentUrl, setExistingAttachmentUrl] = useState(null);
+
     const [notification, setNotification] = useState({ isOpen: false, type: "info", message: "" });
     const [showSubmitModal, setShowSubmitModal] = useState(false);
-    
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+
     const fileInputRef = useRef(null);
     const moduleStartedRef = useRef(false);
 
@@ -80,6 +87,41 @@ export default function EssayDetail() {
                     const essayResponse = await essayService.getById(essayId);
                     if (essayResponse.data?.success && essayResponse.data?.data) {
                         setEssay(essayResponse.data.data);
+
+                        // Check if user has already submitted this essay
+                        try {
+                            const statusResponse = await essaySubmissionService.getSubmissionStatus(essayId);
+                            if (statusResponse?.data?.success && statusResponse?.data?.data) {
+                                const submissionData = statusResponse.data.data;
+                                const submissionId = submissionData?.submissionId || submissionData?.SubmissionId;
+
+                                if (submissionId) {
+                                    // Fetch full submission details
+                                    const submissionResponse = await essaySubmissionService.getById(submissionId);
+                                    if (submissionResponse?.data?.success && submissionResponse?.data?.data) {
+                                        const submission = submissionResponse.data.data;
+                                        if (submission) {
+                                            setCurrentSubmission(submission);
+
+                                            // Load submission data into form
+                                            const content = submission?.textContent || submission?.TextContent || "";
+                                            setTextContent(content);
+
+                                            // Load attachment if exists
+                                            const attachmentUrl = submission?.attachmentUrl || submission?.AttachmentUrl;
+                                            if (attachmentUrl) {
+                                                setExistingAttachmentUrl(attachmentUrl);
+                                            }
+
+                                            console.log("✅ [EssayDetail] Loaded existing submission:", submission);
+                                        }
+                                    }
+                                }
+                            }
+                        } catch (statusErr) {
+                            // If no submission exists, that's fine - user hasn't submitted yet
+                            console.log("ℹ️ [EssayDetail] No existing submission found:", statusErr);
+                        }
                     } else {
                         setError(essayResponse.data?.message || "Không thể tải thông tin essay");
                     }
@@ -115,7 +157,7 @@ export default function EssayDetail() {
             const allowedExtensions = ['.pdf', '.doc', '.docx', '.txt', '.docm', '.dotx', '.dotm'];
             const fileName = file.name.toLowerCase();
             const hasValidExtension = allowedExtensions.some(ext => fileName.endsWith(ext));
-            
+
             if (!hasValidExtension) {
                 setNotification({
                     isOpen: true,
@@ -153,7 +195,7 @@ export default function EssayDetail() {
         try {
             setUploadingFile(true);
             console.log("📤 [EssayDetail] Uploading file to temp storage...");
-            
+
             // Upload file to temp storage
             const uploadResponse = await fileService.uploadTempFile(
                 selectedFile,
@@ -169,17 +211,17 @@ export default function EssayDetail() {
                 const tempKey = resultData.TempKey || resultData.tempKey;
                 const imageUrl = resultData.ImageUrl || resultData.imageUrl;
                 const imageType = resultData.ImageType || resultData.imageType || selectedFile.type;
-                
+
                 if (!tempKey) {
                     throw new Error("Không nhận được TempKey từ server");
                 }
-                
+
                 setAttachmentTempKey(tempKey);
-                
+
                 // Backend chỉ cho phép AttachmentType tối đa 50 ký tự
                 // Dùng extension-based type mapping với type ngắn gọn (tất cả <= 50 ký tự)
-                const extension = selectedFile.name.split('.').pop()?.toLowerCase();
-                
+                const extension = selectedFile?.name?.split('.').pop()?.toLowerCase();
+
                 // Type mapping ngắn gọn (tất cả đều <= 50 ký tự)
                 const typeMap = {
                     'pdf': 'application/pdf', // 15 chars
@@ -190,10 +232,10 @@ export default function EssayDetail() {
                     'dotx': 'application/dotx', // 18 chars (shortened)
                     'dotm': 'application/dotm' // 18 chars (shortened)
                 };
-                
+
                 // Ưu tiên dùng type từ mapping (ngắn gọn), nếu không có thì dùng imageType, cuối cùng là default
                 let finalAttachmentType = typeMap[extension];
-                
+
                 // Nếu không có trong mapping, dùng imageType hoặc tạo từ extension
                 if (!finalAttachmentType) {
                     if (imageType && imageType.length <= 50) {
@@ -203,26 +245,26 @@ export default function EssayDetail() {
                         finalAttachmentType = extension ? `application/${extension}` : 'application/octet-stream';
                     }
                 }
-                
+
                 // Đảm bảo không vượt quá 50 ký tự (fallback safety)
                 if (finalAttachmentType.length > 50) {
                     finalAttachmentType = finalAttachmentType.substring(0, 50);
                 }
-                
+
                 setAttachmentType(finalAttachmentType);
-                
+
                 console.log("✅ [EssayDetail] File uploaded successfully:", {
                     tempKey,
                     imageUrl,
                     imageType: finalAttachmentType,
                     originalImageType: imageType,
-                    fileName: selectedFile.name
+                    fileName: selectedFile?.name || "Unknown"
                 });
-                
+
                 setNotification({
                     isOpen: true,
                     type: "success",
-                    message: `Upload file "${selectedFile.name}" thành công!`
+                    message: `Upload file "${selectedFile?.name || "file"}" thành công!`
                 });
             } else {
                 const errorMessage = uploadResponse.data?.message || "Không thể upload file";
@@ -260,86 +302,116 @@ export default function EssayDetail() {
             return;
         }
 
-        // Validate minimum length (backend requires at least 50 characters)
-            if (textContent.trim().length < 10) {
-                setNotification({
-                    isOpen: true,
-                    type: "error",
-                    message: "Nội dung essay phải có ít nhất 10 ký tự. Hiện tại bạn đã nhập " + textContent.trim().length + " ký tự."
-                });
-                return;
-        }
-
-        // Validate maximum length (backend allows max 10000 characters)
-        if (textContent.trim().length > 10000) {
-            setNotification({
-                isOpen: true,
-                type: "error",
-                message: "Nội dung essay không được vượt quá 10000 ký tự. Hiện tại bạn đã nhập " + textContent.trim().length + " ký tự."
-            });
-            return;
-        }
-
-        // If file is selected but not uploaded, upload it first
-        if (selectedFile && !attachmentTempKey) {
-            await handleUploadFile();
-            // Wait a bit for upload to complete
-            await new Promise(resolve => setTimeout(resolve, 500));
-            
-            // Check again if upload was successful
-            if (!attachmentTempKey) {
-                setNotification({
-                    isOpen: true,
-                    type: "error",
-                    message: "Vui lòng upload file trước khi nộp bài"
-                });
-                return;
+        // If file is selected but not uploaded, upload it first (optional)
+        if (selectedFile && !attachmentTempKey && !existingAttachmentUrl) {
+            try {
+                await handleUploadFile();
+                // Wait a bit for upload to complete
+                await new Promise(resolve => setTimeout(resolve, 500));
+            } catch (err) {
+                console.error("Error uploading file:", err);
+                // Continue with submission even if file upload fails (file is optional)
             }
         }
 
-        // Backend expects PascalCase: EssayId, TextContent, AttachmentTempKey, AttachmentType
-        const submissionData = {
-            EssayId: essay.essayId || essay.EssayId,
-            TextContent: textContent.trim(),
-        };
-        
-        // Only add attachment fields if they exist
-        if (attachmentTempKey) {
-            submissionData.AttachmentTempKey = attachmentTempKey;
-        }
-        if (attachmentType) {
-            submissionData.AttachmentType = attachmentType;
-        }
-        
         try {
-            setSubmitting(true);
-            console.log("📤 [EssayDetail] Submitting essay...");
-            console.log("📝 [EssayDetail] Submission data (PascalCase):", submissionData);
+            if (currentSubmission) {
+                // Update existing submission
+                setIsUpdating(true);
+                const submissionId = currentSubmission.submissionId || currentSubmission.SubmissionId;
 
-            const submitResponse = await essaySubmissionService.submit(submissionData);
-            console.log("📥 [EssayDetail] Submit response:", submitResponse.data);
+                // Backend expects PascalCase: TextContent, AttachmentTempKey, AttachmentType
+                const updateData = {
+                    TextContent: textContent.trim(),
+                };
 
-            if (submitResponse.data?.success) {
-                setNotification({
-                    isOpen: true,
-                    type: "success",
-                    message: "Nộp bài essay thành công!"
-                });
+                // Only add attachment fields if new file is uploaded
+                if (attachmentTempKey) {
+                    updateData.AttachmentTempKey = attachmentTempKey;
+                }
+                if (attachmentType) {
+                    updateData.AttachmentType = attachmentType;
+                }
 
-                // Navigate back to assignment page after 2 seconds
-                setTimeout(() => {
-                    navigate(`/course/${courseId}/lesson/${lessonId}/module/${moduleId}/assignment`);
-                }, 2000);
+                console.log("📤 [EssayDetail] Updating submission...");
+                console.log("📝 [EssayDetail] Update data (PascalCase):", updateData);
+
+                const updateResponse = await essaySubmissionService.update(submissionId, updateData);
+                console.log("📥 [EssayDetail] Update response:", updateResponse.data);
+
+                if (updateResponse.data?.success) {
+                    setNotification({
+                        isOpen: true,
+                        type: "success",
+                        message: "Cập nhật bài essay thành công!"
+                    });
+
+                    // Reload submission data
+                    const submissionResponse = await essaySubmissionService.getById(submissionId);
+                    if (submissionResponse.data?.success && submissionResponse.data?.data) {
+                        setCurrentSubmission(submissionResponse.data.data);
+                        setExistingAttachmentUrl(submissionResponse.data.data.attachmentUrl || submissionResponse.data.data.AttachmentUrl);
+                        setAttachmentTempKey(null);
+                        setSelectedFile(null);
+                    }
+
+                    // Navigate back to assignment page after 2 seconds
+                    setTimeout(() => {
+                        navigate(`/course/${courseId}/lesson/${lessonId}/module/${moduleId}/assignment`);
+                    }, 2000);
+                } else {
+                    setNotification({
+                        isOpen: true,
+                        type: "error",
+                        message: updateResponse.data?.message || "Không thể cập nhật bài essay"
+                    });
+                }
             } else {
-                setNotification({
-                    isOpen: true,
-                    type: "error",
-                    message: submitResponse.data?.message || "Không thể nộp bài essay"
-                });
+                // Submit new submission
+                setSubmitting(true);
+
+                // Backend expects PascalCase: EssayId, TextContent, AttachmentTempKey, AttachmentType
+                const submissionData = {
+                    EssayId: essay.essayId || essay.EssayId,
+                    TextContent: textContent.trim(),
+                };
+
+                // Only add attachment fields if they exist
+                if (attachmentTempKey) {
+                    submissionData.AttachmentTempKey = attachmentTempKey;
+                }
+                if (attachmentType) {
+                    submissionData.AttachmentType = attachmentType;
+                }
+
+                console.log("📤 [EssayDetail] Submitting essay...");
+                console.log("📝 [EssayDetail] Submission data (PascalCase):", submissionData);
+
+                const submitResponse = await essaySubmissionService.submit(submissionData);
+                console.log("📥 [EssayDetail] Submit response:", submitResponse.data);
+
+                if (submitResponse.data?.success) {
+                    setNotification({
+                        isOpen: true,
+                        type: "success",
+                        message: "Nộp bài essay thành công!"
+                    });
+
+                    // Navigate back to assignment page after 2 seconds
+                    setTimeout(() => {
+                        navigate(`/course/${courseId}/lesson/${lessonId}/module/${moduleId}/assignment`);
+                    }, 2000);
+                } else {
+                    setNotification({
+                        isOpen: true,
+                        type: "error",
+                        message: submitResponse.data?.message || "Không thể nộp bài essay"
+                    });
+                }
             }
         } catch (err) {
-            console.error("❌ [EssayDetail] Error submitting essay:", err);
-            
+            console.error("❌ [EssayDetail] Error submitting/updating essay:", err);
+
             // Log full error response
             if (err.response?.data) {
                 console.error("❌ [EssayDetail] Full error response:", err.response.data);
@@ -349,21 +421,15 @@ export default function EssayDetail() {
                     console.error("❌ [EssayDetail] Could not stringify error response");
                 }
             }
-            
-            console.error("❌ [EssayDetail] Error details:", {
-                message: err.message,
-                status: err.response?.status,
-                statusText: err.response?.statusText,
-                headers: err.response?.headers,
-                requestData: submissionData
-            });
-            
+
             // Extract error message from backend response
-            let errorMessage = "Không thể nộp bài essay. Vui lòng thử lại.";
-            
+            let errorMessage = currentSubmission
+                ? "Không thể cập nhật bài essay. Vui lòng thử lại."
+                : "Không thể nộp bài essay. Vui lòng thử lại.";
+
             if (err.response?.data) {
                 const responseData = err.response.data;
-                
+
                 // Check for validation errors (FluentValidation format)
                 if (responseData.errors) {
                     const validationErrors = Object.values(responseData.errors).flat();
@@ -383,7 +449,7 @@ export default function EssayDetail() {
                     errorMessage = responseData;
                 }
             }
-            
+
             setNotification({
                 isOpen: true,
                 type: "error",
@@ -391,7 +457,58 @@ export default function EssayDetail() {
             });
         } finally {
             setSubmitting(false);
+            setIsUpdating(false);
             setShowSubmitModal(false);
+        }
+    };
+
+    const handleDeleteSubmission = async () => {
+        if (!currentSubmission) return;
+
+        try {
+            setIsDeleting(true);
+            const submissionId = currentSubmission.submissionId || currentSubmission.SubmissionId;
+
+            console.log("🗑️ [EssayDetail] Deleting submission:", submissionId);
+
+            const deleteResponse = await essaySubmissionService.delete(submissionId);
+            console.log("📥 [EssayDetail] Delete response:", deleteResponse.data);
+
+            if (deleteResponse.data?.success) {
+                setNotification({
+                    isOpen: true,
+                    type: "success",
+                    message: "Xóa bài nộp thành công!"
+                });
+
+                // Reset form
+                setCurrentSubmission(null);
+                setTextContent("");
+                setSelectedFile(null);
+                setFilePreview(null);
+                setAttachmentTempKey(null);
+                setAttachmentType(null);
+                setExistingAttachmentUrl(null);
+                if (fileInputRef.current) {
+                    fileInputRef.current.value = '';
+                }
+            } else {
+                setNotification({
+                    isOpen: true,
+                    type: "error",
+                    message: deleteResponse.data?.message || "Không thể xóa bài nộp"
+                });
+            }
+        } catch (err) {
+            console.error("❌ [EssayDetail] Error deleting submission:", err);
+            setNotification({
+                isOpen: true,
+                type: "error",
+                message: err.response?.data?.message || "Không thể xóa bài nộp. Vui lòng thử lại."
+            });
+        } finally {
+            setIsDeleting(false);
+            setShowDeleteModal(false);
         }
     };
 
@@ -451,6 +568,18 @@ export default function EssayDetail() {
     const lessonTitle = lesson?.title || lesson?.Title || "Bài học";
     const moduleName = module?.name || module?.Name || "Module";
 
+    // Safety check: ensure all required objects exist before rendering
+    if (!essay) {
+        return (
+            <>
+                <MainHeader />
+                <div className="essay-detail-container">
+                    <div className="loading-message">Đang tải...</div>
+                </div>
+            </>
+        );
+    }
+
     return (
         <>
             <MainHeader />
@@ -494,8 +623,22 @@ export default function EssayDetail() {
                     <Row>
                         <Col lg={8}>
                             <div className="essay-form-section">
-                                <h2 className="section-title">Nộp bài Essay</h2>
-                                
+                                <h2 className="section-title">
+                                    {currentSubmission ? "Cập nhật bài Essay" : "Nộp bài Essay"}
+                                </h2>
+
+                                {currentSubmission && (
+                                    <div className="alert alert-info mb-3" role="alert">
+                                        <FaCheckCircle className="me-2" />
+                                        Bạn đã nộp bài essay này. Bạn có thể cập nhật hoặc xóa bài nộp.
+                                        {currentSubmission.submittedAt && (
+                                            <div className="mt-2">
+                                                <small>Nộp lúc: {formatDate(currentSubmission.submittedAt || currentSubmission.SubmittedAt)}</small>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
                                 <Form>
                                     <Form.Group className="mb-4">
                                         <Form.Label className="form-label">
@@ -510,11 +653,8 @@ export default function EssayDetail() {
                                             placeholder="Nhập nội dung essay của bạn ở đây..."
                                             className="essay-textarea"
                                         />
-                                        <Form.Text className={`text-muted ${textContent.trim().length < 50 ? 'text-danger' : textContent.trim().length > 10000 ? 'text-danger' : ''}`}>
-                                            Số ký tự: {textContent.length} / 10000
-                                            {textContent.trim().length < 50 && (
-                                                <span className="ms-2">(Tối thiểu 50 ký tự)</span>
-                                            )}
+                                        <Form.Text className="text-muted">
+                                            Số ký tự: {textContent.length}
                                         </Form.Text>
                                     </Form.Group>
 
@@ -523,31 +663,38 @@ export default function EssayDetail() {
                                             <FaFileUpload className="label-icon" />
                                             File đính kèm (tùy chọn)
                                         </Form.Label>
-                                    <div className="file-upload-section">
-                                        {!selectedFile ? (
-                                            <div className="file-upload-area">
-                                                <input
-                                                    ref={fileInputRef}
-                                                    type="file"
-                                                    id="file-input"
-                                                    className="file-input"
-                                                    onChange={handleFileSelect}
-                                                    accept=".pdf,.doc,.docx,.txt,.docm,.dotx,.dotm"
-                                                />
-                                                <label htmlFor="file-input" className="file-upload-label">
-                                                    <FaFileUpload className="upload-icon" />
-                                                    <span>Chọn file để upload</span>
-                                                    <small>(PDF, DOC, DOCX, TXT, DOCM, DOTX, DOTM - tối đa 10MB)</small>
-                                                </label>
-                                            </div>
-                                        ) : (
+                                        <div className="file-upload-section">
+                                            {existingAttachmentUrl && !selectedFile && (
+                                                <div className="existing-file-section mb-3">
+                                                    <div className="file-preview-card">
+                                                        <div className="file-preview-info">
+                                                            <FaFileUpload className="file-icon" />
+                                                            <div className="file-info">
+                                                                <div className="file-name">File đính kèm hiện tại</div>
+                                                                <div className="file-size">
+                                                                    <a href={existingAttachmentUrl} target="_blank" rel="noopener noreferrer" className="text-primary">
+                                                                        Xem file
+                                                                    </a>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="file-actions">
+                                                            <span className="upload-success">
+                                                                <FaCheckCircle /> Đã có file
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {selectedFile ? (
                                                 <div className="file-preview-section">
                                                     <div className="file-preview-card">
                                                         <div className="file-preview-info">
                                                             <FaFileUpload className="file-icon" />
                                                             <div className="file-info">
-                                                                <div className="file-name">{selectedFile.name}</div>
-                                                                <div className="file-size">{formatFileSize(selectedFile.size)}</div>
+                                                                <div className="file-name">{selectedFile?.name || "Unknown file"}</div>
+                                                                <div className="file-size">{formatFileSize(selectedFile?.size || 0)}</div>
                                                             </div>
                                                         </div>
                                                         {filePreview && (
@@ -581,20 +728,63 @@ export default function EssayDetail() {
                                                         </div>
                                                     </div>
                                                 </div>
+                                            ) : (
+                                                <div className="file-upload-area">
+                                                    <input
+                                                        ref={fileInputRef}
+                                                        type="file"
+                                                        id="file-input"
+                                                        className="file-input"
+                                                        onChange={handleFileSelect}
+                                                        accept=".pdf,.doc,.docx,.txt,.docm,.dotx,.dotm"
+                                                    />
+                                                    <label htmlFor="file-input" className="file-upload-label">
+                                                        <FaFileUpload className="upload-icon" />
+                                                        <span>Chọn file để upload</span>
+                                                        <small>(PDF, DOC, DOCX, TXT, DOCM, DOTX, DOTM - tối đa 10MB)</small>
+                                                    </label>
+                                                </div>
                                             )}
                                         </div>
                                     </Form.Group>
 
-                                    <div className="essay-submit-section">
+                                    <div className="essay-submit-section d-flex gap-2">
                                         <Button
                                             variant="primary"
                                             size="lg"
                                             className="submit-essay-btn"
                                             onClick={() => setShowSubmitModal(true)}
-                                            disabled={submitting || !textContent.trim()}
+                                            disabled={(submitting || isUpdating) || !textContent.trim()}
+                                            style={{
+                                                backgroundColor: '#41d6e3',
+                                                borderColor: '#41d6e3',
+                                                color: '#fff'
+                                            }}
+                                            onMouseEnter={(e) => {
+                                                if (!submitting && !isUpdating && textContent.trim()) {
+                                                    e.target.style.backgroundColor = '#35b8c4';
+                                                    e.target.style.borderColor = '#35b8c4';
+                                                }
+                                            }}
+                                            onMouseLeave={(e) => {
+                                                if (!submitting && !isUpdating && textContent.trim()) {
+                                                    e.target.style.backgroundColor = '#41d6e3';
+                                                    e.target.style.borderColor = '#41d6e3';
+                                                }
+                                            }}
                                         >
-                                            {submitting ? "Đang nộp bài..." : "Nộp bài"}
+                                            {isUpdating ? "Đang cập nhật..." : submitting ? "Đang nộp bài..." : currentSubmission ? "Cập nhật bài" : "Nộp bài"}
                                         </Button>
+                                        {currentSubmission && (
+                                            <Button
+                                                variant="outline-danger"
+                                                size="lg"
+                                                onClick={() => setShowDeleteModal(true)}
+                                                disabled={isDeleting}
+                                            >
+                                                {isDeleting ? "Đang xóa..." : "Xóa bài"}
+                                            </Button>
+                                        )}
                                     </div>
                                 </Form>
                             </div>
@@ -603,14 +793,14 @@ export default function EssayDetail() {
                         <Col lg={4}>
                             <div className="essay-info-section">
                                 <h3 className="info-section-title">Thông tin Essay</h3>
-                                
+
                                 <div className="info-item">
                                     <FaClock className="info-icon" />
                                     <div className="info-content">
                                         <div className="info-label">Hạn nộp</div>
                                         <div className="info-value">
-                                            {essay?.assessment?.dueAt 
-                                                ? formatDate(essay.assessment.dueAt)
+                                            {essay?.assessment?.dueAt
+                                                ? formatDate(essay?.assessment?.dueAt)
                                                 : "Không có hạn nộp"}
                                         </div>
                                     </div>
@@ -620,9 +810,30 @@ export default function EssayDetail() {
                                     <FaCheckCircle className="info-icon" />
                                     <div className="info-content">
                                         <div className="info-label">Trạng thái</div>
-                                        <div className="info-value">Chưa nộp</div>
+                                        <div className="info-value">
+                                            {currentSubmission ? (
+                                                <span className="text-success">
+                                                    <FaCheckCircle className="me-1" />
+                                                    Đã nộp
+                                                </span>
+                                            ) : (
+                                                "Chưa nộp"
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
+
+                                {currentSubmission && currentSubmission.submittedAt && (
+                                    <div className="info-item">
+                                        <FaClock className="info-icon" />
+                                        <div className="info-content">
+                                            <div className="info-label">Thời gian nộp</div>
+                                            <div className="info-value">
+                                                {formatDate(currentSubmission.submittedAt || currentSubmission.SubmittedAt)}
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
 
                                 {essay?.description && (
                                     <div className="info-description">
@@ -640,10 +851,24 @@ export default function EssayDetail() {
                 isOpen={showSubmitModal}
                 onClose={() => setShowSubmitModal(false)}
                 onConfirm={handleSubmitEssay}
-                title="Xác nhận nộp bài"
-                message="Bạn có chắc chắn muốn nộp bài essay này? Sau khi nộp, bạn không thể chỉnh sửa."
-                confirmText="Nộp bài"
+                title={currentSubmission ? "Xác nhận cập nhật bài" : "Xác nhận nộp bài"}
+                message={currentSubmission
+                    ? "Bạn có chắc chắn muốn cập nhật bài essay này?"
+                    : "Bạn có chắc chắn muốn nộp bài essay này? Sau khi nộp, bạn có thể cập nhật hoặc xóa bài nộp."
+                }
+                confirmText={currentSubmission ? "Cập nhật bài" : "Nộp bài"}
                 cancelText="Hủy"
+            />
+
+            <ConfirmModal
+                isOpen={showDeleteModal}
+                onClose={() => setShowDeleteModal(false)}
+                onConfirm={handleDeleteSubmission}
+                title="Xác nhận xóa bài"
+                message="Bạn có chắc chắn muốn xóa bài nộp này? Hành động này không thể hoàn tác."
+                confirmText="Xóa bài"
+                cancelText="Hủy"
+                type="danger"
             />
 
             <NotificationModal
