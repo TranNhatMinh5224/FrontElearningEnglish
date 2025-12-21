@@ -60,22 +60,7 @@ export default function WelcomePremium() {
             </Card>
           </Col>
         </Row>
-        <div className="premium-actions d-flex justify-content-center gap-3">
-          <Button 
-            variant="outline-primary"
-            className="premium-btn login-btn"
-            onClick={() => navigate("/login")}
-          >
-            Đăng nhập ngay
-          </Button>
-          <Button 
-            variant="success"
-            className="premium-btn register-btn"
-            onClick={() => navigate("/register")}
-          >
-            Đăng ký ngay
-          </Button>
-        </div>
+       
       </Container>
     </section>
   );

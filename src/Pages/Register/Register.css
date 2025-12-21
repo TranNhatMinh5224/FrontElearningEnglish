@@ -69,26 +69,165 @@
 .date-gender-row {
   align-items: flex-start;
   margin-bottom: 30px;
+  gap: 8px;
 }
 
 .date-picker-wrapper {
-  flex: 1;
+  flex: 3;
   position: relative;
   margin-bottom: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Remove padding from react-bootstrap Row and Col, make equal width */
+.date-picker-wrapper .date-picker-container {
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex !important;
+  gap: 4px;
+  width: 100%;
+  flex: 1;
+}
+
+.date-picker-wrapper .date-picker-container > * {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.date-picker-wrapper .date-picker-scroll-wrapper {
+  padding: 0 !important;
+  margin: 0 !important;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: none !important;
+}
+
+.date-picker-wrapper .scroll-picker-container {
+  width: 100% !important;
+  height: 100px;
+}
+
+.date-picker-wrapper .scroll-picker-wrapper {
+  padding: 25px 0;
+}
+
+/* Keep item height 50px to match ScrollPicker logic, but make selected bigger visually */
+.date-picker-wrapper .scroll-picker-item {
+  height: 50px;
+  font-size: 14px;
+  padding: 0 4px;
+}
+
+.date-picker-wrapper .scroll-picker-item.selected {
+  font-size: 26px;
+  font-weight: 700;
+  color: #1f2937;
+  height: 50px;
+  background: rgba(122, 61, 240, 0.05);
+  border: none;
+  border-radius: 10px;
+  box-shadow: none;
+  z-index: 10;
+  position: relative;
+}
+
+.date-picker-wrapper .scroll-picker-overlay-top,
+.date-picker-wrapper .scroll-picker-overlay-bottom {
+  height: 25px;
+}
+
+.date-picker-wrapper .scroll-picker-container::before {
+  top: 25px;
+  bottom: 25px;
+}
+
+.date-picker-wrapper .date-picker-label {
+  font-size: 11px;
+  margin-top: 4px;
+  text-align: center;
 }
 
 .date-picker-wrapper .input-field-error {
   display: block;
   margin-top: 8px;
-  margin-left: 4px;
+  margin-left: 0;
   font-size: 13px;
   color: #ef4444;
-  text-align: left;
+  text-align: center;
+  width: 100%;
+  min-height: 20px;
 }
 
+
+
+/* Gender wrapper styling */
 .gender-wrapper {
   flex: 1;
   margin-bottom: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.gender-wrapper .select-field-wrapper {
+  margin-bottom: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.gender-wrapper .select-field-error {
+  display: block;
+  margin-top: 8px;
+  margin-left: 0;
+  font-size: 13px;
+  color: #ef4444;
+  text-align: center;
+  width: 100%;
+  min-height: 20px;
+}
+
+.gender-wrapper .scroll-picker-container {
+  width: 100% !important;
+  height: 100px;
+}
+
+.gender-wrapper .scroll-picker-wrapper {
+  padding: 25px 0;
+}
+
+/* Keep item height 50px to match ScrollPicker logic, but make selected bigger visually */
+.gender-wrapper .scroll-picker-item {
+  height: 50px;
+  font-size: 14px;
+  padding: 0 8px;
+}
+
+.gender-wrapper .scroll-picker-item.selected {
+  font-size: 26px;
+  font-weight: 700;
+  color: #1f2937;
+  height: 50px;
+  background: rgba(122, 61, 240, 0.05);
+  border: none;
+  border-radius: 10px;
+  box-shadow: none;
+  z-index: 10;
+  position: relative;
+}
+
+.gender-wrapper .scroll-picker-overlay-top,
+.gender-wrapper .scroll-picker-overlay-bottom {
+  height: 25px;
+}
+
+.gender-wrapper .scroll-picker-container::before {
+  top: 25px;
+  bottom: 25px;
 }
 
 /* ===========================
