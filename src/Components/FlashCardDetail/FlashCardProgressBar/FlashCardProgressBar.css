@@ -1,7 +1,7 @@
 .flashcard-progress-bar {
     width: 100%;
     max-width: 800px;
-    margin-bottom: 20px;
+    margin-bottom: -30px;
 }
 
 .progress-container {
@@ -79,4 +79,3 @@
 .flashcard-progress-bar.review-variant .progress-label {
     display: none;
 }
-

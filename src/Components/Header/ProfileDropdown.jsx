@@ -18,8 +18,8 @@ export default function ProfileDropdown() {
 
   return (
     <Dropdown className="profile-wrapper" align="end">
-      <Dropdown.Toggle 
-        as="div" 
+      <Dropdown.Toggle
+        as="div"
         className="profile-trigger"
         id="profile-dropdown"
       >
@@ -34,7 +34,11 @@ export default function ProfileDropdown() {
         </div>
         {!isGuest && (
           <div className="user-info">
-            <span className="name">{user?.fullName}</span>
+            <span className="name">
+              {user?.fullName && user.fullName.length > 12
+                ? `${user.fullName.substring(0, 12)}...`
+                : user?.fullName}
+            </span>
             <span className="role">Học sinh</span>
           </div>
         )}

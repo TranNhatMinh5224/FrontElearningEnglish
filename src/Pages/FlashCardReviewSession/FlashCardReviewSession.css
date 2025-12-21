@@ -1,14 +1,19 @@
 .flashcard-review-session-container {
     min-height: 100vh;
-    padding: 30px 0;
+    padding: 0px 0;
     background: var(--color-bg-secondary, #f5f5f5);
+}
+
+.flashcard-review-session-container .flashcard-content-container {
+    padding-top: 15px !important;
+    padding-bottom: 20px !important;
 }
 
 .review-navigation {
     display: flex;
     justify-content: center;
     gap: 15px;
-    margin-top: 20px;
+    margin-top: -20px;
 }
 
 .review-prev-button,
@@ -80,4 +85,3 @@
 .back-button:hover {
     background: var(--color-secondary-cyan-dark, #35c4d0);
 }
-

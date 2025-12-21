@@ -125,8 +125,36 @@ export default function LessonDetail() {
             }
         }
 
+        // Gọi API start module ngay khi click vào module
+        // Backend sẽ tự động complete cho Lecture/FlashCard/Video/Reading
+        try {
+            console.log(`Starting module ${moduleId}...`);
+            await moduleService.startModule(moduleId);
+            console.log(`Module ${moduleId} started successfully`);
+
+            // Refresh modules list để cập nhật trạng thái completed
+            try {
+                const modulesResponse = await moduleService.getModulesByLessonId(lessonId);
+                if (modulesResponse.data?.success && modulesResponse.data?.data) {
+                    const modulesData = modulesResponse.data.data;
+                    // Sort by orderIndex
+                    const sortedModules = modulesData.sort((a, b) => {
+                        const orderA = a.orderIndex || 0;
+                        const orderB = b.orderIndex || 0;
+                        return orderA - orderB;
+                    });
+                    setModules(sortedModules);
+                }
+            } catch (refreshErr) {
+                console.error("Error refreshing modules list:", refreshErr);
+                // Tiếp tục navigate dù có lỗi refresh
+            }
+        } catch (err) {
+            console.error(`Error starting module ${moduleId}:`, err);
+            // Vẫn tiếp tục navigate dù có lỗi API
+        }
+
         // Navigate based on ContentType: 1=Lecture, 2=Quiz, 3=Assignment, 4=FlashCard
-        // API sẽ được gọi trong LectureDetail/FlashCardDetail/AssignmentDetail để tránh xung đột
         if (contentType === 4 || contentTypeName.includes("flashcard") || contentTypeName.includes("flash")) {
             // Navigate to flashcard detail page
             console.log("Navigating to FlashCard page");
