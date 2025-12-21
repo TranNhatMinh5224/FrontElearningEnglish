@@ -8,7 +8,6 @@ import CourseInfo from "../../Components/Courses/CourseInfo/CourseInfo";
 import CourseSummaryCard from "../../Components/Courses/CourseSummaryCard/CourseSummaryCard";
 import EnrollmentModal from "../../Components/Common/EnrollmentModal/EnrollmentModal";
 import NotificationModal from "../../Components/Common/NotificationModal/NotificationModal";
-import ConfirmModal from "../../Components/Common/ConfirmModal/ConfirmModal";
 import { courseService } from "../../Services/courseService";
 import { enrollmentService } from "../../Services/enrollmentService";
 import { paymentService } from "../../Services/paymentService";
@@ -22,7 +21,6 @@ export default function CourseDetail() {
     const [showEnrollmentModal, setShowEnrollmentModal] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
     const [notification, setNotification] = useState({ isOpen: false, type: "success", message: "" });
-    const [confirmModal, setConfirmModal] = useState({ isOpen: false, message: "", onConfirm: null });
 
     useEffect(() => {
         const fetchCourseDetail = async () => {
@@ -159,47 +157,6 @@ export default function CourseDetail() {
         navigate(`/course/${courseId}/learn`);
     };
 
-    const handleUnenroll = () => {
-        setConfirmModal({
-            isOpen: true,
-            message: "Bạn có chắc chắn muốn hủy đăng ký khóa học này?",
-            onConfirm: async () => {
-                setConfirmModal({ isOpen: false, message: "", onConfirm: null });
-                try {
-                    const response = await enrollmentService.unenroll(courseId);
-                    
-                    if (response.data?.success) {
-                        // Refresh course data to update enrollment status
-                        const courseResponse = await courseService.getCourseById(courseId);
-                        if (courseResponse.data?.success && courseResponse.data?.data) {
-                            setCourse(courseResponse.data.data);
-                        }
-                        setNotification({
-                            isOpen: true,
-                            type: "success",
-                            message: "Đã hủy khóa học thành công"
-                        });
-                    } else {
-                        const errorMsg = response.data?.message || "Không thể hủy đăng ký khóa học. Vui lòng thử lại.";
-                        setNotification({
-                            isOpen: true,
-                            type: "error",
-                            message: errorMsg
-                        });
-                    }
-                } catch (err) {
-                    console.error("Error unenrolling:", err);
-                    const errorMsg = err.response?.data?.message || "Không thể hủy đăng ký khóa học. Vui lòng thử lại.";
-                    setNotification({
-                        isOpen: true,
-                        type: "error",
-                        message: errorMsg
-                    });
-                }
-            }
-        });
-    };
-
     if (loading) {
         return (
             <>
@@ -257,7 +214,6 @@ export default function CourseDetail() {
                                 course={course}
                                 onEnroll={handleEnroll}
                                 onStartLearning={handleStartLearning}
-                                onUnenroll={handleUnenroll}
                             />
                         </Col>
                     </Row>
@@ -278,17 +234,6 @@ export default function CourseDetail() {
                 onClose={() => setNotification({ isOpen: false, type: "success", message: "" })}
                 type={notification.type}
                 message={notification.message}
-            />
-
-            <ConfirmModal
-                isOpen={confirmModal.isOpen}
-                onClose={() => setConfirmModal({ isOpen: false, message: "", onConfirm: null })}
-                onConfirm={confirmModal.onConfirm}
-                title="Xác nhận hủy đăng ký"
-                message={confirmModal.message}
-                confirmText="Xác nhận"
-                cancelText="Hủy"
-                type="warning"
             />
         </>
     );

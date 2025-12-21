@@ -75,8 +75,38 @@ export default function FlashCardDetail() {
                 const flashcardsResponse = await flashcardService.getFlashcardsByModuleId(moduleId);
                 if (flashcardsResponse.data?.success && flashcardsResponse.data?.data) {
                     const flashcardsData = flashcardsResponse.data.data;
-                    setFlashcards(flashcardsData);
-                    if (flashcardsData.length > 0) {
+                    
+                    // Fetch detailed information for each flashcard to get example and exampleTranslation
+                    const flashcardsWithDetails = await Promise.all(
+                        flashcardsData.map(async (flashcard) => {
+                            try {
+                                // Check if flashcard already has example and exampleTranslation
+                                if (flashcard.example && flashcard.exampleTranslation) {
+                                    return flashcard;
+                                }
+                                
+                                // Fetch detailed flashcard if missing example data
+                                const detailResponse = await flashcardService.getFlashcardById(flashcard.flashCardId);
+                                if (detailResponse.data?.success && detailResponse.data?.data) {
+                                    // Merge detail data with list data
+                                    return {
+                                        ...flashcard,
+                                        example: detailResponse.data.data.example || flashcard.example,
+                                        exampleTranslation: detailResponse.data.data.exampleTranslation || flashcard.exampleTranslation,
+                                        pronunciation: detailResponse.data.data.pronunciation || flashcard.pronunciation,
+                                        partOfSpeech: detailResponse.data.data.partOfSpeech || flashcard.partOfSpeech,
+                                    };
+                                }
+                                return flashcard;
+                            } catch (err) {
+                                console.error(`Error fetching detail for flashcard ${flashcard.flashCardId}:`, err);
+                                return flashcard; // Return original if detail fetch fails
+                            }
+                        })
+                    );
+                    
+                    setFlashcards(flashcardsWithDetails);
+                    if (flashcardsWithDetails.length > 0) {
                         setCurrentIndex(0);
                     }
                 } else {

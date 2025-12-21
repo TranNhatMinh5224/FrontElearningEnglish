@@ -36,7 +36,6 @@ export const API_ENDPOINTS = {
     // Enrollments
     ENROLLMENTS: {
         ENROLL: "/user/enrollments/course",
-        UNENROLL: (courseId) => `/user/enrollments/course/${courseId}`,
         MY_COURSES: "/user/enrollments/my-courses",
         JOIN_BY_CLASS_CODE: "/user/enrollments/join-by-class-code",
     },
@@ -100,6 +99,7 @@ export const API_ENDPOINTS = {
         GET_DUE: "/user/flashcard-review/due",
         REVIEW: "/user/flashcard-review/review",
         STATISTICS: "/user/flashcard-review/statistics",
+        GET_MASTERED: "/user/flashcard-review/mastered",
         GET_REVIEW_LIST: "/user/flashcard-review/review-list",
         UPDATE_REVIEW: "/user/flashcard-review/update-review",
         START_MODULE: (moduleId) => `/user/flashcard-review/start-module/${moduleId}`,

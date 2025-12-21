@@ -114,28 +114,6 @@
     transform: translateY(0);
 }
 
-.course-unenroll-btn {
-    width: 100%;
-    padding: 14px;
-    background: var(--color-text-tertiary, #9ca3af);
-    color: var(--color-text-white, white);
-    border: none;
-    border-radius: 12px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: opacity 0.2s ease, transform 0.1s ease;
-}
-
-.course-unenroll-btn:hover {
-    opacity: 0.9;
-    transform: translateY(-1px);
-}
-
-.course-unenroll-btn:active {
-    transform: translateY(0);
-}
-
 @media (max-width: 1024px) {
     .course-summary-card {
         position: relative;

@@ -29,7 +29,7 @@ export default function VocabularyReview() {
     }, []);
 
     const handleStartReview = () => {
-        // Navigate to review session page (to be implemented later)
+        // Navigate to review session page
         navigate("/vocabulary-review/session");
     };
 

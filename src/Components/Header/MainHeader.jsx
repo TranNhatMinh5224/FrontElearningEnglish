@@ -61,8 +61,8 @@ export default function MainHeader() {
             </Nav.Item>
 
             <Nav.Item
-              onClick={() => navigate("#")}
-              className="nav-item"
+              onClick={() => navigate("/vocabulary-notebook")}
+              className={`nav-item ${isActive("/vocabulary-notebook") ? "active" : ""}`}
             >
               <img src={iconSotay} alt="Notebook" className="nav-icon" />
               <span className="nav-text">Sổ tay từ vựng</span>

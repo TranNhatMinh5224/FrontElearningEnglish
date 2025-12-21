@@ -3,7 +3,7 @@ import "./CourseSummaryCard.css";
 import { FaBook, FaTag, FaUsers } from "react-icons/fa";
 import ProgressBar from "../../CourseLearn/ProgressBar/ProgressBar";
 
-export default function CourseSummaryCard({ course, onEnroll, onUnenroll, onStartLearning }) {
+export default function CourseSummaryCard({ course, onEnroll, onStartLearning }) {
     // Format price display
     const getPriceDisplay = () => {
         if (course.price === null || course.price === undefined) {
@@ -70,12 +70,6 @@ export default function CourseSummaryCard({ course, onEnroll, onUnenroll, onStar
                         onClick={onStartLearning}
                     >
                         Vào học ngay
-                    </button>
-                    <button 
-                        className="course-unenroll-btn"
-                        onClick={onUnenroll}
-                    >
-                        Huỷ khoá học
                     </button>
                 </div>
             ) : (

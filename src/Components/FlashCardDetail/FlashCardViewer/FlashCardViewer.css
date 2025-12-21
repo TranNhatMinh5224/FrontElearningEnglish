@@ -7,13 +7,17 @@
     max-width: 1000px;
 }
 
+.flashcard-viewer-wrapper:has(.flashcard-viewer:only-child) {
+    gap: 0;
+}
+
 .flashcard-viewer {
     width: 100%;
-    max-width: 600px;
-    height: 400px;
+    max-width: 450px;
+    height: 500px;
     perspective: 1000px;
     cursor: pointer;
-    flex: 1;
+    flex: 0 0 auto;
 }
 
 .flashcard-nav-button {
@@ -100,114 +104,6 @@
     transform: rotateY(180deg);
 }
 
-.flashcard-front,
-.flashcard-back {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    backface-visibility: hidden;
-    border-radius: 16px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-    display: flex;
-    flex-direction: column;
-    background: #fffacd; /* Pale yellow background */
-}
-
-.flashcard-back {
-    transform: rotateY(180deg);
-    background: #f0f8ff; /* Light blue background for back */
-}
-
-.flashcard-image {
-    width: calc(100% - 60px);
-    max-width: 350px;
-    height: 160px;
-    margin: 20px auto 0 auto;
-    overflow: hidden;
-    border-radius: 10px;
-    flex-shrink: 0;
-    border: 2px solid rgba(0, 0, 0, 0.1);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.flashcard-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-}
-
-.flashcard-content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 20px 20px 30px 20px;
-    gap: 16px;
-}
-
-.flashcard-word-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.flashcard-word {
-    font-size: 36px;
-    font-weight: 700;
-    color: var(--color-text-primary, #1f2937);
-    margin: 0;
-}
-
-.flashcard-audio-btn {
-    background: var(--color-secondary-cyan, #41d6e3);
-    border: none;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 18px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    flex-shrink: 0;
-}
-
-.flashcard-audio-btn:hover {
-    background: var(--color-secondary-cyan-dark, #35c4d0);
-    transform: scale(1.1);
-}
-
-.flashcard-pronunciation {
-    font-size: 20px;
-    color: var(--color-text-secondary, #6b7280);
-    margin: 0;
-    font-style: italic;
-}
-
-.flashcard-meaning {
-    margin-top: 20px;
-}
-
-.flashcard-meaning p {
-    font-size: 24px;
-    font-weight: 600;
-    color: var(--color-text-primary, #1f2937);
-    margin: 0;
-}
-
-.flashcard-hint {
-    position: absolute;
-    bottom: 15px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 14px;
-    color: var(--color-text-tertiary, #9ca3af);
-    margin: 0;
-}
 
 @media (max-width: 768px) {
     .flashcard-viewer-wrapper {
@@ -222,19 +118,9 @@
     }
 
     .flashcard-viewer {
-        height: 350px;
+        max-width: 380px;
+        height: 450px;
     }
 
-    .flashcard-word {
-        font-size: 28px;
-    }
-
-    .flashcard-pronunciation {
-        font-size: 18px;
-    }
-
-    .flashcard-meaning p {
-        font-size: 20px;
-    }
 }
 

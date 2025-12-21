@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
-import { FaVolumeUp, FaChevronLeft, FaChevronRight, FaCheckCircle } from "react-icons/fa";
+import { FaChevronLeft, FaChevronRight, FaCheckCircle } from "react-icons/fa";
+import FlashCardFront from "../FlashCardFront/FlashCardFront";
+import FlashCardBack from "../FlashCardBack/FlashCardBack";
 import "./FlashCardViewer.css";
 
-export default function FlashCardViewer({ flashcard, onPrevious, onNext, canGoPrevious, canGoNext, isLastCard = false, onComplete }) {
+export default function FlashCardViewer({ flashcard, onPrevious, onNext, canGoPrevious, canGoNext, isLastCard = false, onComplete, hideNavigation = false }) {
     const [isFlipped, setIsFlipped] = useState(false);
     const audioRef = useRef(null);
 
@@ -20,10 +22,6 @@ export default function FlashCardViewer({ flashcard, onPrevious, onNext, canGoPr
         return <div className="flashcard-viewer-empty">Không có flashcard</div>;
     }
 
-    const word = flashcard.word || "";
-    const meaning = flashcard.meaning || "";
-    const pronunciation = flashcard.pronunciation || "";
-    const imageUrl = flashcard.imageUrl || "";
     const audioUrl = flashcard.audioUrl || "";
 
     const handleCardClick = () => {
@@ -102,68 +100,33 @@ export default function FlashCardViewer({ flashcard, onPrevious, onNext, canGoPr
     return (
         <>
             <div className="flashcard-viewer-wrapper">
-                <button
-                    className={`flashcard-nav-button prev-button ${!canGoPrevious ? "disabled" : ""}`}
-                    onClick={(e) => handleNavClick(e, "prev")}
-                    disabled={!canGoPrevious}
-                >
-                    <FaChevronLeft />
-                </button>
+                {!hideNavigation && (
+                    <button
+                        className={`flashcard-nav-button prev-button ${!canGoPrevious ? "disabled" : ""}`}
+                        onClick={(e) => handleNavClick(e, "prev")}
+                        disabled={!canGoPrevious}
+                    >
+                        <FaChevronLeft />
+                    </button>
+                )}
                 <div 
                     className={`flashcard-viewer ${isFlipped ? "flipped" : ""}`}
                     onClick={handleCardClick}
                 >
                     <div className="flashcard-inner">
-                        <div className="flashcard-front">
-                            {imageUrl && (
-                                <div className="flashcard-image">
-                                    <img src={imageUrl} alt={word} />
-                                </div>
-                            )}
-                            <div className="flashcard-content">
-                                <div className="flashcard-word-row">
-                                    <h2 className="flashcard-word">{word}</h2>
-                                    {audioUrl && (
-                                        <button 
-                                            className="flashcard-audio-btn"
-                                            onClick={handleAudioClick}
-                                        >
-                                            <FaVolumeUp />
-                                        </button>
-                                    )}
-                                </div>
-                                {pronunciation && (
-                                    <p className="flashcard-pronunciation">{pronunciation}</p>
-                                )}
-                                <p className="flashcard-hint">Ấn vào thẻ để lật</p>
-                            </div>
-                        </div>
-                        <div className="flashcard-back">
-                            {imageUrl && (
-                                <div className="flashcard-image">
-                                    <img src={imageUrl} alt={word} />
-                                </div>
-                            )}
-                            <div className="flashcard-content">
-                                <h2 className="flashcard-word">{word}</h2>
-                                {pronunciation && (
-                                    <p className="flashcard-pronunciation">{pronunciation}</p>
-                                )}
-                                <div className="flashcard-meaning">
-                                    <p>{meaning}</p>
-                                </div>
-                                <p className="flashcard-hint">Ấn vào thẻ để lật</p>
-                            </div>
-                        </div>
+                        <FlashCardFront flashcard={flashcard} onAudioClick={handleAudioClick} />
+                        <FlashCardBack flashcard={flashcard} onAudioClick={handleAudioClick} />
                     </div>
                 </div>
-                <button
-                    className={`flashcard-nav-button next-button ${!canGoNext ? "disabled" : ""}`}
-                    onClick={(e) => handleNavClick(e, "next")}
-                    disabled={!canGoNext}
-                >
-                    <FaChevronRight />
-                </button>
+                {!hideNavigation && (
+                    <button
+                        className={`flashcard-nav-button next-button ${!canGoNext ? "disabled" : ""}`}
+                        onClick={(e) => handleNavClick(e, "next")}
+                        disabled={!canGoNext}
+                    >
+                        <FaChevronRight />
+                    </button>
+                )}
             </div>
             {isLastCard && (
                 <button

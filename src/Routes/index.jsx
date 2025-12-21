@@ -17,6 +17,8 @@ import OtpResetPassword from "../Pages/OtpResetPassword/OtpResetPassword";
 import ResetPassword from "../Pages/ResetPassword/ResetPassword";
 import Payment from "../Pages/Payment/Payment";
 import VocabularyReview from "../Pages/VocabularyReview/VocabularyReview";
+import FlashCardReviewSession from "../Pages/FlashCardReviewSession/FlashCardReviewSession";
+import VocabularyNotebook from "../Pages/VocabularyNotebook/VocabularyNotebook";
 import GoogleCallback from "../Pages/AuthCallback/GoogleCallback";
 import FacebookCallback from "../Pages/AuthCallback/FacebookCallback";
 import CourseDetail from "../Pages/CourseDetail/CourseDetail";
@@ -59,6 +61,8 @@ export default function AppRoutes() {
       <Route path={ROUTE_PATHS.PROFILE_CHANGE_PASSWORD} element={<ChangePassword />} />
       <Route path={ROUTE_PATHS.PAYMENT} element={<Payment />} />
       <Route path={ROUTE_PATHS.VOCABULARY_REVIEW} element={<VocabularyReview />} />
+      <Route path="/vocabulary-review/session" element={<FlashCardReviewSession />} />
+      <Route path={ROUTE_PATHS.VOCABULARY_NOTEBOOK} element={<VocabularyNotebook />} />
       
       {/* Course routes - specific routes first */}
       <Route path="/course/:courseId/lesson/:lessonId/module/:moduleId/lecture/:lectureId" element={<LectureDetail />} />

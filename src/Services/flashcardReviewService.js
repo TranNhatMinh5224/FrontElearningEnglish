@@ -35,6 +35,13 @@ const flashcardReviewService = {
     startModule: async (moduleId) => {
         return await axiosClient.post(API_ENDPOINTS.FLASHCARD_REVIEW.START_MODULE(moduleId));
     },
+
+    /**
+     * Lấy danh sách từ đã thuộc
+     */
+    getMasteredFlashCards: async () => {
+        return await axiosClient.get(API_ENDPOINTS.FLASHCARD_REVIEW.GET_MASTERED);
+    },
 };
 
 export { flashcardReviewService };
