@@ -3,9 +3,10 @@ import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Container, Navbar, Nav } from "react-bootstrap";
 import "./Header.css";
-import { mochiWelcome as logo, iconHome, iconCourse, iconOntap, iconSotay, iconBell, iconStreakFire as iconFireStreak } from "../../Assets";
+import { mochiWelcome as logo, iconHome, iconCourse, iconOntap, iconSotay } from "../../Assets";
 import ProfileDropdown from "./ProfileDropdown";
-import { useStreak } from "../../Context/StreakContext";
+import NotificationDropdown from "./NotificationDropdown/NotificationDropdown";
+import StreakDropdown from "./StreakDropdown/StreakDropdown";
 import { useAuth } from "../../Context/AuthContext";
 import { ROUTE_PATHS } from "../../Routes/Paths";
 import LoginRequiredModal from "../Common/LoginRequiredModal/LoginRequiredModal";
@@ -13,7 +14,6 @@ import LoginRequiredModal from "../Common/LoginRequiredModal/LoginRequiredModal"
 export default function MainHeader() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { streakDays } = useStreak();
   const { isAuthenticated } = useAuth();
   const [showLoginModal, setShowLoginModal] = useState(false);
 
@@ -85,13 +85,8 @@ export default function MainHeader() {
 
           {/* RIGHT: streak + notification + profile */}
           <div className="main-header__right d-flex align-items-center gap-3">
-            <div className="streak-badge">
-              <img src={iconFireStreak} alt="Streak" className="streak-icon" />
-              <span>{streakDays || 0} ngày</span>
-            </div>
-            <button className="notification-button" onClick={() => navigate("/notifications")}>
-              <img src={iconBell} alt="Notifications" className="notification-icon" />
-            </button>
+            <StreakDropdown />
+            <NotificationDropdown />
             <ProfileDropdown />
           </div>
         </Navbar.Collapse>

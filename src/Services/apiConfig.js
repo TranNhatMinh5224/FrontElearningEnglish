@@ -137,7 +137,8 @@ export const API_ENDPOINTS = {
     // Notifications
     NOTIFICATIONS: {
         GET_ALL: "/user/notifications",
-        MARK_READ: (notificationId) => `/user/notifications/${notificationId}/read`,
+        GET_UNREAD_COUNT: "/user/notifications/unread-count",
+        MARK_READ: (notificationId) => `/user/notifications/${notificationId}/mark-as-read`,
         MARK_ALL_READ: "/user/notifications/mark-all-read",
     },
     // Streaks
