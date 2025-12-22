@@ -4,13 +4,21 @@
     position: sticky;
     top: calc(70px + 30px); /* Header height + padding */
     align-self: flex-start;
+    animation: fadeInUp 0.6s ease-out;
 }
 
 .account-upgrade-section h2 {
     font-size: 26px;
     font-weight: 700;
     margin-bottom: 8px;
-    color: var(--color-text-primary, #1f2937);
+    color: #7c3aed;
+    animation: fadeInDown 0.5s ease-out;
+    transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.account-upgrade-section h2:hover {
+    transform: translateY(-2px);
+    color: #6d28d9;
 }
 
 .account-upgrade-section p {
@@ -18,12 +26,67 @@
     color: var(--color-text-secondary, #6b7280);
     margin-bottom: 14px;
     line-height: 1.4;
+    animation: fadeInUp 0.6s ease-out 0.2s both;
 }
 
 .package-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 8px;
+    align-items: stretch;
+}
+
+.package-grid > * {
+    animation: fadeInScale 0.5s ease-out both;
+}
+
+.package-grid > *:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.package-grid > *:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.package-grid > *:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+.package-grid > *:nth-child(4) {
+    animation-delay: 0.4s;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 @media (max-width: 1024px) {

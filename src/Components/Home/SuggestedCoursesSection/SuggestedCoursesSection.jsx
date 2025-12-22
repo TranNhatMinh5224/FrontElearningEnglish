@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from "react";
 import SuggestedCourseCard from "../SuggestedCourseCard/SuggestedCourseCard";
 import { courseService } from "../../../Services/courseService";
-import { enrollmentService } from "../../../Services/enrollmentService";
 import { mochiKhoaHoc as mochiKhoaHocImage } from "../../../Assets";
 import { useAuth } from "../../../Context/AuthContext";
 import "./SuggestedCoursesSection.css";
 
 export default function SuggestedCoursesSection({ courses = [] }) {
     const [systemCourses, setSystemCourses] = useState([]);
-    const [enrolledCourseIds, setEnrolledCourseIds] = useState(new Set());
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const { isGuest } = useAuth();
@@ -19,11 +17,12 @@ export default function SuggestedCoursesSection({ courses = [] }) {
                 setLoading(true);
                 setError(null);
                 
-                // Fetch system courses
+                // Fetch system courses (API đã trả về IsEnrolled trong response)
                 const response = await courseService.getSystemCourses();
                 
                 if (response.data?.success && response.data?.data) {
                     // Lấy tất cả khóa học hệ thống, không lọc isFeatured
+                    // API đã trả về IsEnrolled, sử dụng trực tiếp
                     const mappedCourses = response.data.data.map((course) => ({
                         id: course.courseId,
                         courseId: course.courseId,
@@ -32,23 +31,9 @@ export default function SuggestedCoursesSection({ courses = [] }) {
                             ? course.imageUrl 
                             : mochiKhoaHocImage,
                         price: course.price || 0,
+                        isEnrolled: course.isEnrolled || course.IsEnrolled || false, // Lấy từ API response
                     }));
                     setSystemCourses(mappedCourses);
-
-                    // Fetch enrolled courses if user is authenticated
-                    if (!isGuest) {
-                        try {
-                            const enrolledResponse = await enrollmentService.getMyCourses();
-                            const enrolledData = enrolledResponse.data?.data || [];
-                            const enrolledIds = new Set(
-                                enrolledData.map((course) => course.courseId)
-                            );
-                            setEnrolledCourseIds(enrolledIds);
-                        } catch (enrollError) {
-                            console.error("Error fetching enrolled courses:", enrollError);
-                            // Continue without enrollment data
-                        }
-                    }
                 } else {
                     setSystemCourses([]);
                 }
@@ -73,7 +58,7 @@ export default function SuggestedCoursesSection({ courses = [] }) {
 
     return (
         <div className="suggested-courses-section">
-            <h2>Khóa học hệ thống</h2>
+            <h2>Catalunya English - Hệ Thống Khóa học Số 1 Việt Nam </h2>
             {loading ? (
                 <div className="loading-message">Đang tải khóa học...</div>
             ) : error ? (
@@ -84,7 +69,8 @@ export default function SuggestedCoursesSection({ courses = [] }) {
                         <SuggestedCourseCard
                             key={course.id || index}
                             course={course}
-                            isEnrolled={enrolledCourseIds.has(course.courseId || course.id)}
+                            isEnrolled={course.isEnrolled || false} // Sử dụng IsEnrolled từ API
+                            showEnrolledBadge={true} // Hiển thị badge ở trang chủ
                         />
                     ))}
                 </div>

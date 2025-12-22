@@ -9,9 +9,9 @@ export default function ProfileDropdown() {
   const navigate = useNavigate();
   const { user: authUser, roles, isGuest, logout } = useAuth();
 
-  const isTeacher = roles.includes("Teacher");
+  const isTeacher = roles.includes("Teacher") || authUser?.teacherSubscription?.isTeacher === true;
   const isAdmin = roles.includes("Admin");
-  const isPremium = authUser?.teacherSubscription?.subscriptionType === "Premium";
+  const isPremium = authUser?.teacherSubscription?.subscriptionType === "Premium" || authUser?.teacherSubscription?.packageLevel === "Premium";
 
   // Use user from auth context (includes avatarUrl)
   const user = authUser;
@@ -69,14 +69,22 @@ export default function ProfileDropdown() {
             </Dropdown.Item>
 
             {isTeacher && user?.teacherSubscription && (
-              <Dropdown.Item
-                className="teacher"
-                onClick={() => navigate("/teacher")}
-              >
-                {isPremium
-                  ? "Gói giáo viên Premium"
-                  : "Gói giáo viên cơ bản"}
-              </Dropdown.Item>
+              <>
+                <Dropdown.Item
+                  className="teacher-switch"
+                  onClick={() => navigate("/teacher")}
+                >
+                  Chuyển giao diện giáo viên
+                </Dropdown.Item>
+                <Dropdown.Item
+                  className="teacher"
+                  onClick={() => navigate("/teacher")}
+                >
+                  {isPremium
+                    ? "Gói giáo viên Premium"
+                    : "Gói giáo viên cơ bản"}
+                </Dropdown.Item>
+              </>
             )}
 
             <Dropdown.Divider />

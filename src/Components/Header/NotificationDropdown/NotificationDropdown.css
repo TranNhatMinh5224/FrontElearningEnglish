@@ -40,6 +40,81 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    transition: transform 0.3s ease;
+}
+
+.notification-icon.ringing {
+    animation: bellRing 0.5s ease-in-out infinite;
+}
+
+.notification-button.has-notifications {
+    animation: bellShake 0.5s ease-in-out infinite;
+}
+
+@keyframes bellRing {
+    0%, 100% {
+        transform: translate(-50%, -50%) rotate(0deg);
+    }
+    10% {
+        transform: translate(-50%, -50%) rotate(-10deg);
+    }
+    20% {
+        transform: translate(-50%, -50%) rotate(10deg);
+    }
+    30% {
+        transform: translate(-50%, -50%) rotate(-10deg);
+    }
+    40% {
+        transform: translate(-50%, -50%) rotate(10deg);
+    }
+    50% {
+        transform: translate(-50%, -50%) rotate(-8deg);
+    }
+    60% {
+        transform: translate(-50%, -50%) rotate(8deg);
+    }
+    70% {
+        transform: translate(-50%, -50%) rotate(-5deg);
+    }
+    80% {
+        transform: translate(-50%, -50%) rotate(5deg);
+    }
+    90% {
+        transform: translate(-50%, -50%) rotate(-2deg);
+    }
+}
+
+@keyframes bellShake {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    10% {
+        transform: translateX(-2px);
+    }
+    20% {
+        transform: translateX(2px);
+    }
+    30% {
+        transform: translateX(-2px);
+    }
+    40% {
+        transform: translateX(2px);
+    }
+    50% {
+        transform: translateX(-1px);
+    }
+    60% {
+        transform: translateX(1px);
+    }
+    70% {
+        transform: translateX(-1px);
+    }
+    80% {
+        transform: translateX(1px);
+    }
+    90% {
+        transform: translateX(0);
+    }
 }
 
 .notification-badge {
@@ -77,6 +152,10 @@
     padding: 16px 20px;
     border-bottom: 1px solid #e5e7eb;
     background: #f9fafb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
 }
 
 .notification-title {
@@ -84,6 +163,29 @@
     font-size: 18px;
     font-weight: 700;
     color: #1f2937;
+    flex: 1;
+}
+
+.notification-mark-all-btn {
+    background: none;
+    border: none;
+    color: #3b82f6;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: background 0.2s ease, color 0.2s ease;
+    white-space: nowrap;
+}
+
+.notification-mark-all-btn:hover {
+    background: #e0e7ff;
+    color: #2563eb;
+}
+
+.notification-mark-all-btn:active {
+    background: #c7d2fe;
 }
 
 .notification-list {
@@ -100,6 +202,51 @@
     align-items: flex-start;
     gap: 12px;
     position: relative;
+}
+
+.notification-icon-wrapper {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    background: #f3f4f6;
+    margin-top: 2px;
+}
+
+.notification-type-icon {
+    font-size: 16px;
+    color: #6b7280;
+}
+
+.notification-type-icon.icon-enrollment {
+    color: #3b82f6;
+}
+
+.notification-type-icon.icon-completion {
+    color: #10b981;
+}
+
+.notification-type-icon.icon-vocabulary {
+    color: #f59e0b;
+}
+
+.notification-type-icon.icon-assessment {
+    color: #8b5cf6;
+}
+
+.notification-type-icon.icon-payment {
+    color: #06b6d4;
+}
+
+.notification-item.unread .notification-icon-wrapper {
+    background: #dbeafe;
+}
+
+.notification-item.unread .notification-type-icon {
+    color: #3b82f6;
 }
 
 .notification-item:hover {

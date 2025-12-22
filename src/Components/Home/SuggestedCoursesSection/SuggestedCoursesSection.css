@@ -1,8 +1,99 @@
 .suggested-courses-section h2 {
-    font-size: 26px;
+    font-size: 28px;
     margin-bottom: 24px;
-    color: var(--color-text-primary, #1f2937);
-    font-weight: 700;
+    margin-left: 0;
+    font-weight: 800;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    padding: 8px 12px;
+    border-radius: 12px;
+    animation: fadeInLeft 0.8s ease-out;
+    color: #7c3aed;
+}
+
+@keyframes gradientTextShift {
+    0%, 100% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
+.suggested-courses-section h2::after {
+    content: '🎯';
+    font-size: 20px;
+    animation: bounceTarget 2s ease-in-out infinite, pulseTarget 1.5s ease-in-out infinite;
+    filter: drop-shadow(0 0 8px rgba(65, 214, 227, 0.6));
+}
+
+
+@keyframes fadeInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-40px) scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+}
+
+@keyframes slideInGlow {
+    0% {
+        text-shadow: 0 0 0 rgba(65, 214, 227, 0);
+    }
+    100% {
+        text-shadow: 0 0 20px rgba(65, 214, 227, 0.4), 0 0 40px rgba(217, 70, 239, 0.2);
+    }
+}
+
+@keyframes bounceTarget {
+    0%, 100% {
+        transform: translateY(0) scale(1);
+    }
+    25% {
+        transform: translateY(-8px) scale(1.1);
+    }
+    50% {
+        transform: translateY(-4px) scale(1.05);
+    }
+    75% {
+        transform: translateY(-6px) scale(1.08);
+    }
+}
+
+@keyframes pulseTarget {
+    0%, 100% {
+        filter: drop-shadow(0 0 8px rgba(65, 214, 227, 0.6));
+    }
+    50% {
+        filter: drop-shadow(0 0 15px rgba(217, 70, 239, 0.8));
+    }
+}
+
+@keyframes gradientBgShift {
+    0%, 100% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
+
+.suggested-courses-section h2:hover {
+    color: #6d28d9;
+    transform: translateX(8px) scale(1.05);
+}
+
+@keyframes hoverGlow {
+    to {
+        text-shadow: 0 0 30px rgba(65, 214, 227, 0.6), 0 0 60px rgba(217, 70, 239, 0.4);
+    }
 }
 
 .suggested-courses-grid {

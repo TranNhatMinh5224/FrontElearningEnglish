@@ -3,9 +3,105 @@
 }
 
 .my-courses-section h2 {
-    font-size: 22px;
+    font-size: 28px;
+    font-weight: 800;
     margin-bottom: 20px;
-    color: var(--color-text-primary, #1f2937);
+    margin-left: 0;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    padding: 8px 12px;
+    border-radius: 12px;
+    animation: fadeInLeft 0.8s ease-out;
+    color: #1f2937;
+}
+
+@keyframes gradientTextShift {
+    0%, 100% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
+.my-courses-section h2::after {
+    content: '⭐';
+    font-size: 24px;
+    line-height: 1;
+    display: inline-block;
+    animation: rotateStar 3s linear infinite, pulseStar 2s ease-in-out infinite;
+    filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.9)) drop-shadow(0 0 12px rgba(255, 193, 7, 0.7));
+    text-shadow: 0 0 6px rgba(255, 215, 0, 0.8);
+    color: #FFD700;
+    -webkit-text-fill-color: #FFD700 !important;
+    background: none !important;
+    background-clip: unset !important;
+    -webkit-background-clip: unset !important;
+}
+
+
+@keyframes fadeInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-40px) scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
+}
+
+@keyframes slideInGlow {
+    0% {
+        text-shadow: 0 0 0 rgba(65, 214, 227, 0);
+    }
+    100% {
+        text-shadow: 0 0 20px rgba(65, 214, 227, 0.4), 0 0 40px rgba(217, 70, 239, 0.2);
+    }
+}
+
+@keyframes rotateStar {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes pulseStar {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.2);
+        opacity: 0.8;
+    }
+}
+
+@keyframes gradientBgShift {
+    0%, 100% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
+
+.my-courses-section h2:hover {
+    transform: translateX(8px) scale(1.05);
+    color: #41d6e3;
+}
+
+@keyframes hoverGlow {
+    to {
+        text-shadow: 0 0 30px rgba(65, 214, 227, 0.6), 0 0 60px rgba(217, 70, 239, 0.4);
+    }
 }
 
 .course-grid-wrapper {
@@ -15,12 +111,52 @@
     margin: 0 auto;
 }
 
+/* Scroll navigation buttons */
+.scroll-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: white;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    transition: all 0.2s ease;
+    color: #1f2937;
+    font-size: 20px;
+}
+
+.scroll-button:hover {
+    background: #f3f4f6;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    transform: translateY(-50%) scale(1.1);
+}
+
+.scroll-button:active {
+    transform: translateY(-50%) scale(0.95);
+}
+
+.scroll-button-left {
+    left: 0;
+}
+
+.scroll-button-right {
+    right: 0;
+}
+
 .course-grid {
     display: flex;
     gap: 28px;
     overflow-x: auto;
     overflow-y: hidden;
-    padding: 0 40px 15px 40px;
+    padding: 0 60px 15px 60px;
+    padding-right: calc(60px + 240px + 28px); /* padding-right + card width + gap để đảm bảo card cuối cùng hiển thị đầy đủ */
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
     position: relative;
@@ -52,6 +188,17 @@
     .course-card {
         width: 220px;
     }
+
+    .course-grid {
+        padding: 0 55px 15px 55px;
+        padding-right: calc(55px + 220px + 28px); /* padding-right + card width + gap */
+    }
+
+    .scroll-button {
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
+    }
 }
 
 @media (max-width: 768px) {
@@ -61,11 +208,30 @@
 
     .course-grid {
         gap: 12px;
+        padding: 0 50px 15px 50px;
+        padding-right: calc(50px + 200px + 12px); /* padding-right + card width + gap */
+    }
+
+    .scroll-button {
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
     }
 }
 
 @media (max-width: 480px) {
     .course-card {
         width: 180px;
+    }
+
+    .course-grid {
+        padding: 0 45px 15px 45px;
+        padding-right: calc(45px + 180px + 12px); /* padding-right + card width + gap */
+    }
+
+    .scroll-button {
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
     }
 }

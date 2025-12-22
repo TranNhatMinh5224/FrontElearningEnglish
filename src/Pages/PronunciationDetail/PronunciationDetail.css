@@ -1,9 +1,10 @@
 .pronunciation-detail-container {
     min-height: 100vh;
     background: #f8f9fa;
-    padding: 2rem 0;
+    padding: 1rem 0;
     border-top: 4px solid #41d6e3;
-    padding-top: calc(2rem + 4px);
+    padding-top: calc(70px + 1rem + 4px);
+    margin-top: 0;
 }
 
 .pronunciation-header {
@@ -12,8 +13,8 @@
     justify-content: center;
     gap: 1rem;
     position: relative;
-    margin-top: 2rem;
-    margin-bottom: 2rem;
+    margin-top: 0.5rem;
+    margin-bottom: 1rem;
 }
 
 .back-button {

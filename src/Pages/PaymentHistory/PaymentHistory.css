@@ -190,3 +190,70 @@
     }
 }
 
+/* Pagination Styles */
+.pagination-wrapper {
+    margin-top: 30px;
+    padding: 20px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    border-top: 1px solid #e9ecef;
+}
+
+.pagination-wrapper .pagination {
+    margin: 0;
+    display: flex;
+    gap: 5px;
+}
+
+.pagination-wrapper .page-link {
+    color: #6fd5e0;
+    border: 1px solid #dee2e6;
+    padding: 8px 16px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.pagination-wrapper .page-link:hover {
+    background-color: #f8f9fa;
+    border-color: #6fd5e0;
+    color: #5bc4d0;
+}
+
+.pagination-wrapper .page-item.active .page-link {
+    background-color: #6fd5e0;
+    border-color: #6fd5e0;
+    color: white;
+}
+
+.pagination-wrapper .page-item.disabled .page-link {
+    color: #6c757d;
+    background-color: #fff;
+    border-color: #dee2e6;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.pagination-info {
+    color: #6b7280;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+@media (max-width: 768px) {
+    .pagination-wrapper {
+        margin-top: 20px;
+        padding: 15px 0;
+    }
+
+    .pagination-wrapper .page-link {
+        padding: 6px 12px;
+        font-size: 14px;
+    }
+
+    .pagination-info {
+        font-size: 13px;
+    }
+}
+

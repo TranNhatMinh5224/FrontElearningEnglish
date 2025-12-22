@@ -85,7 +85,7 @@
 .course-enrolled-btn {
     width: 100%;
     padding: 14px;
-    background: var(--color-secondary-pink, #d946ef);
+    background: var(--color-border-medium, #d1d5db);
     color: var(--color-text-white, white);
     border: none;
     border-radius: 12px;

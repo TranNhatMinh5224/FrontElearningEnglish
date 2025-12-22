@@ -3,7 +3,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    margin: 2rem 0;
+    margin: 1rem 0;
 }
 
 .progress-circle-wrapper {
@@ -45,7 +45,7 @@
 }
 
 .progress-feedback-wrapper {
-    margin-top: 1.5rem;
+    margin-top: 0.75rem;
     text-align: center;
     width: 100%;
     max-width: 400px;

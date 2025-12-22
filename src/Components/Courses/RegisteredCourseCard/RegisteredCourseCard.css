@@ -19,8 +19,13 @@
     object-fit: cover;
 }
 
-.course-info {
+.registered-course-card .course-info {
     padding: 16px;
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
 }
 
 .course-info h3 {

@@ -6,7 +6,15 @@ export const paymentService = {
 
     confirmPayment: (data) => axiosClient.post(API_ENDPOINTS.PAYMENTS.CONFIRM, data),
 
-    getHistory: () => axiosClient.get(API_ENDPOINTS.PAYMENTS.HISTORY),
+    /**
+     * Lấy lịch sử giao dịch với phân trang
+     * @param {number} pageNumber - Số trang (mặc định 1)
+     * @param {number} pageSize - Số lượng bản ghi mỗi trang (mặc định 20)
+     */
+    getHistory: (pageNumber = 1, pageSize = 20) => 
+        axiosClient.get(API_ENDPOINTS.PAYMENTS.HISTORY, {
+            params: { pageNumber, pageSize }
+        }),
 
     getAllHistory: () => axiosClient.get(API_ENDPOINTS.PAYMENTS.HISTORY_ALL),
 

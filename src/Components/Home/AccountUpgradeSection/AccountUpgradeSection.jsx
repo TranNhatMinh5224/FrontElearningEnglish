@@ -89,7 +89,7 @@ export default function AccountUpgradeSection({
                 tốt hơn
             </p>
             <div className="package-grid">
-                {packages.map((pkg) => (
+                {packages.slice(0, 4).map((pkg) => (
                     <UpgradeCard
                         key={pkg.teacherPackageId}
                         teacherPackageId={pkg.teacherPackageId}

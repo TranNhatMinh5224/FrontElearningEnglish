@@ -10,6 +10,13 @@ const notificationService = {
     },
 
     /**
+     * Lấy số lượng thông báo chưa đọc
+     */
+    getUnreadCount: async () => {
+        return await axiosClient.get(API_ENDPOINTS.NOTIFICATIONS.GET_UNREAD_COUNT);
+    },
+
+    /**
      * Đánh dấu thông báo đã đọc
      * @param {number} notificationId - ID của thông báo
      */

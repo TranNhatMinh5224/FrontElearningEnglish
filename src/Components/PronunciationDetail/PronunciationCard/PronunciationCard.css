@@ -1,13 +1,13 @@
 .pronunciation-card {
     background: white;
     border-radius: 16px;
-    padding: 2rem;
+    padding: 1.5rem;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    min-height: 500px;
+    min-height: auto;
     display: flex;
     flex-direction: column;
     border-top: 4px solid #41d6e3;
-    margin-top: 2rem;
+    margin-top: 0;
 }
 
 .pronunciation-card-header {
@@ -24,33 +24,33 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 2rem;
+    gap: 1rem;
     text-align: center;
 }
 
 .word-display {
-    margin: 1rem 0;
+    margin: 0.5rem 0;
 }
 
 .word-text {
-    font-size: 3rem;
+    font-size: 2.5rem;
     font-weight: 700;
     color: #1f2937;
-    margin: 0 0 0.5rem 0;
+    margin: 0 0 0.25rem 0;
 }
 
 .phonetic-text {
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     color: #10b981;
     font-style: italic;
-    margin: 0 0 0.75rem 0;
+    margin: 0 0 0.5rem 0;
     font-weight: 500;
 }
 
 .definition-text {
-    font-size: 1.1rem;
+    font-size: 1rem;
     color: #6b7280;
-    margin: 0;
+    margin: 0 0 0.5rem 0;
     font-weight: 400;
 }
 
@@ -68,7 +68,7 @@
     align-items: center;
     justify-content: center;
     gap: 1rem;
-    margin-top: 2rem;
+    margin-top: 1rem;
     flex-wrap: wrap;
 }
 

@@ -288,6 +288,18 @@
   font-weight: 600 !important;
 }
 
+.profile-dropdown .teacher-switch,
+.profile-wrapper .dropdown-item.teacher-switch {
+  font-weight: 600 !important;
+  color: #ffe089 !important;
+}
+
+.profile-dropdown .teacher-switch:hover,
+.profile-wrapper .dropdown-item.teacher-switch:hover {
+  background: rgba(255, 224, 137, 0.2) !important;
+  color: #ffe089 !important;
+}
+
 /* Override Bootstrap dropdown-divider */
 .profile-dropdown .dropdown-divider,
 .profile-wrapper .dropdown-divider {

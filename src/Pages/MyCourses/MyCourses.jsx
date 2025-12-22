@@ -1,152 +1,117 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { Pagination } from "react-bootstrap";
 import "./MyCourses.css";
 import MainHeader from "../../Components/Header/MainHeader";
 import JoinClassModal from "../../Components/Common/JoinClassModal/JoinClassModal";
 import NotificationModal from "../../Components/Common/NotificationModal/NotificationModal";
-import RegisteredCourseCard from "../../Components/Courses/RegisteredCourseCard/RegisteredCourseCard";
-import PublicCourseCard from "../../Components/Courses/PublicCourseCard/PublicCourseCard";
-import { FaSearch, FaPlus } from "react-icons/fa";
+import SuggestedCourseCard from "../../Components/Home/SuggestedCourseCard/SuggestedCourseCard";
+import AccountUpgradeSection from "../../Components/Home/AccountUpgradeSection/AccountUpgradeSection";
+import { FaPlus } from "react-icons/fa";
 import { enrollmentService } from "../../Services/enrollmentService";
 import { courseService } from "../../Services/courseService";
+import { useAuth } from "../../Context/AuthContext";
 import { mochiKhoaHoc as mochiKhoaHocImage } from "../../Assets";
+import LoginRequiredModal from "../../Components/Common/LoginRequiredModal/LoginRequiredModal";
 
 export default function MyCourses() {
     const navigate = useNavigate();
+    const { isAuthenticated, user } = useAuth();
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [searchQuery, setSearchQuery] = useState("");
-    const [registeredCourses, setRegisteredCourses] = useState([]);
-    const [publicCourses, setPublicCourses] = useState([]);
-    const [filteredRegisteredCourses, setFilteredRegisteredCourses] = useState([]);
-    const [filteredPublicCourses, setFilteredPublicCourses] = useState([]);
+    const [showLoginModal, setShowLoginModal] = useState(false);
+    const [selectedPackage, setSelectedPackage] = useState(null);
+    
+    // Enrolled courses state với pagination
+    const [enrolledCourses, setEnrolledCourses] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [currentPage, setCurrentPage] = useState(1);
+    const [pageSize] = useState(20); // Hiển thị 20 courses mỗi trang (4 columns x 5 rows)
+    const [totalCount, setTotalCount] = useState(0);
+    const [totalPages, setTotalPages] = useState(0);
+    
     const [notification, setNotification] = useState({
         isOpen: false,
         type: "info", // "success", "error", "info"
         message: ""
     });
 
+    // Fetch enrolled courses với pagination
     useEffect(() => {
-        const fetchCourses = async () => {
+        const fetchEnrolledCourses = async () => {
             try {
                 setLoading(true);
                 setError("");
 
-                // 1. Lấy danh sách khóa học đã đăng ký
-                const registeredRes = await enrollmentService.getMyCourses();
-                const registeredData = registeredRes.data?.data || [];
-
-                const mappedRegisteredCourses = registeredData.map((course) => ({
-                    id: course.courseId,
-                    title: course.title,
-                    imageUrl: course.imageUrl && course.imageUrl.trim() !== ""
-                        ? course.imageUrl
-                        : mochiKhoaHocImage,
-                    progress: Math.round(course.progressPercentage || 0),
-                }));
-
-                // 2. Lấy danh sách khóa học hệ thống và lọc chỉ lấy isFeatured = true
-                const publicRes = await courseService.getSystemCourses();
-                const publicData = publicRes.data?.data || [];
-
-                const featuredCourses = publicData.filter(
-                    (course) => course.isFeatured === true
-                );
-
-                const mappedPublicCourses = featuredCourses.map((course) => ({
-                    id: course.courseId,
-                    courseId: course.courseId,
-                    title: course.title,
-                    imageUrl: course.imageUrl && course.imageUrl.trim() !== ""
-                        ? course.imageUrl
-                        : mochiKhoaHocImage,
-                }));
-
-                setRegisteredCourses(mappedRegisteredCourses);
-                setPublicCourses(mappedPublicCourses);
-                // Initialize filtered courses
-                setFilteredRegisteredCourses(mappedRegisteredCourses);
-                setFilteredPublicCourses(mappedPublicCourses);
+                // Lấy danh sách khóa học đã đăng ký với phân trang
+                const registeredRes = await enrollmentService.getMyCourses(currentPage, pageSize);
+                
+                // Handle both camelCase and PascalCase responses
+                const isSuccess = registeredRes.data?.Success !== false && registeredRes.data?.success !== false;
+                const data = registeredRes.data?.data ?? registeredRes.data?.Data;
+                
+                if (isSuccess && data) {
+                    // Handle paginated response
+                    if (data.items || data.Items) {
+                        const items = data.items || data.Items || [];
+                        const total = data.totalCount || data.TotalCount || 0;
+                        const pages = data.totalPages || data.TotalPages || 1;
+                        
+                        const mappedCourses = items.map((course) => ({
+                            id: course.courseId || course.CourseId,
+                            courseId: course.courseId || course.CourseId,
+                            title: course.title || course.Title,
+                            imageUrl: (course.imageUrl || course.ImageUrl) && (course.imageUrl || course.ImageUrl).trim() !== ""
+                                ? (course.imageUrl || course.ImageUrl)
+                                : mochiKhoaHocImage,
+                            price: course.price || course.Price || 0,
+                        }));
+                        
+                        setEnrolledCourses(mappedCourses);
+                        setTotalCount(total);
+                        setTotalPages(pages);
+                    } else {
+                        // Fallback: assume it's a direct array (backward compatibility)
+                        const registeredData = Array.isArray(data) ? data : [];
+                        const mappedCourses = registeredData.map((course) => ({
+                            id: course.courseId || course.CourseId,
+                            courseId: course.courseId || course.CourseId,
+                            title: course.title || course.Title,
+                            imageUrl: (course.imageUrl || course.ImageUrl) && (course.imageUrl || course.ImageUrl).trim() !== ""
+                                ? (course.imageUrl || course.ImageUrl)
+                                : mochiKhoaHocImage,
+                            price: course.price || course.Price || 0,
+                        }));
+                        
+                        setEnrolledCourses(mappedCourses);
+                        setTotalCount(mappedCourses.length);
+                        setTotalPages(1);
+                    }
+                } else {
+                    setError(
+                        registeredRes.data?.Message || registeredRes.data?.message || "Không thể tải danh sách khóa học"
+                    );
+                }
             } catch (err) {
-                console.error("Error fetching courses:", err);
+                console.error("Error fetching enrolled courses:", err);
                 setError("Không thể tải danh sách khóa học");
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchCourses();
-    }, []);
-
-    // Filter courses based on search query - vừa tìm kiếm local vừa gọi API
-    useEffect(() => {
-        if (!searchQuery.trim()) {
-            setFilteredRegisteredCourses(registeredCourses);
-            setFilteredPublicCourses(publicCourses);
-            return;
+        if (isAuthenticated) {
+            fetchEnrolledCourses();
+        } else {
+            setEnrolledCourses([]);
+            setLoading(false);
         }
+    }, [currentPage, pageSize, isAuthenticated]);
 
-        const searchCourses = async () => {
-            try {
-                // Gọi API search
-                const response = await courseService.searchCourses(searchQuery.trim());
-                if (response.data?.success && response.data?.data) {
-                    const searchResults = response.data.data;
-
-                    // Map search results
-                    const mappedSearchResults = searchResults.map((course) => ({
-                        id: course.courseId,
-                        courseId: course.courseId,
-                        title: course.title,
-                        imageUrl: course.imageUrl && course.imageUrl.trim() !== ""
-                            ? course.imageUrl
-                            : mochiKhoaHocImage,
-                    }));
-
-                    // Tìm trong registered courses xem có course nào match không
-                    const matchedRegistered = registeredCourses.filter((course) =>
-                        searchResults.some((result) => result.courseId === course.id)
-                    );
-
-                    // Public courses từ search results
-                    const matchedPublic = mappedSearchResults.filter((course) =>
-                        !matchedRegistered.some((reg) => reg.id === course.id)
-                    );
-
-                    setFilteredRegisteredCourses(matchedRegistered);
-                    setFilteredPublicCourses(matchedPublic);
-                } else {
-                    // Fallback: local filtering nếu API fails
-                    const localFilteredRegistered = registeredCourses.filter((course) =>
-                        course.title?.toLowerCase().includes(searchQuery.toLowerCase())
-                    );
-                    const localFilteredPublic = publicCourses.filter((course) =>
-                        course.title?.toLowerCase().includes(searchQuery.toLowerCase())
-                    );
-                    setFilteredRegisteredCourses(localFilteredRegistered);
-                    setFilteredPublicCourses(localFilteredPublic);
-                }
-            } catch (err) {
-                console.error("Error searching courses:", err);
-                // Fallback: local filtering nếu API fails
-                const localFilteredRegistered = registeredCourses.filter((course) =>
-                    course.title?.toLowerCase().includes(searchQuery.toLowerCase())
-                );
-                const localFilteredPublic = publicCourses.filter((course) =>
-                    course.title?.toLowerCase().includes(searchQuery.toLowerCase())
-                );
-                setFilteredRegisteredCourses(localFilteredRegistered);
-                setFilteredPublicCourses(localFilteredPublic);
-            }
-        };
-
-        const debounceTimer = setTimeout(() => {
-            searchCourses();
-        }, 300);
-
-        return () => clearTimeout(debounceTimer);
-    }, [searchQuery, registeredCourses, publicCourses]);
+    const handlePageChange = (pageNumber) => {
+        setCurrentPage(pageNumber);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
 
     const handleJoinClass = async (classCode) => {
         try {
@@ -198,22 +163,8 @@ export default function MyCourses() {
                     }
                 }
 
-                // Refresh courses list
-                const registeredRes = await enrollmentService.getMyCourses();
-                const registeredData = registeredRes.data?.data || [];
-                const mappedRegisteredCourses = registeredData.map((course) => ({
-                    id: course.courseId,
-                    title: course.title,
-                    imageUrl: course.imageUrl && course.imageUrl.trim() !== ""
-                        ? course.imageUrl
-                        : mochiKhoaHocImage,
-                    progress: Math.round(course.progressPercentage || 0),
-                }));
-                setRegisteredCourses(mappedRegisteredCourses);
-                // Update filtered courses if no search query
-                if (!searchQuery.trim()) {
-                    setFilteredRegisteredCourses(mappedRegisteredCourses);
-                }
+                // Refresh courses list - reset to page 1
+                setCurrentPage(1);
             } else {
                 // Join thất bại - kiểm tra xem có phải "đã đăng ký rồi" không
                 const errorMessage = response.data?.message || "";
@@ -283,18 +234,25 @@ export default function MyCourses() {
         }
     };
 
-    const handleContinueCourse = (course) => {
-        const courseId = course.id || course.courseId;
-        if (courseId) {
-            navigate(`/course/${courseId}`);
-        }
+
+    // Account upgrade handlers
+    const handlePackageHover = (teacherPackageId) => {
+        setSelectedPackage(teacherPackageId);
     };
 
-    const handleStartCourse = (course) => {
-        const courseId = course.id || course.courseId;
-        if (courseId) {
-            navigate(`/course/${courseId}`);
+    const handlePackageLeave = () => {
+        setSelectedPackage(null);
+    };
+
+    const handleUpgradeClick = (e, teacherPackageId, packageType) => {
+        e.stopPropagation();
+
+        if (!isAuthenticated) {
+            setShowLoginModal(true);
+            return;
         }
+
+        navigate(`/payment?packageId=${teacherPackageId}&package=${packageType}`);
     };
 
     return (
@@ -302,17 +260,15 @@ export default function MyCourses() {
             <MainHeader />
             <div className="my-courses-container">
                 <div className="my-courses-header">
-                    <h1>Khoá học của tôi</h1>
+                    <div className="my-courses-welcome-section">
+                        <h1>
+                            Chào mừng {user?.fullName || "bạn"}!
+                        </h1>
+                        <p className="welcome-message">
+                            Hãy bắt đầu hành trình học tập của bạn ngay hôm nay!
+                        </p>
+                    </div>
                     <div className="header-actions">
-                        <div className="search-box">
-                            <FaSearch className="search-icon" />
-                            <input
-                                type="text"
-                                placeholder="Tìm kiếm khoá học..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                            />
-                        </div>
                         <button
                             className="join-class-btn"
                             onClick={() => setIsModalOpen(true)}
@@ -323,57 +279,94 @@ export default function MyCourses() {
                     </div>
                 </div>
 
-                {/* Registered Courses */}
-                <section className="courses-section">
-                    <h2>Khoá học đã đăng ký</h2>
-                    {loading ? (
-                        <div className="loading-message">Đang tải khóa học...</div>
-                    ) : error ? (
-                        <div className="error-message">{error}</div>
-                    ) : (searchQuery ? filteredRegisteredCourses : registeredCourses).length > 0 ? (
-                        <div className="course-grid-wrapper">
-                            <div className="course-grid">
-                                {(searchQuery ? filteredRegisteredCourses : registeredCourses).map((course) => (
-                                    <RegisteredCourseCard
-                                        key={course.id}
-                                        course={course}
-                                        onContinue={handleContinueCourse}
-                                    />
-                                ))}
-                            </div>
-                        </div>
-                    ) : (
-                        <div className="no-courses-message">
-                            {searchQuery ? "Không tìm thấy khóa học đã đăng ký" : "Chưa có khóa học đã đăng ký"}
-                        </div>
-                    )}
-                </section>
+                {/* Main Content: 2 columns layout */}
+                <div className="my-courses-main-content">
+                    {/* Left: Enrolled Courses Section */}
+                    <div className="suggested-courses-section">
+                        {loading ? (
+                            <div className="loading-message">Đang tải khóa học...</div>
+                        ) : error ? (
+                            <div className="error-message">{error}</div>
+                        ) : enrolledCourses.length > 0 ? (
+                            <>
+                                <div className="suggested-courses-grid">
+                                    {enrolledCourses.map((course, index) => (
+                                        <SuggestedCourseCard
+                                            key={course.id || index}
+                                            course={course}
+                                            isEnrolled={true} // Tất cả đều đã đăng ký
+                                            showEnrolledBadge={true} // Hiển thị badge "Đã tham gia"
+                                        />
+                                    ))}
+                                </div>
+                                
+                                {/* Pagination */}
+                                {totalPages > 1 && (
+                                    <div className="pagination-wrapper">
+                                        <div className="pagination-info">
+                                            Trang {currentPage} / {totalPages} ({totalCount} khóa học)
+                                        </div>
+                                        <Pagination className="custom-pagination">
+                                            <Pagination.First 
+                                                onClick={() => handlePageChange(1)}
+                                                disabled={currentPage === 1}
+                                            />
+                                            <Pagination.Prev 
+                                                onClick={() => handlePageChange(currentPage - 1)}
+                                                disabled={currentPage === 1}
+                                            />
+                                            
+                                            {[...Array(totalPages)].map((_, index) => {
+                                                const pageNumber = index + 1;
+                                                // Chỉ hiển thị một số trang xung quanh trang hiện tại
+                                                if (
+                                                    pageNumber === 1 ||
+                                                    pageNumber === totalPages ||
+                                                    (pageNumber >= currentPage - 2 && pageNumber <= currentPage + 2)
+                                                ) {
+                                                    return (
+                                                        <Pagination.Item
+                                                            key={pageNumber}
+                                                            active={pageNumber === currentPage}
+                                                            onClick={() => handlePageChange(pageNumber)}
+                                                        >
+                                                            {pageNumber}
+                                                        </Pagination.Item>
+                                                    );
+                                                } else if (
+                                                    pageNumber === currentPage - 3 ||
+                                                    pageNumber === currentPage + 3
+                                                ) {
+                                                    return <Pagination.Ellipsis key={pageNumber} />;
+                                                }
+                                                return null;
+                                            })}
+                                            
+                                            <Pagination.Next 
+                                                onClick={() => handlePageChange(currentPage + 1)}
+                                                disabled={currentPage === totalPages}
+                                            />
+                                            <Pagination.Last 
+                                                onClick={() => handlePageChange(totalPages)}
+                                                disabled={currentPage === totalPages}
+                                            />
+                                        </Pagination>
+                                    </div>
+                                )}
+                            </>
+                        ) : (
+                            <div className="no-courses-message">Chưa có khóa học đã đăng ký</div>
+                        )}
+                    </div>
 
-                {/* Public Courses */}
-                <section className="courses-section">
-                    <h2>Khoá học công khai</h2>
-                    {loading ? (
-                        <div className="loading-message">Đang tải khóa học...</div>
-                    ) : error ? (
-                        <div className="error-message">{error}</div>
-                    ) : (searchQuery ? filteredPublicCourses : publicCourses).length > 0 ? (
-                        <div className="course-grid-wrapper">
-                            <div className="course-grid">
-                                {(searchQuery ? filteredPublicCourses : publicCourses).map((course) => (
-                                    <PublicCourseCard
-                                        key={course.id}
-                                        course={course}
-                                        onStart={handleStartCourse}
-                                    />
-                                ))}
-                            </div>
-                        </div>
-                    ) : (
-                        <div className="no-courses-message">
-                            {searchQuery ? "Không tìm thấy khóa học công khai" : "Chưa có khóa học công khai"}
-                        </div>
-                    )}
-                </section>
+                    {/* Right: Account Upgrade Section */}
+                    <AccountUpgradeSection
+                        selectedPackage={selectedPackage}
+                        onPackageHover={handlePackageHover}
+                        onPackageLeave={handlePackageLeave}
+                        onUpgradeClick={handleUpgradeClick}
+                    />
+                </div>
             </div>
 
             <JoinClassModal
@@ -389,6 +382,11 @@ export default function MyCourses() {
                 message={notification.message}
                 autoClose={true}
                 autoCloseDelay={3000}
+            />
+
+            <LoginRequiredModal
+                isOpen={showLoginModal}
+                onClose={() => setShowLoginModal(false)}
             />
         </>
     );

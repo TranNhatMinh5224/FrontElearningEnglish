@@ -37,7 +37,7 @@ export default function MainHeader() {
         {/* LEFT: logo + brand */}
         <Navbar.Brand
           className="main-header__left"
-          onClick={() => handleNavigation(ROUTE_PATHS.MY_COURSES, true)}
+          onClick={() => navigate(ROUTE_PATHS.HOME)}
           style={{ cursor: "pointer" }}
         >
           <img src={logo} alt="logo" className="main-header__logo" />

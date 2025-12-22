@@ -12,6 +12,7 @@ import { courseService } from "../../Services/courseService";
 import { enrollmentService } from "../../Services/enrollmentService";
 import { paymentService } from "../../Services/paymentService";
 import { useAuth } from "../../Context/AuthContext";
+import { useNotificationRefresh } from "../../Context/NotificationContext";
 import { ROUTE_PATHS } from "../../Routes/Paths";
 import LoginRequiredModal from "../../Components/Common/LoginRequiredModal/LoginRequiredModal";
 
@@ -19,6 +20,7 @@ export default function CourseDetail() {
     const { courseId } = useParams();
     const navigate = useNavigate();
     const { isAuthenticated } = useAuth();
+    const { refreshNotifications } = useNotificationRefresh();
     const [course, setCourse] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
@@ -77,6 +79,9 @@ export default function CourseDetail() {
                     setCourse(response.data.data);
                 }
 
+                // Refresh notifications để hiển thị thông báo mới ngay lập tức
+                refreshNotifications();
+
                 setShowEnrollmentModal(false);
                 setNotification({
                     isOpen: true,
@@ -125,6 +130,9 @@ export default function CourseDetail() {
                     if (response.data?.success && response.data?.data) {
                         setCourse(response.data.data);
                     }
+
+                    // Refresh notifications để hiển thị thông báo mới ngay lập tức
+                    refreshNotifications();
 
                     setShowEnrollmentModal(false);
                     setNotification({

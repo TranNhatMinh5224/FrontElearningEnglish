@@ -218,7 +218,7 @@ export default function PronunciationDetail() {
                 <Container>
                     <Row>
                         <Col>
-                            <div className="pronunciation-header mb-4">
+                            <div className="pronunciation-header">
                                 <Button
                                     variant="link"
                                     onClick={handleBackClick}
