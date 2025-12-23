@@ -15,6 +15,7 @@ import { useAuth } from "../../Context/AuthContext";
 import { useNotificationRefresh } from "../../Context/NotificationContext";
 import { ROUTE_PATHS } from "../../Routes/Paths";
 import LoginRequiredModal from "../../Components/Common/LoginRequiredModal/LoginRequiredModal";
+import SEO from "../../Components/SEO/SEO";
 
 export default function CourseDetail() {
     const { courseId } = useParams();
@@ -197,8 +198,19 @@ export default function CourseDetail() {
         );
     }
 
+    const courseTitle = course?.title || course?.Title || "Khóa học";
+    const courseDescription = course?.description || course?.descriptionMarkdown || "Khóa học tiếng Anh chất lượng tại Catalunya English";
+    const courseImage = course?.imageUrl || "/logo512.png";
+
     return (
         <>
+            <SEO
+                title={`${courseTitle} - Catalunya English`}
+                description={courseDescription}
+                keywords={`${courseTitle}, học tiếng anh, khóa học tiếng anh online, Catalunya English`}
+                image={courseImage}
+                url={typeof window !== "undefined" ? `${window.location.origin}/course/${courseId}` : ""}
+            />
             <MainHeader />
             <div className="course-detail-container">
                 <Container fluid>

@@ -55,5 +55,10 @@ export const ROUTE_PATHS = {
   // Essay routes
   ESSAY_DETAIL: (courseId, lessonId, moduleId, essayId) => 
     `/course/${courseId}/lesson/${lessonId}/module/${moduleId}/essay/${essayId}`,
+  
+  // Teacher routes
+  TEACHER: "/teacher",
+  TEACHER_ACCOUNT_MANAGEMENT: "/teacher/account-management",
+  TEACHER_COURSE_MANAGEMENT: "/teacher/course-management",
 };
 

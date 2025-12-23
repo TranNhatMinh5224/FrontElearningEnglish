@@ -146,6 +146,17 @@ export const API_ENDPOINTS = {
         GET_MY_STREAK: "/user/streaks",
         CHECKIN: "/user/streaks/checkin",
     },
+    // Teacher endpoints
+    TEACHER: {
+        GET_MY_COURSES: "/courses/teacher",
+        GET_COURSE_DETAIL: (courseId) => `/courses/teacher/${courseId}`,
+        CREATE_COURSE: "/courses/teacher",
+        UPDATE_COURSE: (courseId) => `/courses/teacher/${courseId}`,
+        GET_COURSE_STUDENTS: (courseId) => `/courses/${courseId}/students`,
+        GET_STUDENT_DETAIL: (courseId, studentId) => `/courses/${courseId}/students/${studentId}`,
+        ADD_STUDENT: (courseId) => `/courses/${courseId}/students`,
+        REMOVE_STUDENT: (courseId, studentId) => `/courses/${courseId}/students/${studentId}`,
+    },
 };
 
 export { API_BASE_URL, AUTH_REFRESH_URL };

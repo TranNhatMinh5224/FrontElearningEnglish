@@ -77,7 +77,7 @@ export default function ForgotPassword() {
 
       <div className="forgot-password-card">
         <div className="forgot-password-icon-wrapper">
-          <img src={iconLock} alt="Lock" className="forgot-password-icon" />
+          <img src={iconLock} alt="Khóa - Quên mật khẩu" className="forgot-password-icon" />
         </div>
 
         <h1 className="forgot-password-title">Quên mật khẩu?</h1>

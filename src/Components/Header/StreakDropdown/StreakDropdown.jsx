@@ -23,14 +23,14 @@ export default function StreakDropdown() {
                 className="streak-badge"
                 id="streak-dropdown"
             >
-                <img src={iconFireStreak} alt="Streak" className="streak-icon" />
+                <img src={iconFireStreak} alt="Chuỗi ngày học" className="streak-icon" />
                 <span>{streakDays || 0} ngày</span>
             </Dropdown.Toggle>
 
             <Dropdown.Menu className="streak-dropdown">
                 <div className="streak-content">
                     <div className="streak-icon-large">
-                        <img src={iconFireStreak} alt="Streak" />
+                        <img src={iconFireStreak} alt="Chuỗi ngày học" />
                     </div>
                     <div className="streak-message">
                         <p className="streak-main-text">

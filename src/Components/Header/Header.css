@@ -300,6 +300,51 @@
   color: #ffe089 !important;
 }
 
+/* Teacher Package Info */
+.teacher-package-info {
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  margin: 8px 0;
+}
+
+.teacher-package-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.teacher-package-label {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 500;
+}
+
+.teacher-package-badge {
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.teacher-package-badge.basic {
+  background: rgba(65, 214, 227, 0.3);
+  color: #41d6e3;
+}
+
+.teacher-package-badge.premium {
+  background: rgba(255, 224, 137, 0.3);
+  color: #ffe089;
+}
+
+.teacher-package-expiry {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.7);
+  margin-top: 4px;
+}
+
 /* Override Bootstrap dropdown-divider */
 .profile-dropdown .dropdown-divider,
 .profile-wrapper .dropdown-divider {

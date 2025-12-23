@@ -32,6 +32,7 @@ import QuizDetail from "../Pages/QuizDetail/QuizDetail";
 import QuizResults from "../Pages/QuizResults/QuizResults";
 import EssayDetail from "../Pages/EssayDetail/EssayDetail";
 import PronunciationDetail from "../Pages/PronunciationDetail/PronunciationDetail";
+import CourseManagement from "../Pages/Teacher/CourseManagement";
 
 /**
  * Application Routes
@@ -80,6 +81,11 @@ export default function AppRoutes() {
       <Route path="/course/:courseId" element={<CourseDetail />} />
       <Route path="/course/:courseId/learn" element={<CourseLearn />} />
       <Route path="/course/:courseId/lesson/:lessonId" element={<LessonDetail />} />
+      
+      {/* Teacher routes */}
+      <Route path="/teacher" element={<CourseManagement />} />
+      <Route path="/teacher/account-management" element={<CourseManagement />} />
+      <Route path="/teacher/course-management" element={<CourseManagement />} />
     </Routes>
   );
 }

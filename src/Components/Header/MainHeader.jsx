@@ -40,7 +40,7 @@ export default function MainHeader() {
           onClick={() => navigate(ROUTE_PATHS.HOME)}
           style={{ cursor: "pointer" }}
         >
-          <img src={logo} alt="logo" className="main-header__logo" />
+          <img src={logo} alt="Catalunya English - Logo" className="main-header__logo" />
           <span className="main-header__brand">Catalunya English</span>
         </Navbar.Brand>
 
@@ -54,7 +54,7 @@ export default function MainHeader() {
               onClick={() => navigate("/home")}
               className={`nav-item ${isActive("/home") ? "active" : ""}`}
             >
-              <img src={iconHome} alt="Home" className="nav-icon" />
+              <img src={iconHome} alt="Trang chủ" className="nav-icon" />
               <span className="nav-text">Trang chủ</span>
             </Nav.Item>
 
@@ -62,7 +62,7 @@ export default function MainHeader() {
               onClick={() => handleNavigation(ROUTE_PATHS.MY_COURSES, true)}
               className={`nav-item ${isActive("/my-courses") ? "active" : ""}`}
             >
-              <img src={iconCourse} alt="Courses" className="nav-icon" />
+              <img src={iconCourse} alt="Khóa học của tôi" className="nav-icon" />
               <span className="nav-text">Khóa học của tôi</span>
             </Nav.Item>
 
@@ -70,7 +70,7 @@ export default function MainHeader() {
               onClick={() => handleNavigation(ROUTE_PATHS.VOCABULARY_REVIEW, true)}
               className={`nav-item ${isActive("/vocabulary-review") ? "active" : ""}`}
             >
-              <img src={iconOntap} alt="Review" className="nav-icon" />
+              <img src={iconOntap} alt="Ôn tập từ vựng" className="nav-icon" />
               <span className="nav-text">Ôn tập từ vựng</span>
             </Nav.Item>
 
@@ -78,7 +78,7 @@ export default function MainHeader() {
               onClick={() => handleNavigation(ROUTE_PATHS.VOCABULARY_NOTEBOOK, true)}
               className={`nav-item ${isActive("/vocabulary-notebook") ? "active" : ""}`}
             >
-              <img src={iconSotay} alt="Notebook" className="nav-icon" />
+              <img src={iconSotay} alt="Sổ tay từ vựng" className="nav-icon" />
               <span className="nav-text">Sổ tay từ vựng</span>
             </Nav.Item>
           </Nav>

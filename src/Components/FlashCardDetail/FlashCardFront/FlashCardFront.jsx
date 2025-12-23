@@ -40,7 +40,7 @@ export default function FlashCardFront({ flashcard, onAudioClick }) {
             </div>
             {imageUrl && (
                 <div className="flashcard-image">
-                    <img src={imageUrl} alt={word} />
+                    <img src={imageUrl} alt={`Hình ảnh minh họa cho từ "${word}"`} />
                 </div>
             )}
             <div className="flashcard-content">

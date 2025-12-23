@@ -249,7 +249,7 @@ export default function NotificationDropdown() {
                 className={`notification-button ${unreadCount > 0 ? 'has-notifications' : ''}`}
                 id="notification-dropdown"
             >
-                <img src={iconBell} alt="Notifications" className={`notification-icon ${unreadCount > 0 ? 'ringing' : ''}`} />
+                <img src={iconBell} alt="Thông báo" className={`notification-icon ${unreadCount > 0 ? 'ringing' : ''}`} />
                 {unreadCount > 0 && (
                     <span className="notification-badge">{unreadCount > 99 ? '99+' : unreadCount}</span>
                 )}
