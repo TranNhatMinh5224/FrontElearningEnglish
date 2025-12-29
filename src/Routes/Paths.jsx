@@ -60,5 +60,6 @@ export const ROUTE_PATHS = {
   TEACHER: "/teacher",
   TEACHER_ACCOUNT_MANAGEMENT: "/teacher/account-management",
   TEACHER_COURSE_MANAGEMENT: "/teacher/course-management",
+  TEACHER_STUDENT_MANAGEMENT: (courseId) => `/teacher/course/${courseId}/students`,
 };
 

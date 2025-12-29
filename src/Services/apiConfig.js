@@ -51,8 +51,8 @@ export const API_ENDPOINTS = {
     },
     // Teacher Packages
     TEACHER_PACKAGES: {
-        GET_ALL: "/user/teacher-packages/teacher-packages",
-        GET_BY_ID: (id) => `/user/teacher-packages/teacher-packages/${id}`,
+        GET_ALL: "/user/teacher-packages",
+        GET_BY_ID: (id) => `/user/teacher-packages/${id}`,
     },
     // Modules
     MODULES: {
@@ -148,14 +148,14 @@ export const API_ENDPOINTS = {
     },
     // Teacher endpoints
     TEACHER: {
-        GET_MY_COURSES: "/courses/teacher",
-        GET_COURSE_DETAIL: (courseId) => `/courses/teacher/${courseId}`,
-        CREATE_COURSE: "/courses/teacher",
+        GET_MY_COURSES: "/courses/teacher/my-courses",
+        GET_COURSE_DETAIL: (courseId) => `/courses/teacher/${courseId}/detail`,
+        CREATE_COURSE: "/courses/teacher/create",
         UPDATE_COURSE: (courseId) => `/courses/teacher/${courseId}`,
         GET_COURSE_STUDENTS: (courseId) => `/courses/${courseId}/students`,
         GET_STUDENT_DETAIL: (courseId, studentId) => `/courses/${courseId}/students/${studentId}`,
-        ADD_STUDENT: (courseId) => `/courses/${courseId}/students`,
-        REMOVE_STUDENT: (courseId, studentId) => `/courses/${courseId}/students/${studentId}`,
+        ADD_STUDENT: (courseId) => `/courses/teacher/${courseId}/students`,
+        REMOVE_STUDENT: (courseId, studentId) => `/courses/teacher/${courseId}/students/${studentId}`,
         // Lesson endpoints
         CREATE_LESSON: "/lessons/teacher/add",
         GET_LESSONS_BY_COURSE: (courseId) => `/lessons/course/${courseId}`,

@@ -1,0 +1,252 @@
+.student-detail-modal .modal-content {
+  border-radius: 12px;
+  border: none;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.student-detail-modal .modal-header {
+  border-bottom: 1px solid #e0e0e0;
+  padding: 20px 24px;
+}
+
+.student-detail-modal .modal-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+}
+
+.student-detail-modal .modal-body {
+  padding: 24px;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.student-detail-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.student-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.student-avatar-large {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  background-color: #e0e0e0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid #41d6e3;
+}
+
+.student-avatar-large img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatar-placeholder-large {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #999;
+  font-size: 48px;
+}
+
+.student-header-info {
+  flex: 1;
+}
+
+.student-name-large {
+  font-size: 28px;
+  font-weight: bold;
+  color: #333;
+  margin: 0 0 8px 0;
+}
+
+.completion-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background-color: #4CAF50;
+  color: white;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.info-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.section-icon {
+  color: #41d6e3;
+  font-size: 18px;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.info-item label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #666;
+}
+
+.info-icon {
+  color: #41d6e3;
+  font-size: 14px;
+}
+
+.info-item span {
+  font-size: 16px;
+  color: #333;
+  padding-left: 20px;
+}
+
+.progress-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.progress-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.progress-stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+}
+
+.progress-label {
+  font-size: 14px;
+  color: #666;
+}
+
+.progress-value {
+  font-size: 20px;
+  font-weight: bold;
+  color: #41d6e3;
+}
+
+.progress-bar-wrapper {
+  margin-top: 8px;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 24px;
+  background-color: #e0e0e0;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(135deg, #41d6e3 0%, #0097A7 100%);
+  transition: width 0.3s ease;
+  border-radius: 12px;
+}
+
+.completion-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  background-color: #e8f5e9;
+  border-radius: 8px;
+  color: #2e7d32;
+  font-size: 14px;
+}
+
+.completion-icon {
+  color: #4CAF50;
+}
+
+.last-updated {
+  font-size: 12px;
+  color: #999;
+  text-align: right;
+}
+
+.student-detail-modal .modal-footer {
+  border-top: 1px solid #e0e0e0;
+  padding: 16px 24px;
+}
+
+.close-btn {
+  padding: 10px 24px;
+  background-color: #e0e0e0;
+  color: #333;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.close-btn:hover {
+  background-color: #d0d0d0;
+}
+
+@media (max-width: 768px) {
+  .student-header {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .progress-stats {
+    grid-template-columns: 1fr;
+  }
+}
+

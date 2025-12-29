@@ -225,7 +225,15 @@ export default function TeacherCourseDetail() {
                     
                     <div className="course-detail-item">
                       <label>Tổng số học sinh:</label>
-                      <span className="course-stat-value">{totalStudents}</span>
+                      <div className="course-stat-with-action">
+                        <span className="course-stat-value">{totalStudents}</span>
+                        <button 
+                          className="manage-students-btn"
+                          onClick={() => navigate(`/teacher/course/${courseId}/students`)}
+                        >
+                          Quản lý học viên
+                        </button>
+                      </div>
                     </div>
                   </div>
 

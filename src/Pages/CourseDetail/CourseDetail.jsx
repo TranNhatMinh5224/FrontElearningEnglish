@@ -110,65 +110,10 @@ export default function CourseDetail() {
         }
     };
 
-    const handlePayment = async () => {
-        setIsProcessing(true);
-        try {
-            // Call payment process API to create payment record
-            const paymentResponse = await paymentService.processPayment({
-                ProductId: parseInt(courseId),
-                typeproduct: 1 // ProductType.Course = 1
-            });
-
-            if (paymentResponse.data?.success) {
-                // Payment record created, now user needs to complete payment
-                // For now, we'll try to enroll (backend will check for successful payment)
-                // In a real scenario, you might redirect to payment gateway here
-                try {
-                    await enrollmentService.enroll({ courseId: parseInt(courseId) });
-
-                    // Refresh course data to update enrollment status
-                    const response = await courseService.getCourseById(courseId);
-                    if (response.data?.success && response.data?.data) {
-                        setCourse(response.data.data);
-                    }
-
-                    // Refresh notifications để hiển thị thông báo mới ngay lập tức
-                    refreshNotifications();
-
-                    setShowEnrollmentModal(false);
-                    setNotification({
-                        isOpen: true,
-                        type: "success",
-                        message: "Thanh toán và đăng ký khóa học thành công!"
-                    });
-                } catch (enrollErr) {
-                    // If enrollment fails due to payment not completed, show appropriate message
-                    const enrollErrorMsg = enrollErr.response?.data?.message || "Vui lòng hoàn tất thanh toán trước khi đăng ký.";
-                    setNotification({
-                        isOpen: true,
-                        type: "error",
-                        message: enrollErrorMsg
-                    });
-                }
-            } else {
-                const errorMsg = paymentResponse.data?.message || "Không thể xử lý thanh toán. Vui lòng thử lại.";
-                setNotification({
-                    isOpen: true,
-                    type: "error",
-                    message: errorMsg
-                });
-            }
-        } catch (err) {
-            console.error("Error processing payment:", err);
-            const errorMsg = err.response?.data?.message || "Không thể xử lý thanh toán. Vui lòng thử lại.";
-            setNotification({
-                isOpen: true,
-                type: "error",
-                message: errorMsg
-            });
-        } finally {
-            setIsProcessing(false);
-        }
+    const handlePayment = () => {
+        // Close modal and navigate to payment page with course information
+        setShowEnrollmentModal(false);
+        navigate(`${ROUTE_PATHS.PAYMENT}?courseId=${courseId}&typeproduct=1`);
     };
 
     const handleStartLearning = () => {

@@ -16,6 +16,8 @@ import ForgotPassword from "../Pages/ForgotPassword/ForgotPassword";
 import OtpResetPassword from "../Pages/OtpResetPassword/OtpResetPassword";
 import ResetPassword from "../Pages/ResetPassword/ResetPassword";
 import Payment from "../Pages/Payment/Payment";
+import PaymentSuccess from "../Pages/Payment/PaymentSuccess";
+import PaymentFailed from "../Pages/Payment/PaymentFailed";
 import PaymentHistory from "../Pages/PaymentHistory/PaymentHistory";
 import VocabularyReview from "../Pages/VocabularyReview/VocabularyReview";
 import FlashCardReviewSession from "../Pages/FlashCardReviewSession/FlashCardReviewSession";
@@ -35,6 +37,7 @@ import PronunciationDetail from "../Pages/PronunciationDetail/PronunciationDetai
 import CourseManagement from "../Pages/Teacher/CourseManagement";
 import TeacherCourseDetail from "../Pages/Teacher/TeacherCourseDetail";
 import TeacherLessonDetail from "../Pages/Teacher/TeacherLessonDetail";
+import TeacherStudentManagement from "../Pages/Teacher/TeacherStudentManagement";
 
 /**
  * Application Routes
@@ -64,6 +67,8 @@ export default function AppRoutes() {
       <Route path={ROUTE_PATHS.PROFILE_EDIT} element={<EditProfile />} />
       <Route path={ROUTE_PATHS.PROFILE_CHANGE_PASSWORD} element={<ChangePassword />} />
       <Route path={ROUTE_PATHS.PAYMENT} element={<Payment />} />
+      <Route path="/payment-success" element={<PaymentSuccess />} />
+      <Route path="/payment-failed" element={<PaymentFailed />} />
       <Route path={ROUTE_PATHS.PAYMENT_HISTORY} element={<PaymentHistory />} />
       <Route path={ROUTE_PATHS.VOCABULARY_REVIEW} element={<VocabularyReview />} />
       <Route path="/vocabulary-review/session" element={<FlashCardReviewSession />} />
@@ -88,6 +93,7 @@ export default function AppRoutes() {
       <Route path="/teacher" element={<CourseManagement />} />
       <Route path="/teacher/account-management" element={<CourseManagement />} />
       <Route path="/teacher/course-management" element={<CourseManagement />} />
+      <Route path="/teacher/course/:courseId/students" element={<TeacherStudentManagement />} />
       <Route path="/teacher/course/:courseId/lesson/:lessonId" element={<TeacherLessonDetail />} />
       <Route path="/teacher/course/:courseId" element={<TeacherCourseDetail />} />
     </Routes>

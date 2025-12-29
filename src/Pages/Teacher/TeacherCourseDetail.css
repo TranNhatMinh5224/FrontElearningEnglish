@@ -112,6 +112,30 @@
   color: #333;
 }
 
+.course-stat-with-action {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.manage-students-btn {
+  padding: 6px 16px;
+  background: linear-gradient(135deg, #41d6e3 0%, #0097A7 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  margin-left: auto;
+}
+
+.manage-students-btn:hover {
+  opacity: 0.9;
+}
+
 .update-course-btn {
   width: 100%;
   padding: 12px;

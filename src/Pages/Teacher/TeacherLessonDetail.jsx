@@ -16,6 +16,7 @@ export default function TeacherLessonDetail() {
   const { courseId, lessonId } = useParams();
   const navigate = useNavigate();
   const { user, roles, isAuthenticated } = useAuth();
+  const [course, setCourse] = useState(null);
   const [lesson, setLesson] = useState(null);
   const [modules, setModules] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -33,9 +34,21 @@ export default function TeacherLessonDetail() {
       return;
     }
 
+    fetchCourseDetail();
     fetchLessonDetail();
     fetchModules();
-  }, [isAuthenticated, isTeacher, navigate, lessonId]);
+  }, [isAuthenticated, isTeacher, navigate, courseId, lessonId]);
+
+  const fetchCourseDetail = async () => {
+    try {
+      const response = await teacherService.getCourseDetail(courseId);
+      if (response.data?.success && response.data?.data) {
+        setCourse(response.data.data);
+      }
+    } catch (err) {
+      console.error("Error fetching course detail:", err);
+    }
+  };
 
   const fetchLessonDetail = async () => {
     try {
@@ -131,7 +144,7 @@ export default function TeacherLessonDetail() {
               className="breadcrumb-link"
               onClick={() => navigate(`/teacher/course/${courseId}`)}
             >
-              {courseId}
+              {course?.title || course?.Title || courseId}
             </span>
             {" / "}
             <span className="breadcrumb-current">{lessonTitle}</span>
