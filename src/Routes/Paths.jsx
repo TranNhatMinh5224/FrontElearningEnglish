@@ -31,31 +31,12 @@ export const ROUTE_PATHS = {
   VOCABULARY_REVIEW: "/vocabulary-review",
   VOCABULARY_NOTEBOOK: "/vocabulary-notebook",
   
-  // Course routes
-  COURSE_DETAIL: (courseId) => `/course/${courseId}`,
-  COURSE_LEARN: (courseId) => `/course/${courseId}/learn`,
-  LESSON_DETAIL: (courseId, lessonId) => `/course/${courseId}/lesson/${lessonId}`,
-  
-  // Module routes
-  LECTURE_DETAIL: (courseId, lessonId, moduleId, lectureId) => 
-    `/course/${courseId}/lesson/${lessonId}/module/${moduleId}/lecture/${lectureId}`,
-  MODULE_DETAIL: (courseId, lessonId, moduleId) => 
-    `/course/${courseId}/lesson/${lessonId}/module/${moduleId}`,
-  FLASHCARD_DETAIL: (courseId, lessonId, moduleId) => 
-    `/course/${courseId}/lesson/${lessonId}/module/${moduleId}/flashcards`,
-  PRONUNCIATION_DETAIL: (courseId, lessonId, moduleId) => 
-    `/course/${courseId}/lesson/${lessonId}/module/${moduleId}/pronunciation`,
-  ASSIGNMENT_DETAIL: (courseId, lessonId, moduleId) => 
-    `/course/${courseId}/lesson/${lessonId}/module/${moduleId}/assignment`,
-  
-  // Quiz routes
-  QUIZ_DETAIL: (courseId, lessonId, moduleId, quizId, attemptId) => 
-    `/course/${courseId}/lesson/${lessonId}/module/${moduleId}/quiz/${quizId}/attempt/${attemptId}`,
-  QUIZ_RESULTS: (courseId, lessonId, moduleId, quizId, attemptId) => 
-    `/course/${courseId}/lesson/${lessonId}/module/${moduleId}/quiz/${quizId}/attempt/${attemptId}/results`,
-  
-  // Essay routes
-  ESSAY_DETAIL: (courseId, lessonId, moduleId, essayId) => 
-    `/course/${courseId}/lesson/${lessonId}/module/${moduleId}/essay/${essayId}`,
+  // Admin Routes
+  ADMIN: {
+    DASHBOARD: "/admin/dashboard",
+    COURSES: "/admin/courses",
+    USERS: "/admin/users",
+    FINANCE: "/admin/finance"
+  }
 };
 

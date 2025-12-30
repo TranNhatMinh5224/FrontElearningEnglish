@@ -18,6 +18,8 @@
     "react-router-dom": "^7.10.1",
     "react-scripts": "5.0.1",
     "react-select": "^5.10.2",
+    "react-toastify": "^10.0.6",
+    "recharts": "^2.15.0",
     "remark-gfm": "^4.0.1",
     "web-vitals": "^2.1.4"
   },

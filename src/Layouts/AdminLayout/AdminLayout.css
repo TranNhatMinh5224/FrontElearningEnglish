@@ -1,0 +1,200 @@
+:root {
+  --admin-sidebar-width: 260px;
+  --admin-header-height: 64px;
+  --admin-bg-color: #f8fafc; /* Soft Porcelain */
+  --admin-sidebar-bg: #1e293b; /* Deep Royal Blue */
+  --admin-sidebar-text: #94a3b8;
+  --admin-sidebar-text-active: #ffffff;
+  --admin-primary-color: #6366f1; /* Electric Indigo */
+  --admin-text-primary: #1e293b;
+  --admin-card-bg: #ffffff;
+}
+
+.admin-layout {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--admin-bg-color);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* SIDEBAR */
+.admin-sidebar {
+  width: var(--admin-sidebar-width);
+  background-color: var(--admin-sidebar-bg);
+  color: var(--admin-sidebar-text);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 1000;
+  transition: all 0.3s ease;
+  box-shadow: 4px 0 24px rgba(0,0,0,0.1);
+}
+
+.sidebar-brand {
+  height: var(--admin-header-height);
+  display: flex;
+  align-items: center;
+  padding: 0 1.5rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #fff;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.sidebar-menu {
+  padding: 1.5rem 0;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1.5rem;
+  color: var(--admin-sidebar-text);
+  text-decoration: none;
+  transition: all 0.2s;
+  font-weight: 500;
+  border-left: 3px solid transparent;
+}
+
+.menu-item:hover {
+  color: #fff;
+  background-color: rgba(255,255,255,0.05);
+}
+
+.menu-item.active {
+  color: var(--admin-sidebar-text-active);
+  background-color: rgba(99, 102, 241, 0.1);
+  border-left-color: var(--admin-primary-color);
+}
+
+.menu-item svg {
+  margin-right: 0.75rem;
+  font-size: 1.2rem;
+}
+
+/* MAIN CONTENT */
+.admin-main {
+  flex: 1;
+  margin-left: var(--admin-sidebar-width);
+  display: flex;
+  flex-direction: column;
+  min-width: 0; /* Prevent overflow */
+}
+
+/* HEADER */
+.admin-header {
+  height: var(--admin-header-height);
+  background-color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  position: sticky;
+  top: 0;
+  z-index: 999;
+}
+
+.header-search input {
+  background-color: #f1f5f9;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 99px;
+  width: 300px;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.header-search input:focus {
+  background-color: #fff;
+  box-shadow: 0 0 0 2px var(--admin-primary-color);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.header-btn {
+  background: none;
+  border: none;
+  color: #64748b;
+  cursor: pointer;
+  position: relative;
+  font-size: 1.2rem;
+}
+
+.header-btn .badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background-color: #ef4444;
+  color: white;
+  font-size: 0.6rem;
+  padding: 0.15rem 0.3rem;
+  border-radius: 99px;
+}
+
+/* PAGE CONTENT */
+.admin-content {
+  padding: 2rem;
+  flex: 1;
+}
+
+.page-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--admin-text-primary);
+  margin-bottom: 1.5rem;
+}
+
+/* CARD STYLES (Used across admin pages) */
+.admin-card {
+  background: var(--admin-card-bg);
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  padding: 1.5rem;
+  border: 1px solid rgba(0,0,0,0.05);
+  height: 100%;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.admin-table th {
+  text-align: left;
+  padding: 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #64748b;
+  border-bottom: 1px solid #e2e8f0;
+  background-color: #f8fafc;
+}
+
+.admin-table td {
+  padding: 1rem;
+  border-bottom: 1px solid #e2e8f0;
+  vertical-align: middle;
+}
+
+.status-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.status-success { background-color: #dcfce7; color: #166534; }
+.status-warning { background-color: #fef3c7; color: #92400e; }
+.status-danger { background-color: #fee2e2; color: #991b1b; }
+.status-info { background-color: #e0f2fe; color: #075985; }

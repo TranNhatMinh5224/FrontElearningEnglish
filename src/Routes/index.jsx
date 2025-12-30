@@ -35,6 +35,12 @@ import QuizResults from "../Pages/QuizResults/QuizResults";
 import EssayDetail from "../Pages/EssayDetail/EssayDetail";
 import PronunciationDetail from "../Pages/PronunciationDetail/PronunciationDetail";
 
+// Admin Imports
+import AdminLayout from "../Layouts/AdminLayout/AdminLayout";
+import AdminDashboard from "../Pages/Admin/Dashboard/AdminDashboard";
+import AdminCourseList from "../Pages/Admin/CourseManagement/AdminCourseList";
+import AdminUserList from "../Pages/Admin/UserManagement/AdminUserList";
+
 /**
  * Application Routes
  * Tất cả các routes được định nghĩa tại đây
@@ -84,6 +90,16 @@ export default function AppRoutes() {
       <Route path="/course/:courseId" element={<CourseDetail />} />
       <Route path="/course/:courseId/learn" element={<CourseLearn />} />
       <Route path="/course/:courseId/lesson/:lessonId" element={<LessonDetail />} />
+
+      {/* ADMIN ROUTES */}
+      <Route path="/admin" element={<AdminLayout />}>
+        <Route index element={<AdminDashboard />} /> {/* Default to Dashboard */}
+        <Route path="dashboard" element={<AdminDashboard />} />
+        <Route path="courses" element={<AdminCourseList />} />
+        <Route path="users" element={<AdminUserList />} />
+        {/* Placeholder for Finance */}
+        <Route path="finance" element={<div className="p-4">Finance Module Coming Soon</div>} />
+      </Route>
     </Routes>
   );
 }
