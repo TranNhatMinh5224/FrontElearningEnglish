@@ -24,6 +24,25 @@ export default function Payment() {
     const [error, setError] = useState("");
     const [paymentStatus, setPaymentStatus] = useState("pending"); // pending, checking, completed
 
+    // Helper function để parse error message từ backend
+    const parseErrorMessage = (error) => {
+        if (!error) return "Có lỗi xảy ra khi xử lý thanh toán";
+        
+        const response = error.response;
+        if (!response?.data) return error.message || "Có lỗi xảy ra khi xử lý thanh toán";
+
+        const data = response.data;
+        return (
+            data.message ||
+            data.Message ||
+            data.detail ||
+            data.error ||
+            (typeof data === 'string' ? data : JSON.stringify(data)) ||
+            error.message ||
+            "Có lỗi xảy ra khi xử lý thanh toán"
+        );
+    };
+
     useEffect(() => {
         let isCancelled = false; // Flag to prevent state updates after unmount
         

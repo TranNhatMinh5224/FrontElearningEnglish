@@ -27,6 +27,28 @@ export const API_ENDPOINTS = {
         RESET_PASSWORD: "/auth/set-new-password",
         REFRESH_TOKEN: AUTH_REFRESH_URL, // Full URL vì có thể khác base URL
     },
+    // ADMIN APIs
+    ADMIN: {
+        STATISTICS: {
+            DASHBOARD_STATS: "/admin/statistics/overview",
+            REVENUE_CHART: "/admin/statistics/revenue/chart",
+        },
+        COURSES: {
+            GET_ALL: "/admin/courses", // GET with query params
+            CREATE: "/admin/courses",
+            UPDATE: (id) => `/admin/courses/${id}`,
+            DELETE: (id) => `/admin/courses/${id}`,
+        },
+        USERS: {
+            GET_ALL: "/admin/users", 
+            GET_TEACHERS: "/admin/users/teachers",
+            GET_BLOCKED: "/admin/users/blocked",
+            USER_STATS: "/admin/statistics/users", // Thêm endpoint thống kê user
+            BLOCK: (id) => `/admin/users/block/${id}`, 
+            UNBLOCK: (id) => `/admin/users/unblock/${id}`,
+            UPGRADE_TEACHER: "/admin/users/upgrade-to-teacher"
+        }
+    },
     // Courses
     COURSES: {
         GET_SYSTEM_COURSES: "/user/courses/system-courses",

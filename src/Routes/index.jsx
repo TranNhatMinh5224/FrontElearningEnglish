@@ -45,6 +45,12 @@ import TeacherAssessmentTypeSelection from "../Pages/Teacher/TeacherAssessmentTy
 import TeacherModuleQuizDetail from "../Pages/Teacher/TeacherModuleQuizDetail/TeacherModuleQuizDetail";
 import TeacherModuleEssayDetail from "../Pages/Teacher/TeacherModuleEssayDetail/TeacherModuleEssayDetail";
 
+// Admin Imports
+import AdminLayout from "../Layouts/AdminLayout/AdminLayout";
+import AdminDashboard from "../Pages/Admin/Dashboard/AdminDashboard";
+import AdminCourseList from "../Pages/Admin/CourseManagement/AdminCourseList";
+import AdminUserList from "../Pages/Admin/UserManagement/AdminUserList";
+
 /**
  * Application Routes
  * Tất cả các routes được định nghĩa tại đây

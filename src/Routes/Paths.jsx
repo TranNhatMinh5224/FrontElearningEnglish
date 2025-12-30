@@ -26,6 +26,8 @@ export const ROUTE_PATHS = {
   PROFILE_CHANGE_PASSWORD: "/profile/change-password",
   PAYMENT: "/payment",
   PAYMENT_HISTORY: "/payment-history",
+  PAYMENT_SUCCESS: "/payment-success",
+  PAYMENT_FAILED: "/payment-failed",
   VOCABULARY_REVIEW: "/vocabulary-review",
   VOCABULARY_NOTEBOOK: "/vocabulary-notebook",
   
