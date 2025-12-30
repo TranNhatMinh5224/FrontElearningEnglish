@@ -10,10 +10,30 @@ export default function Payment() {
     const [searchParams] = useSearchParams();
     const packageId = searchParams.get("packageId"); // teacherPackageId từ Home
     const packageType = searchParams.get("package"); // fallback: packageType string
+    const courseId = searchParams.get("courseId"); // courseId từ CourseDetail
+    const paymentIdParam = searchParams.get("paymentId"); // paymentId đã tạo sẵn từ CourseDetail
 
-    const [qrCode, setQrCode] = useState("");
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+
+    // Helper function để parse error message từ backend
+    const parseErrorMessage = (error) => {
+        if (!error) return "Có lỗi xảy ra khi xử lý thanh toán";
+        
+        const response = error.response;
+        if (!response?.data) return error.message || "Có lỗi xảy ra khi xử lý thanh toán";
+
+        const data = response.data;
+        return (
+            data.message ||
+            data.Message ||
+            data.detail ||
+            data.error ||
+            (typeof data === 'string' ? data : JSON.stringify(data)) ||
+            error.message ||
+            "Có lỗi xảy ra khi xử lý thanh toán"
+        );
+    };
 
     useEffect(() => {
         const processPayment = async () => {
@@ -21,59 +41,80 @@ export default function Payment() {
                 setLoading(true);
                 setError("");
 
-                let selectedPackage = null;
+                let currentPaymentId = null;
 
-                // Nếu có packageId, sử dụng trực tiếp
-                if (packageId) {
-                    const packagesResponse = await teacherPackageService.getAll();
-                    const packages = packagesResponse.data?.data || [];
-                    selectedPackage = packages.find(
-                        (pkg) => pkg.teacherPackageId === parseInt(packageId)
-                    );
-                } 
-                // Nếu không có packageId, tìm theo packageType (backward compatibility)
-                else if (packageType) {
-                    const packagesResponse = await teacherPackageService.getAll();
-                    const packages = packagesResponse.data?.data || [];
-                    selectedPackage = packages.find(
-                        (pkg) => pkg.packageName?.toLowerCase().includes(packageType?.toLowerCase() || "")
-                    );
+                // Case 1: Có paymentId sẵn (từ CourseDetail)
+                if (paymentIdParam) {
+                    currentPaymentId = parseInt(paymentIdParam);
                 }
+                // Case 2: Có courseId - tạo payment mới cho Course
+                else if (courseId) {
+                    const paymentResponse = await paymentService.processPayment({
+                        ProductId: parseInt(courseId),
+                        typeproduct: 1 // ProductType.Course = 1
+                    });
+                    currentPaymentId = paymentResponse.data.data.paymentId;
+                }
+                // Case 3: Có packageId - tạo payment mới cho TeacherPackage
+                else if (packageId || packageType) {
+                    let selectedPackage = null;
 
-                if (!selectedPackage) {
-                    setError("Không tìm thấy gói đăng ký");
+                    if (packageId) {
+                        const packagesResponse = await teacherPackageService.getAll();
+                        const packages = packagesResponse.data?.data || [];
+                        selectedPackage = packages.find(
+                            (pkg) => pkg.teacherPackageId === parseInt(packageId)
+                        );
+                    } else if (packageType) {
+                        const packagesResponse = await teacherPackageService.getAll();
+                        const packages = packagesResponse.data?.data || [];
+                        selectedPackage = packages.find(
+                            (pkg) => pkg.packageName?.toLowerCase().includes(packageType?.toLowerCase() || "")
+                        );
+                    }
+
+                    if (!selectedPackage) {
+                        setError("Không tìm thấy gói đăng ký");
+                        setLoading(false);
+                        return;
+                    }
+
+                    // ✅ SỬA: GỬI SỐ 2 THAY VÌ STRING "TeacherPackage"
+                    // ProductType enum: Course = 1, TeacherPackage = 2
+                    const paymentResponse = await paymentService.processPayment({
+                        ProductId: selectedPackage.teacherPackageId,
+                        typeproduct: 2 // ProductType.TeacherPackage = 2
+                    });
+                    currentPaymentId = paymentResponse.data.data.paymentId;
+                } else {
+                    setError("Không tìm thấy thông tin thanh toán");
                     setLoading(false);
                     return;
                 }
 
-                // 2. Tạo payment với ProductType = TeacherPackage
-                const paymentResponse = await paymentService.processPayment({
-                    ProductId: selectedPackage.teacherPackageId,
-                    typeproduct: "TeacherPackage"
-                });
+                // Tạo PayOS link để lấy checkoutUrl
+                const payOsResponse = await paymentService.createPayOsLink(currentPaymentId);
+                const url = payOsResponse.data.data.checkoutUrl; // ✅ Đọc checkoutUrl
 
-                const paymentId = paymentResponse.data.data.paymentId;
+                if (!url) {
+                    setError("Không thể tạo link thanh toán");
+                    setLoading(false);
+                    return;
+                }
 
-                // 3. Tạo PayOS link để lấy QR code
-                const payOsResponse = await paymentService.createPayOsLink(paymentId);
-                const qrCodeUrl = payOsResponse.data.data.qrCode;
-
-                setQrCode(qrCodeUrl);
-                setLoading(false);
+                // ✅ Redirect trực tiếp đến trang PayOS
+                window.location.href = url;
             } catch (error) {
                 console.error("Error processing payment:", error);
-                setError(error.response?.data?.message || "Có lỗi xảy ra khi xử lý thanh toán");
+                // ✅ CẢI THIỆN HIỂN THỊ LỖI
+                const errorMsg = parseErrorMessage(error);
+                setError(errorMsg);
                 setLoading(false);
             }
         };
 
-        if (packageId || packageType) {
-            processPayment();
-        } else {
-            setError("Không tìm thấy loại gói đăng ký");
-            setLoading(false);
-        }
-    }, [packageId, packageType]);
+        processPayment();
+    }, [packageId, packageType, courseId, paymentIdParam]);
 
     const handleBack = () => {
         navigate("/home");
@@ -88,33 +129,13 @@ export default function Payment() {
             </div>
 
             <div className="payment-card">
-                <h1 className="payment-title">Chuyển khoản ngân hàng</h1>
+                <h1 className="payment-title">Thanh toán PayOS</h1>
 
                 {loading ? (
-                    <div className="payment-loading">Đang tải...</div>
+                    <div className="payment-loading">Đang chuyển hướng đến trang thanh toán...</div>
                 ) : error ? (
                     <div className="payment-error">{error}</div>
-                ) : (
-                    <>
-                        <div className="qr-code-wrapper">
-                            <img src={qrCode} alt="QR Code" className="qr-code" />
-                        </div>
-
-                        <div className="payment-logos">
-                            <div className="payment-logo vietqr">VIETQR</div>
-                            <div className="payment-logo napas">napas 247</div>
-                        </div>
-
-                        <div className="payment-instructions">
-                            <div className="instruction-step">
-                                Bước 1: Mở ứng dụng ngân hàng/ví điện tử.
-                            </div>
-                            <div className="instruction-step">
-                                Bước 2: Quét mã QR. Xác nhận thanh toán.
-                            </div>
-                        </div>
-                    </>
-                )}
+                ) : null}
             </div>
         </div>
     );

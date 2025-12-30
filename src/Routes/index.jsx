@@ -16,6 +16,8 @@ import ForgotPassword from "../Pages/ForgotPassword/ForgotPassword";
 import OtpResetPassword from "../Pages/OtpResetPassword/OtpResetPassword";
 import ResetPassword from "../Pages/ResetPassword/ResetPassword";
 import Payment from "../Pages/Payment/Payment";
+import PaymentSuccess from "../Pages/Payment/PaymentSuccess";
+import PaymentFailed from "../Pages/Payment/PaymentFailed";
 import PaymentHistory from "../Pages/PaymentHistory/PaymentHistory";
 import VocabularyReview from "../Pages/VocabularyReview/VocabularyReview";
 import FlashCardReviewSession from "../Pages/FlashCardReviewSession/FlashCardReviewSession";
@@ -32,6 +34,12 @@ import QuizDetail from "../Pages/QuizDetail/QuizDetail";
 import QuizResults from "../Pages/QuizResults/QuizResults";
 import EssayDetail from "../Pages/EssayDetail/EssayDetail";
 import PronunciationDetail from "../Pages/PronunciationDetail/PronunciationDetail";
+
+// Admin Imports
+import AdminLayout from "../Layouts/AdminLayout/AdminLayout";
+import AdminDashboard from "../Pages/Admin/Dashboard/AdminDashboard";
+import AdminCourseList from "../Pages/Admin/CourseManagement/AdminCourseList";
+import AdminUserList from "../Pages/Admin/UserManagement/AdminUserList";
 
 /**
  * Application Routes
@@ -61,6 +69,8 @@ export default function AppRoutes() {
       <Route path={ROUTE_PATHS.PROFILE_EDIT} element={<EditProfile />} />
       <Route path={ROUTE_PATHS.PROFILE_CHANGE_PASSWORD} element={<ChangePassword />} />
       <Route path={ROUTE_PATHS.PAYMENT} element={<Payment />} />
+      <Route path={ROUTE_PATHS.PAYMENT_SUCCESS} element={<PaymentSuccess />} />
+      <Route path={ROUTE_PATHS.PAYMENT_FAILED} element={<PaymentFailed />} />
       <Route path={ROUTE_PATHS.PAYMENT_HISTORY} element={<PaymentHistory />} />
       <Route path={ROUTE_PATHS.VOCABULARY_REVIEW} element={<VocabularyReview />} />
       <Route path="/vocabulary-review/session" element={<FlashCardReviewSession />} />
@@ -80,6 +90,16 @@ export default function AppRoutes() {
       <Route path="/course/:courseId" element={<CourseDetail />} />
       <Route path="/course/:courseId/learn" element={<CourseLearn />} />
       <Route path="/course/:courseId/lesson/:lessonId" element={<LessonDetail />} />
+
+      {/* ADMIN ROUTES */}
+      <Route path="/admin" element={<AdminLayout />}>
+        <Route index element={<AdminDashboard />} /> {/* Default to Dashboard */}
+        <Route path="dashboard" element={<AdminDashboard />} />
+        <Route path="courses" element={<AdminCourseList />} />
+        <Route path="users" element={<AdminUserList />} />
+        {/* Placeholder for Finance */}
+        <Route path="finance" element={<div className="p-4">Finance Module Coming Soon</div>} />
+      </Route>
     </Routes>
   );
 }

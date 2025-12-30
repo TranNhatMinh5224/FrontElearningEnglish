@@ -121,6 +121,38 @@
     border-radius: 8px;
 }
 
+.payment-checking {
+    text-align: center;
+    padding: 15px;
+    background-color: #e3f2fd;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    color: #1976d2;
+    font-weight: 500;
+}
+
+.payment-checking p {
+    margin: 0;
+    margin-bottom: 8px;
+}
+
+.payment-checking p:last-child {
+    margin-bottom: 0;
+}
+
+.payment-checking-hint {
+    font-size: 0.9em;
+    font-weight: 400;
+    color: #1565c0;
+    opacity: 0.9;
+}
+
+.payos-embed-container {
+    min-height: 600px;
+    width: 100%;
+    margin: 20px 0;
+}
+
 @media (max-width: 768px) {
     .payment-card {
         padding: 30px 20px;

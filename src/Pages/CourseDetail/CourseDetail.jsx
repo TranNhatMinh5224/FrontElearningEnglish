@@ -119,36 +119,11 @@ export default function CourseDetail() {
             });
 
             if (paymentResponse.data?.success) {
-                // Payment record created, now user needs to complete payment
-                // For now, we'll try to enroll (backend will check for successful payment)
-                // In a real scenario, you might redirect to payment gateway here
-                try {
-                    await enrollmentService.enroll({ courseId: parseInt(courseId) });
-
-                    // Refresh course data to update enrollment status
-                    const response = await courseService.getCourseById(courseId);
-                    if (response.data?.success && response.data?.data) {
-                        setCourse(response.data.data);
-                    }
-
-                    // Refresh notifications để hiển thị thông báo mới ngay lập tức
-                    refreshNotifications();
-
-                    setShowEnrollmentModal(false);
-                    setNotification({
-                        isOpen: true,
-                        type: "success",
-                        message: "Thanh toán và đăng ký khóa học thành công!"
-                    });
-                } catch (enrollErr) {
-                    // If enrollment fails due to payment not completed, show appropriate message
-                    const enrollErrorMsg = enrollErr.response?.data?.message || "Vui lòng hoàn tất thanh toán trước khi đăng ký.";
-                    setNotification({
-                        isOpen: true,
-                        type: "error",
-                        message: enrollErrorMsg
-                    });
-                }
+                // Payment record created, navigate to payment page to show QR code
+                const paymentId = paymentResponse.data.data.paymentId;
+                setShowEnrollmentModal(false);
+                // Navigate to payment page with courseId
+                navigate(`/payment?courseId=${courseId}&paymentId=${paymentId}`);
             } else {
                 const errorMsg = paymentResponse.data?.message || "Không thể xử lý thanh toán. Vui lòng thử lại.";
                 setNotification({
