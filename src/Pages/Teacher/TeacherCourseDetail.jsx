@@ -150,7 +150,7 @@ export default function TeacherCourseDetail() {
       <>
         <TeacherHeader />
         <div className="teacher-course-detail-container">
-          <div className="loading-message">Đang tải thông tin khóa học...</div>
+          <div className="loading-message">Đang tải thông tin khóa học....</div>
         </div>
       </>
     );
