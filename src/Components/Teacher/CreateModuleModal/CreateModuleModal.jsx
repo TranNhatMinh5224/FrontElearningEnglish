@@ -201,7 +201,14 @@ export default function CreateModuleModal({ show, onClose, onSuccess, lessonId }
   const isFormValid = name.trim() && description.trim() && contentType;
 
   return (
-    <Modal show={show} onHide={onClose} centered className="create-module-modal">
+    <Modal 
+      show={show} 
+      onHide={onClose} 
+      centered 
+      className="create-module-modal" 
+      dialogClassName="create-module-modal-dialog"
+      style={{ zIndex: 1050 }}
+    >
       <Modal.Header closeButton>
         <Modal.Title>Thêm Module</Modal.Title>
       </Modal.Header>

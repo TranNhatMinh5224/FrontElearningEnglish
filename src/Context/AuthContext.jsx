@@ -100,7 +100,12 @@ export const AuthProvider = ({ children }) => {
       tokenStorage.setTokens({ accessToken, refreshToken });
 
       // Use window.location.href instead of navigate to prevent state reset
-      const redirectPath = user.roles?.some((r) => r.name === "Admin") ? "/admin" : "/home";
+      // Check for any admin role: SuperAdmin, ContentAdmin, or FinanceAdmin
+      const isAdmin = user.roles?.some((r) => {
+        const roleName = r.name || r;
+        return roleName === "SuperAdmin" || roleName === "ContentAdmin" || roleName === "FinanceAdmin";
+      });
+      const redirectPath = isAdmin ? "/admin" : "/home";
       window.location.href = redirectPath;
     } catch (error) {
       throw error; // Re-throw để component có thể catch
@@ -142,7 +147,12 @@ export const AuthProvider = ({ children }) => {
 
       console.log("Navigating to home/admin...");
       // Use window.location.href instead of navigate to prevent state reset
-      const redirectPath = user.roles?.some((r) => r.name === "Admin") ? "/admin" : "/home";
+      // Check for any admin role: SuperAdmin, ContentAdmin, or FinanceAdmin
+      const isAdmin = user.roles?.some((r) => {
+        const roleName = r.name || r;
+        return roleName === "SuperAdmin" || roleName === "ContentAdmin" || roleName === "FinanceAdmin";
+      });
+      const redirectPath = isAdmin ? "/admin" : "/home";
       window.location.href = redirectPath;
       console.log("=== AuthContext.googleLogin SUCCESS ===");
     } catch (error) {
@@ -210,7 +220,12 @@ export const AuthProvider = ({ children }) => {
 
       console.log("Navigating to home/admin...");
       // Use window.location.href instead of navigate to prevent state reset
-      const redirectPath = user.roles?.some((r) => r.name === "Admin") ? "/admin" : "/home";
+      // Check for any admin role: SuperAdmin, ContentAdmin, or FinanceAdmin
+      const isAdmin = user.roles?.some((r) => {
+        const roleName = r.name || r;
+        return roleName === "SuperAdmin" || roleName === "ContentAdmin" || roleName === "FinanceAdmin";
+      });
+      const redirectPath = isAdmin ? "/admin" : "/home";
       window.location.href = redirectPath;
       console.log("=== AuthContext.facebookLogin SUCCESS ===");
     } catch (error) {

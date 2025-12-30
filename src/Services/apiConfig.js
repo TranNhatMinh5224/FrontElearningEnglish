@@ -148,23 +148,25 @@ export const API_ENDPOINTS = {
     },
     // Teacher endpoints
     TEACHER: {
-        GET_MY_COURSES: "/courses/teacher/my-courses",
-        GET_COURSE_DETAIL: (courseId) => `/courses/teacher/${courseId}/detail`,
-        CREATE_COURSE: "/courses/teacher/create",
-        UPDATE_COURSE: (courseId) => `/courses/teacher/${courseId}`,
-        GET_COURSE_STUDENTS: (courseId) => `/courses/${courseId}/students`,
-        GET_STUDENT_DETAIL: (courseId, studentId) => `/courses/${courseId}/students/${studentId}`,
-        ADD_STUDENT: (courseId) => `/courses/teacher/${courseId}/students`,
-        REMOVE_STUDENT: (courseId, studentId) => `/courses/teacher/${courseId}/students/${studentId}`,
+        // Course endpoints
+        GET_MY_COURSES: "/teacher/courses/my-courses",
+        GET_COURSE_DETAIL: (courseId) => `/teacher/courses/${courseId}`,
+        CREATE_COURSE: "/teacher/courses",
+        UPDATE_COURSE: (courseId) => `/teacher/courses/${courseId}`,
+        // Student management endpoints
+        GET_COURSE_STUDENTS: (courseId) => `/teacher/courses/${courseId}/students`,
+        GET_STUDENT_DETAIL: (courseId, studentId) => `/teacher/courses/${courseId}/students/${studentId}`,
+        ADD_STUDENT: (courseId) => `/teacher/courses/${courseId}/students`,
+        REMOVE_STUDENT: (courseId, studentId) => `/teacher/courses/${courseId}/students/${studentId}`,
         // Lesson endpoints
-        CREATE_LESSON: "/lessons/teacher/add",
-        GET_LESSONS_BY_COURSE: (courseId) => `/lessons/course/${courseId}`,
-        UPDATE_LESSON: (lessonId) => `/lessons/update/${lessonId}`,
-        GET_LESSON_BY_ID: (lessonId) => `/lessons/get/${lessonId}`,
+        CREATE_LESSON: "/teacher/lessons",
+        GET_LESSONS_BY_COURSE: (courseId) => `/teacher/lessons/course/${courseId}`,
+        GET_LESSON_BY_ID: (lessonId) => `/teacher/lessons/${lessonId}`,
+        UPDATE_LESSON: (lessonId) => `/teacher/lessons/${lessonId}`,
         // Module endpoints
-        CREATE_MODULE: "/modules",
-        GET_MODULES_BY_LESSON: (lessonId) => `/modules/lesson/${lessonId}`,
-        GET_MODULE_BY_ID: (moduleId) => `/modules/${moduleId}`,
+        CREATE_MODULE: "/teacher/modules",
+        GET_MODULES_BY_LESSON: (lessonId) => `/teacher/modules/lesson/${lessonId}`,
+        GET_MODULE_BY_ID: (moduleId) => `/teacher/modules/${moduleId}`,
     },
 };
 

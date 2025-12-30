@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from "react";
 import { Modal, Button } from "react-bootstrap";
 import { fileService } from "../../../Services/fileService";
 import { teacherService } from "../../../Services/teacherService";
+import { teacherPackageService } from "../../../Services/teacherPackageService";
+import { useAuth } from "../../../Context/AuthContext";
 import { FaFileUpload, FaTimes } from "react-icons/fa";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -11,11 +13,13 @@ const COURSE_IMAGE_BUCKET = "courses"; // Bucket name for course images
 
 export default function CreateCourseModal({ show, onClose, onSuccess, courseData, isUpdateMode = false }) {
   const fileInputRef = useRef(null);
+  const { user } = useAuth();
 
   // Form state
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [type] = useState(2); // Mặc định type = 2 (khóa học của giáo viên)
+  const [maxStudent, setMaxStudent] = useState(0); // Max students từ package
 
   // Image upload state
   const [selectedImage, setSelectedImage] = useState(null);
@@ -30,6 +34,63 @@ export default function CreateCourseModal({ show, onClose, onSuccess, courseData
 
   // Submit state
   const [submitting, setSubmitting] = useState(false);
+  const [loadingPackage, setLoadingPackage] = useState(false);
+
+  // Load maxStudent from teacher package
+  useEffect(() => {
+    const loadMaxStudent = async () => {
+      if (!show || !user?.teacherSubscription?.packageLevel) {
+        setMaxStudent(0);
+        return;
+      }
+
+      try {
+        setLoadingPackage(true);
+        const packageResponse = await teacherPackageService.getAll();
+        const userPackageLevel = user.teacherSubscription.packageLevel;
+
+        if (packageResponse.data?.success && packageResponse.data?.data && userPackageLevel) {
+          const packages = packageResponse.data.data;
+          const levelMap = {
+            "Basic": 0,
+            "Standard": 1,
+            "Premium": 2,
+            "Professional": 3
+          };
+          const expectedLevel = levelMap[userPackageLevel];
+
+          const matchedPackage = packages.find(
+            (pkg) => {
+              const pkgLevel = pkg.level !== undefined ? pkg.level : (pkg.Level !== undefined ? pkg.Level : null);
+              return (
+                pkgLevel === expectedLevel ||
+                pkgLevel?.toString() === userPackageLevel ||
+                (typeof pkgLevel === "string" && pkgLevel === userPackageLevel)
+              );
+            }
+          );
+
+          if (matchedPackage) {
+            const maxStudents = matchedPackage.maxStudents || matchedPackage.MaxStudents || 0;
+            setMaxStudent(maxStudents);
+          } else {
+            setMaxStudent(0);
+          }
+        } else {
+          setMaxStudent(0);
+        }
+      } catch (error) {
+        console.error("Error loading teacher package:", error);
+        setMaxStudent(0);
+      } finally {
+        setLoadingPackage(false);
+      }
+    };
+
+    if (show) {
+      loadMaxStudent();
+    }
+  }, [show, user]);
 
   // Pre-fill form when in update mode
   useEffect(() => {
@@ -41,6 +102,7 @@ export default function CreateCourseModal({ show, onClose, onSuccess, courseData
       setTitle(courseTitle);
       setDescription(courseDescription);
       setExistingImageUrl(courseImageUrl);
+      // Không set maxStudent từ course data - sẽ dùng giá trị từ package (được load ở useEffect khác)
       
       // Set preview to existing image if available
       if (courseImageUrl) {
@@ -181,37 +243,59 @@ export default function CreateCourseModal({ show, onClose, onSuccess, courseData
     setSubmitting(true);
 
     try {
-      const submitData = {
-        title: title.trim(),
-        description: description.trim(),
-        type: type,
-        maxStudent: 0, // Backend will auto-set based on package
-      };
-
-      // Chỉ thêm imageTempKey và imageType nếu có upload ảnh mới
-      if (imageTempKey && imageType) {
-        submitData.imageTempKey = imageTempKey;
-        submitData.imageType = imageType;
-      }
-
-      let response;
+      let submitData;
+      
       if (isUpdateMode && courseData) {
+        // Update mode: chỉ gửi các trường có thể cập nhật (không gửi type)
+        submitData = {
+          title: title.trim(),
+          description: description.trim(),
+          maxStudent: maxStudent, // Từ gói giáo viên hiện tại
+        };
+
+        // Chỉ thêm imageTempKey và imageType nếu có upload ảnh mới
+        if (imageTempKey && imageType) {
+          submitData.imageTempKey = imageTempKey;
+          submitData.imageType = imageType;
+        }
+        
         const courseId = courseData.courseId || courseData.CourseId;
         if (!courseId) {
           throw new Error("Không tìm thấy ID khóa học");
         }
-        response = await teacherService.updateCourse(courseId, submitData);
+        const response = await teacherService.updateCourse(courseId, submitData);
+        
+        if (response.data?.success) {
+          onSuccess?.();
+          onClose();
+        } else {
+          throw new Error(response.data?.message || "Cập nhật khóa học thất bại");
+        }
       } else {
-        response = await teacherService.createCourse(submitData);
+        // Create mode: gửi đầy đủ thông tin
+        submitData = {
+          title: title.trim(),
+          description: description.trim(),
+          type: type,
+          maxStudent: maxStudent, // Từ gói giáo viên hiện tại
+        };
+
+        // Chỉ thêm imageTempKey và imageType nếu có upload ảnh mới
+        if (imageTempKey && imageType) {
+          submitData.imageTempKey = imageTempKey;
+          submitData.imageType = imageType;
+        }
+        
+        const response = await teacherService.createCourse(submitData);
+        
+        if (response.data?.success) {
+          onSuccess?.();
+          onClose();
+        } else {
+          throw new Error(response.data?.message || "Tạo khóa học thất bại");
+        }
       }
 
-      if (response.data?.success) {
-        // Success
-        onSuccess?.();
-        onClose();
-      } else {
-        throw new Error(response.data?.message || (isUpdateMode ? "Cập nhật khóa học thất bại" : "Tạo khóa học thất bại"));
-      }
     } catch (error) {
       console.error(`Error ${isUpdateMode ? "updating" : "creating"} course:`, error);
       const errorMessage = error.response?.data?.message || error.message || (isUpdateMode ? "Có lỗi xảy ra khi cập nhật khóa học" : "Có lỗi xảy ra khi tạo khóa học");
@@ -252,6 +336,27 @@ export default function CreateCourseModal({ show, onClose, onSuccess, courseData
             />
             {errors.title && <div className="invalid-feedback">{errors.title}</div>}
             <div className="form-hint">*Bắt buộc</div>
+          </div>
+
+          {/* Số học viên tối đa (từ gói giáo viên) */}
+          <div className="form-group">
+            <label className="form-label">Số học viên tối đa</label>
+            <input
+              type="number"
+              className="form-control"
+              value={maxStudent}
+              readOnly
+              disabled
+              style={{ 
+                backgroundColor: "#f5f5f5", 
+                cursor: "not-allowed",
+                opacity: 0.7
+              }}
+              placeholder={loadingPackage ? "Đang tải..." : "Tự động từ gói giáo viên"}
+            />
+            <div className="form-hint">
+              Giá trị này được lấy từ gói giáo viên hiện tại của bạn ! Không thể thay đổi.
+            </div>
           </div>
 
           {/* Ảnh khóa học */}

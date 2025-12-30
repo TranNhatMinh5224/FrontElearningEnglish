@@ -220,7 +220,14 @@ export default function CreateLessonModal({ show, onClose, onSuccess, courseId, 
   const isFormValid = title.trim() && description.trim();
 
   return (
-    <Modal show={show} onHide={onClose} centered className="create-lesson-modal">
+    <Modal 
+      show={show} 
+      onHide={onClose} 
+      centered 
+      className="create-lesson-modal" 
+      dialogClassName="create-lesson-modal-dialog"
+      style={{ zIndex: 1050 }}
+    >
       <Modal.Header closeButton>
         <Modal.Title>{isUpdateMode ? "Cập nhật bài học" : "Thêm bài học"}</Modal.Title>
       </Modal.Header>

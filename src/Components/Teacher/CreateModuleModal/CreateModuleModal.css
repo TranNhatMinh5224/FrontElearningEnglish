@@ -1,7 +1,66 @@
-.create-module-modal .modal-content {
-  border-radius: 16px;
-  border: none;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+/* Override Bootstrap modal styles - make it wider and centered */
+/* Use highest specificity to override global modal rules */
+
+/* Base styles - target all possible selector combinations */
+.create-module-modal-dialog,
+.modal .create-module-modal-dialog,
+.modal.show .create-module-modal-dialog,
+.create-module-modal .modal-dialog.create-module-modal-dialog,
+.modal.create-module-modal .modal-dialog.create-module-modal-dialog,
+.modal.show.create-module-modal .modal-dialog.create-module-modal-dialog,
+body .modal .create-module-modal-dialog,
+body .modal.show .create-module-modal-dialog,
+body .create-module-modal .modal-dialog.create-module-modal-dialog,
+html body .modal .create-module-modal-dialog,
+html body .modal.show .create-module-modal-dialog {
+  max-width: 900px !important;
+  width: 90% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* Override global modal.show rule - highest specificity */
+body .modal.show .create-module-modal .modal-dialog.create-module-modal-dialog,
+body .modal.show.create-module-modal .modal-dialog.create-module-modal-dialog,
+html body .modal.show .create-module-modal-dialog,
+html body .modal.show .create-module-modal .modal-dialog.create-module-modal-dialog {
+  max-width: 900px !important;
+  width: 90% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  display: flex !important;
+  align-items: center !important;
+  min-height: calc(100% - 1rem) !important;
+}
+
+/* Ensure centered alignment works correctly with Bootstrap centered class */
+.create-module-modal-dialog.modal-dialog-centered,
+.modal.create-module-modal .modal-dialog.create-module-modal-dialog.modal-dialog-centered,
+body .create-module-modal .modal-dialog.create-module-modal-dialog.modal-dialog-centered,
+html body .create-module-modal-dialog.modal-dialog-centered,
+html body .modal.create-module-modal .modal-dialog.create-module-modal-dialog.modal-dialog-centered {
+  max-width: 900px !important;
+  width: 90% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  display: flex !important;
+  align-items: center !important;
+  min-height: calc(100% - 1rem) !important;
+}
+
+/* Override modal-content from other modals */
+.create-module-modal .modal-content,
+.modal.create-module-modal .modal-content,
+body .create-module-modal .modal-content,
+html body .create-module-modal .modal-content {
+  border-radius: 16px !important;
+  border: none !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15) !important;
+  max-width: none !important;
+  width: 100% !important;
+  max-height: 90vh !important;
+  display: flex !important;
+  flex-direction: column !important;
 }
 
 .create-module-modal .modal-header {
@@ -17,6 +76,9 @@
 
 .create-module-modal .modal-body {
   padding: 28px;
+  overflow-y: auto;
+  flex: 1;
+  max-height: calc(90vh - 140px); /* Subtract header + footer height */
 }
 
 .create-module-modal .modal-footer {
