@@ -8,6 +8,18 @@
     /* Scroll margin for smooth scrolling */
 }
 
+.assignment-management-view .container-fluid {
+    margin-left: 120px;
+    margin-right: 120px;
+    max-width: calc(100% - 240px);
+}
+
+/* Override Bootstrap Col padding to match button width exactly */
+.assignment-management-view .row>[class*="col-"] {
+    padding-left: 0;
+    padding-right: 0;
+}
+
 .assignment-header {
     margin-bottom: 20px;
 }
@@ -69,7 +81,21 @@
         padding: 15px;
     }
 
+    .assignment-management-view .container-fluid {
+        margin-left: 60px;
+        margin-right: 60px;
+        max-width: calc(100% - 120px);
+    }
+
     .assignment-title {
         font-size: 24px;
+    }
+}
+
+@media (max-width: 768px) {
+    .assignment-management-view .container-fluid {
+        margin-left: 20px;
+        margin-right: 20px;
+        max-width: calc(100% - 40px);
     }
 }

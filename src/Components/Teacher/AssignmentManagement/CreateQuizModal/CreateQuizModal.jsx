@@ -13,6 +13,7 @@ export default function CreateQuizModal({ show, onClose, onSubmit }) {
     const [description, setDescription] = useState("");
     const [quizType, setQuizType] = useState(1);
     const [duration, setDuration] = useState("");
+    const [isPublished, setIsPublished] = useState(false);
     const [errors, setErrors] = useState({});
 
     useEffect(() => {
@@ -22,6 +23,7 @@ export default function CreateQuizModal({ show, onClose, onSubmit }) {
             setDescription("");
             setQuizType(1);
             setDuration("");
+            setIsPublished(false);
             setErrors({});
         }
     }, [show]);
@@ -47,6 +49,7 @@ export default function CreateQuizModal({ show, onClose, onSubmit }) {
             description: description.trim() || null,
             type: quizType,
             duration: duration ? parseInt(duration) : null,
+            isPublished: isPublished,
         };
 
         onSubmit(quizData);
@@ -115,6 +118,18 @@ export default function CreateQuizModal({ show, onClose, onSubmit }) {
                         </Form.Control.Feedback>
                         <Form.Text className="text-muted">
                             Để trống nếu không giới hạn thời gian
+                        </Form.Text>
+                    </Form.Group>
+
+                    <Form.Group className="mb-3">
+                        <Form.Check
+                            type="checkbox"
+                            label="Công khai cho học sinh (Published)"
+                            checked={isPublished}
+                            onChange={(e) => setIsPublished(e.target.checked)}
+                        />
+                        <Form.Text className="text-muted">
+                            Nếu bật, học sinh sẽ nhìn thấy quiz này
                         </Form.Text>
                     </Form.Group>
                 </Form>

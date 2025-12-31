@@ -23,8 +23,10 @@ export default function EssayList({ essays, onEdit, onDelete }) {
                     const essayId = essay.essayId || essay.EssayId;
                     const assessmentId = essay.assessmentId || essay.AssessmentId;
                     const title = essay.title || essay.Title || "Untitled Essay";
-                    const status = essay.status || essay.Status;
-                    const isPublished = status === 1 || status === "Published" || essay.isPublished || essay.IsPublished;
+                    // Use assessmentIsPublished from assessment, not essay status
+                    const isPublished = essay.assessmentIsPublished !== undefined 
+                        ? essay.assessmentIsPublished 
+                        : (essay.AssessmentIsPublished !== undefined ? essay.AssessmentIsPublished : false);
 
                     return (
                         <Card

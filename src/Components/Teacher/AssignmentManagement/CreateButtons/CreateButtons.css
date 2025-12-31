@@ -9,29 +9,6 @@
 .create-quiz-btn {
     flex: 1;
     min-width: 200px;
-    background-color: #d946ef;
-    /* Pink color from theme - single color, no gradient */
-    color: white;
-    border: none;
-    padding: 15px 30px;
-    font-size: 16px;
-    font-weight: 600;
-    border-radius: 14px;
-    /* Rounded like "Tạo khóa học" button */
-    transition: all 0.3s;
-    box-shadow: 0 2px 8px rgba(217, 70, 239, 0.3);
-}
-
-.create-quiz-btn:hover {
-    background-color: #c026d3;
-    color: white;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(217, 70, 239, 0.4);
-}
-
-.create-essay-btn {
-    flex: 1;
-    min-width: 200px;
     background-color: #6fd5e0;
     /* Cyan color - single color, no gradient */
     color: white;
@@ -45,11 +22,34 @@
     box-shadow: 0 2px 8px rgba(111, 213, 224, 0.3);
 }
 
-.create-essay-btn:hover {
+.create-quiz-btn:hover {
     background-color: #0097A7;
     color: white;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(111, 213, 224, 0.4);
+}
+
+.create-essay-btn {
+    flex: 1;
+    min-width: 200px;
+    background-color: #d946ef;
+    /* Pink color from theme - single color, no gradient */
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 14px;
+    /* Rounded like "Tạo khóa học" button */
+    transition: all 0.3s;
+    box-shadow: 0 2px 8px rgba(217, 70, 239, 0.3);
+}
+
+.create-essay-btn:hover {
+    background-color: #c026d3;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(217, 70, 239, 0.4);
 }
 
 @media (max-width: 768px) {

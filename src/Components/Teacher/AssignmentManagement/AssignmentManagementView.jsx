@@ -62,6 +62,7 @@ export default function AssignmentManagementView({
                             title: quiz.title || quiz.Title || assessment.title || assessment.Title || "Untitled Quiz",
                             status: quiz.status || quiz.Status || assessment.status || assessment.Status,
                             isPublished: quiz.status === 1 || quiz.Status === 1 || assessment.isPublished || assessment.IsPublished,
+                            assessmentIsPublished: assessment.isPublished !== undefined ? assessment.isPublished : (assessment.IsPublished !== undefined ? assessment.IsPublished : false),
                         };
                     }
                     return null;
@@ -79,6 +80,7 @@ export default function AssignmentManagementView({
                             title: assessment.title || assessment.Title || essay.title || essay.Title,
                             status: essay.status || essay.Status || assessment.status || assessment.Status,
                             isPublished: essay.status === 1 || essay.Status === 1 || assessment.isPublished || assessment.IsPublished,
+                            assessmentIsPublished: assessment.isPublished !== undefined ? assessment.isPublished : (assessment.IsPublished !== undefined ? assessment.IsPublished : false),
                         };
                     }
                     return null;
@@ -129,12 +131,36 @@ export default function AssignmentManagementView({
                     moduleId: parseInt(moduleId),
                     title: quizFormData.title,
                     description: quizFormData.description,
+                    isPublished: quizFormData.isPublished || false,
+                    totalPoints: 0,
+                    passingScore: 0,
                 };
                 const assessmentRes = await assessmentService.createAssessment(assessmentData);
                 if (assessmentRes.data?.success && assessmentRes.data?.data) {
                     assessmentId = assessmentRes.data.data.assessmentId || assessmentRes.data.data.AssessmentId;
                 } else {
                     throw new Error(assessmentRes.data?.message || "Không thể tạo assessment");
+                }
+            } else {
+                // Update existing assessment's isPublished
+                try {
+                    const assessmentRes = await assessmentService.getTeacherAssessmentById(assessmentId);
+                    if (assessmentRes.data?.success && assessmentRes.data?.data) {
+                        const currentAssessment = assessmentRes.data.data;
+                        await assessmentService.updateAssessment(assessmentId, {
+                            moduleId: currentAssessment.moduleId || currentAssessment.ModuleId,
+                            title: currentAssessment.title || currentAssessment.Title,
+                            description: currentAssessment.description || currentAssessment.Description || null,
+                            openAt: currentAssessment.openAt || currentAssessment.OpenAt || null,
+                            dueAt: currentAssessment.dueAt || currentAssessment.DueAt || null,
+                            timeLimit: currentAssessment.timeLimit || currentAssessment.TimeLimit || null,
+                            isPublished: quizFormData.isPublished || false,
+                            totalPoints: currentAssessment.totalPoints || currentAssessment.TotalPoints || 0,
+                            passingScore: currentAssessment.passingScore || currentAssessment.PassingScore || 0,
+                        });
+                    }
+                } catch (assessmentErr) {
+                    console.error("Error updating assessment isPublished:", assessmentErr);
                 }
             }
 
@@ -272,7 +298,7 @@ export default function AssignmentManagementView({
 
             const quizRes = await quizService.updateQuiz(quizId, updateData);
             if (quizRes.data?.success) {
-                // Update assessment title if needed - need to get current assessment data first
+                // Update assessment title and isPublished - need to get current assessment data first
                 if (assessmentId) {
                     try {
                         const assessmentRes = await assessmentService.getTeacherAssessmentById(assessmentId);
@@ -285,7 +311,7 @@ export default function AssignmentManagementView({
                                 openAt: currentAssessment.openAt || currentAssessment.OpenAt || null,
                                 dueAt: currentAssessment.dueAt || currentAssessment.DueAt || null,
                                 timeLimit: currentAssessment.timeLimit || currentAssessment.TimeLimit || null,
-                                isPublished: currentAssessment.isPublished !== undefined ? currentAssessment.isPublished : currentAssessment.IsPublished || false,
+                                isPublished: quizFormData.isPublished !== undefined ? quizFormData.isPublished : (currentAssessment.isPublished !== undefined ? currentAssessment.isPublished : currentAssessment.IsPublished || false),
                                 totalPoints: currentAssessment.totalPoints || currentAssessment.TotalPoints || 0,
                                 passingScore: currentAssessment.passingScore || currentAssessment.PassingScore || 0,
                             });
@@ -320,7 +346,41 @@ export default function AssignmentManagementView({
         if (window.confirm("Bạn có chắc chắn muốn xóa quiz này?")) {
             try {
                 const quizId = quiz.quizId || quiz.QuizId;
+                const assessmentId = quiz.assessmentId || quiz.AssessmentId;
+
+                // Delete quiz
                 await quizService.deleteQuiz(quizId);
+
+                // Check if assessment has any essay left
+                if (assessmentId) {
+                    try {
+                        const essayRes = await essayService.getTeacherEssaysByAssessment(assessmentId);
+                        const hasEssay = essayRes.data?.success && essayRes.data?.data && essayRes.data.data.length > 0;
+
+                        if (!hasEssay) {
+                            // No essay left, set isPublished to false so students don't see empty assessment
+                            const assessmentRes = await assessmentService.getTeacherAssessmentById(assessmentId);
+                            if (assessmentRes.data?.success && assessmentRes.data?.data) {
+                                const currentAssessment = assessmentRes.data.data;
+                                await assessmentService.updateAssessment(assessmentId, {
+                                    moduleId: currentAssessment.moduleId || currentAssessment.ModuleId,
+                                    title: currentAssessment.title || currentAssessment.Title,
+                                    description: currentAssessment.description || currentAssessment.Description || null,
+                                    openAt: currentAssessment.openAt || currentAssessment.OpenAt || null,
+                                    dueAt: currentAssessment.dueAt || currentAssessment.DueAt || null,
+                                    timeLimit: currentAssessment.timeLimit || currentAssessment.TimeLimit || null,
+                                    isPublished: false, // Hide from students
+                                    totalPoints: currentAssessment.totalPoints || currentAssessment.TotalPoints || 0,
+                                    passingScore: currentAssessment.passingScore || currentAssessment.PassingScore || 0,
+                                });
+                            }
+                        }
+                    } catch (assessmentErr) {
+                        console.error("Error checking/updating assessment after quiz deletion:", assessmentErr);
+                        // Continue even if this fails
+                    }
+                }
+
                 await loadAssessments();
             } catch (err) {
                 console.error("Error deleting quiz:", err);
@@ -333,7 +393,41 @@ export default function AssignmentManagementView({
         if (window.confirm("Bạn có chắc chắn muốn xóa essay này?")) {
             try {
                 const essayId = essay.essayId || essay.EssayId;
+                const assessmentId = essay.assessmentId || essay.AssessmentId;
+
+                // Delete essay
                 await essayService.deleteEssay(essayId);
+
+                // Check if assessment has any quiz left
+                if (assessmentId) {
+                    try {
+                        const quizRes = await quizService.getTeacherQuizzesByAssessment(assessmentId);
+                        const hasQuiz = quizRes.data?.success && quizRes.data?.data && quizRes.data.data.length > 0;
+
+                        if (!hasQuiz) {
+                            // No quiz left, set isPublished to false so students don't see empty assessment
+                            const assessmentRes = await assessmentService.getTeacherAssessmentById(assessmentId);
+                            if (assessmentRes.data?.success && assessmentRes.data?.data) {
+                                const currentAssessment = assessmentRes.data.data;
+                                await assessmentService.updateAssessment(assessmentId, {
+                                    moduleId: currentAssessment.moduleId || currentAssessment.ModuleId,
+                                    title: currentAssessment.title || currentAssessment.Title,
+                                    description: currentAssessment.description || currentAssessment.Description || null,
+                                    openAt: currentAssessment.openAt || currentAssessment.OpenAt || null,
+                                    dueAt: currentAssessment.dueAt || currentAssessment.DueAt || null,
+                                    timeLimit: currentAssessment.timeLimit || currentAssessment.TimeLimit || null,
+                                    isPublished: false, // Hide from students
+                                    totalPoints: currentAssessment.totalPoints || currentAssessment.TotalPoints || 0,
+                                    passingScore: currentAssessment.passingScore || currentAssessment.PassingScore || 0,
+                                });
+                            }
+                        }
+                    } catch (assessmentErr) {
+                        console.error("Error checking/updating assessment after essay deletion:", assessmentErr);
+                        // Continue even if this fails
+                    }
+                }
+
                 await loadAssessments();
             } catch (err) {
                 console.error("Error deleting essay:", err);

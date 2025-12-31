@@ -22,8 +22,11 @@ export default function EditQuizModal({ show, onClose, onSubmit, quiz }) {
             setDescription(quiz.description || quiz.Description || "");
             setQuizType(quiz.type || quiz.Type || 1);
             setDuration(quiz.duration || quiz.Duration ? String(quiz.duration || quiz.Duration) : "");
-            const status = quiz.status || quiz.Status;
-            setIsPublished(status === 1 || status === "Open" || status === "Published");
+            // Get isPublished from assessment, not from quiz status
+            const assessmentIsPublished = quiz.assessmentIsPublished !== undefined
+                ? quiz.assessmentIsPublished
+                : (quiz.AssessmentIsPublished !== undefined ? quiz.AssessmentIsPublished : false);
+            setIsPublished(assessmentIsPublished);
         }
     }, [quiz, show]);
 
@@ -59,7 +62,7 @@ export default function EditQuizModal({ show, onClose, onSubmit, quiz }) {
             description: description.trim() || null,
             type: quizType,
             duration: duration ? parseInt(duration) : null,
-            status: isPublished ? 1 : 0, // 1 = Open (Published), 0 = Draft
+            isPublished: isPublished, // For assessment isPublished
         };
 
         onSubmit(quizData);
@@ -134,10 +137,13 @@ export default function EditQuizModal({ show, onClose, onSubmit, quiz }) {
                     <Form.Group className="mb-3">
                         <Form.Check
                             type="checkbox"
-                            label="Công khai (Published)"
+                            label="Công khai cho học sinh (Published)"
                             checked={isPublished}
                             onChange={(e) => setIsPublished(e.target.checked)}
                         />
+                        <Form.Text className="text-muted">
+                            Nếu bật, học sinh sẽ nhìn thấy quiz này
+                        </Form.Text>
                     </Form.Group>
                 </Form>
             </Modal.Body>

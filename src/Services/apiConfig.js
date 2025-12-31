@@ -40,11 +40,11 @@ export const API_ENDPOINTS = {
             DELETE: (id) => `/admin/courses/${id}`,
         },
         USERS: {
-            GET_ALL: "/admin/users", 
+            GET_ALL: "/admin/users",
             GET_TEACHERS: "/admin/users/teachers",
             GET_BLOCKED: "/admin/users/blocked",
             USER_STATS: "/admin/statistics/users", // Thêm endpoint thống kê user
-            BLOCK: (id) => `/admin/users/block/${id}`, 
+            BLOCK: (id) => `/admin/users/block/${id}`,
             UNBLOCK: (id) => `/admin/users/unblock/${id}`,
             UPGRADE_TEACHER: "/admin/users/upgrade-to-teacher"
         }
@@ -98,7 +98,7 @@ export const API_ENDPOINTS = {
     QUIZZES: {
         GET_BY_LESSON: (lessonId) => `/user/quizzes/lesson/${lessonId}`,
         GET_BY_ID: (quizId) => `/user/quizzes/quiz/${quizId}`, // Fixed: backend uses /quiz/{quizId}
-        GET_BY_ASSESSMENT: (assessmentId) => `/user/quizzes/Quizz/${assessmentId}`,
+        GET_BY_ASSESSMENT: (assessmentId) => `/user/quizzes/assessment/${assessmentId}`,
     },
     // Quiz Attempts
     QUIZ_ATTEMPTS: {

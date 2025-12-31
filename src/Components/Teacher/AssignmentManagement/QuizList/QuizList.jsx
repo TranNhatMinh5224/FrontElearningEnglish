@@ -23,9 +23,10 @@ export default function QuizList({ quizzes, onEdit, onCardClick, onDelete }) {
                     const quizId = quiz.quizId || quiz.QuizId;
                     const assessmentId = quiz.assessmentId || quiz.AssessmentId;
                     const title = quiz.title || quiz.Title || "Untitled Quiz";
-                    const status = quiz.status || quiz.Status;
-                    // QuizStatus: 0 = Draft, 1 = Open (Published)
-                    const isPublished = status === 1 || status === "Open" || status === "Published" || quiz.isPublished || quiz.IsPublished;
+                    // Use assessmentIsPublished from assessment, not quiz status
+                    const isPublished = quiz.assessmentIsPublished !== undefined
+                        ? quiz.assessmentIsPublished
+                        : (quiz.AssessmentIsPublished !== undefined ? quiz.AssessmentIsPublished : false);
 
                     return (
                         <Card
