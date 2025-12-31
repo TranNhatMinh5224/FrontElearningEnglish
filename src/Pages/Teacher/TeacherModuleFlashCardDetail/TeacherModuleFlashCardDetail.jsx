@@ -10,7 +10,7 @@ import { ROUTE_PATHS } from "../../../Routes/Paths";
 import SuccessModal from "../../../Components/Common/SuccessModal/SuccessModal";
 
 export default function TeacherModuleFlashCardDetail() {
-  const { courseId, lessonId, moduleId } = useParams();
+  const { courseId, lessonId, moduleId, flashcardId } = useParams();
   const navigate = useNavigate();
   const { user, roles, isAuthenticated } = useAuth();
   const [course, setCourse] = useState(null);
@@ -30,6 +30,7 @@ export default function TeacherModuleFlashCardDetail() {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const isTeacher = roles.includes("Teacher") || user?.teacherSubscription?.isTeacher === true;
+  const isEditMode = !!flashcardId;
 
   useEffect(() => {
     if (!isAuthenticated || !isTeacher) {
@@ -38,31 +39,49 @@ export default function TeacherModuleFlashCardDetail() {
     }
 
     fetchData();
-  }, [isAuthenticated, isTeacher, navigate, courseId, lessonId, moduleId]);
+  }, [isAuthenticated, isTeacher, navigate, courseId, lessonId, moduleId, flashcardId]);
 
   const fetchData = async () => {
     try {
       setLoading(true);
       setError("");
 
-      const [courseRes, lessonRes, moduleRes] = await Promise.all([
+      const promises = [
         teacherService.getCourseDetail(courseId),
         teacherService.getLessonById(lessonId),
         teacherService.getModuleById(moduleId),
-      ]);
+      ];
 
-      if (courseRes.data?.success && courseRes.data?.data) {
-        setCourse(courseRes.data.data);
+      // If edit mode, fetch flashcard data
+      if (isEditMode) {
+        promises.push(flashcardService.getTeacherFlashcardById(flashcardId));
       }
 
-      if (lessonRes.data?.success && lessonRes.data?.data) {
-        setLesson(lessonRes.data.data);
+      const results = await Promise.all(promises);
+
+      if (results[0].data?.success && results[0].data?.data) {
+        setCourse(results[0].data.data);
       }
 
-      if (moduleRes.data?.success && moduleRes.data?.data) {
-        setModule(moduleRes.data.data);
+      if (results[1].data?.success && results[1].data?.data) {
+        setLesson(results[1].data.data);
+      }
+
+      if (results[2].data?.success && results[2].data?.data) {
+        setModule(results[2].data.data);
       } else {
         setError("Không thể tải thông tin module");
+      }
+
+      // If edit mode, pre-fill form with flashcard data
+      if (isEditMode && results[3]?.data?.success && results[3]?.data?.data) {
+        const flashcard = results[3].data.data;
+        // Backend returns camelCase field names
+        setWord(flashcard.word || flashcard.Word || "");
+        setMeaning(flashcard.meaning || flashcard.Meaning || "");
+        setPronunciation(flashcard.pronunciation || flashcard.Pronunciation || "");
+        setPartOfSpeech(flashcard.partOfSpeech || flashcard.PartOfSpeech || "");
+        setExample(flashcard.example || flashcard.Example || "");
       }
     } catch (err) {
       console.error("Error fetching data:", err);
@@ -91,7 +110,6 @@ export default function TeacherModuleFlashCardDetail() {
     setSubmitting(true);
     try {
       const flashcardData = {
-        moduleId: parseInt(moduleId),
         word: word.trim(),
         meaning: meaning.trim(),
         pronunciation: pronunciation.trim() || null,
@@ -99,19 +117,27 @@ export default function TeacherModuleFlashCardDetail() {
         example: example.trim() || null,
       };
 
-      const response = await flashcardService.createFlashcard(flashcardData);
-      
+      let response;
+      if (isEditMode) {
+        // Update flashcard
+        response = await flashcardService.updateFlashcard(flashcardId, flashcardData);
+      } else {
+        // Create flashcard
+        flashcardData.moduleId = parseInt(moduleId);
+        response = await flashcardService.createFlashcard(flashcardData);
+      }
+
       if (response.data?.success) {
         setShowSuccessModal(true);
         setTimeout(() => {
           navigate(ROUTE_PATHS.TEACHER_LESSON_DETAIL(courseId, lessonId));
         }, 1500);
       } else {
-        throw new Error(response.data?.message || "Tạo flashcard thất bại");
+        throw new Error(response.data?.message || (isEditMode ? "Cập nhật flashcard thất bại" : "Tạo flashcard thất bại"));
       }
     } catch (error) {
-      console.error("Error creating flashcard:", error);
-      setErrors({ submit: error.response?.data?.message || error.message || "Có lỗi xảy ra khi tạo flashcard" });
+      console.error(`Error ${isEditMode ? 'updating' : 'creating'} flashcard:`, error);
+      setErrors({ submit: error.response?.data?.message || error.message || `Có lỗi xảy ra khi ${isEditMode ? 'cập nhật' : 'tạo'} flashcard` });
     } finally {
       setSubmitting(false);
     }
@@ -152,35 +178,35 @@ export default function TeacherModuleFlashCardDetail() {
       <div className="teacher-module-flashcard-detail-container">
         <div className="breadcrumb-section">
           <span className="breadcrumb-text">
-            <span 
+            <span
               className="breadcrumb-link"
               onClick={() => navigate(ROUTE_PATHS.TEACHER_COURSE_MANAGEMENT)}
             >
               Quản lý khoá học
             </span>
             {" / "}
-            <span 
+            <span
               className="breadcrumb-link"
               onClick={() => navigate(`/teacher/course/${courseId}`)}
             >
               {courseTitle}
             </span>
             {" / "}
-            <span 
+            <span
               className="breadcrumb-link"
               onClick={() => navigate(ROUTE_PATHS.TEACHER_LESSON_DETAIL(courseId, lessonId))}
             >
               {lessonTitle}
             </span>
             {" / "}
-            <span className="breadcrumb-current">Tạo Flashcard</span>
+            <span className="breadcrumb-current">{isEditMode ? "Sửa Flashcard" : "Tạo Flashcard"}</span>
           </span>
         </div>
 
         <Container fluid className="create-flashcard-content">
           <div className="create-flashcard-card">
-            <h1 className="page-title">Tạo Flashcard</h1>
-            
+            <h1 className="page-title">{isEditMode ? "Sửa Flashcard" : "Tạo Flashcard"}</h1>
+
             <form onSubmit={handleSubmit}>
               <div className="form-group">
                 <label className="form-label required">Từ vựng</label>
@@ -268,7 +294,7 @@ export default function TeacherModuleFlashCardDetail() {
                   className="btn btn-primary"
                   disabled={!word.trim() || !meaning.trim() || submitting}
                 >
-                  {submitting ? "Đang tạo..." : "Tạo"}
+                  {submitting ? (isEditMode ? "Đang cập nhật..." : "Đang tạo...") : (isEditMode ? "Cập nhật" : "Tạo")}
                 </button>
               </div>
             </form>
@@ -279,8 +305,8 @@ export default function TeacherModuleFlashCardDetail() {
       <SuccessModal
         isOpen={showSuccessModal}
         onClose={() => setShowSuccessModal(false)}
-        title="Tạo flashcard thành công"
-        message="Flashcard của bạn đã được tạo thành công!"
+        title={isEditMode ? "Cập nhật flashcard thành công" : "Tạo flashcard thành công"}
+        message={isEditMode ? "Flashcard của bạn đã được cập nhật thành công!" : "Flashcard của bạn đã được tạo thành công!"}
         autoClose={true}
         autoCloseDelay={1500}
       />

@@ -19,8 +19,8 @@ const LECTURE_TYPES = [
   { value: 5, label: "Interactive" },
 ];
 
-export default function TeacherModuleLectureDetail() {
-  const { courseId, lessonId, moduleId } = useParams();
+export default function EditLecture() {
+  const { courseId, lessonId, moduleId, lectureId } = useParams();
   const navigate = useNavigate();
   const { user, roles, isAuthenticated } = useAuth();
   const [course, setCourse] = useState(null);
@@ -46,17 +46,18 @@ export default function TeacherModuleLectureDetail() {
     }
 
     fetchData();
-  }, [isAuthenticated, isTeacher, navigate, courseId, lessonId, moduleId]);
+  }, [isAuthenticated, isTeacher, navigate, courseId, lessonId, moduleId, lectureId]);
 
   const fetchData = async () => {
     try {
       setLoading(true);
       setError("");
 
-      const [courseRes, lessonRes, moduleRes] = await Promise.all([
+      const [courseRes, lessonRes, moduleRes, lectureRes] = await Promise.all([
         teacherService.getCourseDetail(courseId),
         teacherService.getLessonById(lessonId),
         teacherService.getModuleById(moduleId),
+        lectureService.getTeacherLectureById(lectureId),
       ]);
 
       if (courseRes.data?.success && courseRes.data?.data) {
@@ -71,6 +72,16 @@ export default function TeacherModuleLectureDetail() {
         setModule(moduleRes.data.data);
       } else {
         setError("Không thể tải thông tin module");
+      }
+
+      // Load lecture data
+      if (lectureRes.data?.success && lectureRes.data?.data) {
+        const lectureData = lectureRes.data.data;
+        setTitle(lectureData.title || lectureData.Title || "");
+        setMarkdownContent(lectureData.markdownContent || lectureData.MarkdownContent || "");
+        setLectureType(lectureData.type || lectureData.Type || 1);
+      } else {
+        setError("Không thể tải thông tin lecture");
       }
     } catch (err) {
       console.error("Error fetching data:", err);
@@ -96,14 +107,12 @@ export default function TeacherModuleLectureDetail() {
     setSubmitting(true);
     try {
       const lectureData = {
-        moduleId: parseInt(moduleId),
         title: title.trim(),
         markdownContent: markdownContent.trim() || null,
         type: lectureType,
-        orderIndex: 0,
       };
 
-      const response = await lectureService.createLecture(lectureData);
+      const response = await lectureService.updateLecture(lectureId, lectureData);
 
       if (response.data?.success) {
         setShowSuccessModal(true);
@@ -111,11 +120,11 @@ export default function TeacherModuleLectureDetail() {
           navigate(ROUTE_PATHS.TEACHER_LESSON_DETAIL(courseId, lessonId));
         }, 1500);
       } else {
-        throw new Error(response.data?.message || "Tạo lecture thất bại");
+        throw new Error(response.data?.message || "Cập nhật lecture thất bại");
       }
     } catch (error) {
-      console.error("Error creating lecture:", error);
-      setErrors({ submit: error.response?.data?.message || error.message || "Có lỗi xảy ra khi tạo lecture" });
+      console.error("Error updating lecture:", error);
+      setErrors({ submit: error.response?.data?.message || error.message || "Có lỗi xảy ra khi cập nhật lecture" });
     } finally {
       setSubmitting(false);
     }
@@ -178,13 +187,13 @@ export default function TeacherModuleLectureDetail() {
               {lessonTitle}
             </span>
             {" / "}
-            <span className="breadcrumb-current">Tạo Lecture</span>
+            <span className="breadcrumb-current">Sửa Lecture</span>
           </span>
         </div>
 
         <Container fluid className="create-lecture-content">
           <div className="create-lecture-card">
-            <h1 className="page-title">Tạo Lecture</h1>
+            <h1 className="page-title">Sửa Lecture</h1>
 
             <form onSubmit={handleSubmit}>
               <div className="form-group">
@@ -275,7 +284,7 @@ Ví dụ:
                   className="btn btn-primary"
                   disabled={!title.trim() || submitting}
                 >
-                  {submitting ? "Đang tạo..." : "Tạo"}
+                  {submitting ? "Đang cập nhật..." : "Cập nhật"}
                 </button>
               </div>
             </form>
@@ -286,8 +295,8 @@ Ví dụ:
       <SuccessModal
         isOpen={showSuccessModal}
         onClose={() => setShowSuccessModal(false)}
-        title="Tạo lecture thành công"
-        message="Lecture của bạn đã được tạo thành công!"
+        title="Cập nhật lecture thành công"
+        message="Lecture của bạn đã được cập nhật thành công!"
         autoClose={true}
         autoCloseDelay={1500}
       />
