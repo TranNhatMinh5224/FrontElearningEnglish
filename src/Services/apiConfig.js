@@ -218,6 +218,26 @@ export const API_ENDPOINTS = {
         GET_QUIZZES_BY_ASSESSMENT: (assessmentId) => `/teacher/quizzes/assessment/${assessmentId}`,
         UPDATE_QUIZ: (quizId) => `/teacher/quizzes/${quizId}`,
         DELETE_QUIZ: (quizId) => `/teacher/quizzes/${quizId}`,
+        // Quiz Section endpoints
+        CREATE_QUIZ_SECTION: "/teacher/quiz-sections",
+        GET_QUIZ_SECTION_BY_ID: (sectionId) => `/teacher/quiz-sections/${sectionId}`,
+        GET_QUIZ_SECTIONS_BY_QUIZ: (quizId) => `/teacher/quiz-sections/by-quiz/${quizId}`,
+        UPDATE_QUIZ_SECTION: (sectionId) => `/teacher/quiz-sections/${sectionId}`,
+        DELETE_QUIZ_SECTION: (sectionId) => `/teacher/quiz-sections/${sectionId}`,
+        // Quiz Group endpoints
+        CREATE_QUIZ_GROUP: "/teacher/quiz-groups",
+        GET_QUIZ_GROUP_BY_ID: (groupId) => `/teacher/quiz-groups/${groupId}`,
+        GET_QUIZ_GROUPS_BY_SECTION: (sectionId) => `/teacher/quiz-groups/by-quiz-section/${sectionId}`,
+        UPDATE_QUIZ_GROUP: (groupId) => `/teacher/quiz-groups/${groupId}`,
+        DELETE_QUIZ_GROUP: (groupId) => `/teacher/quiz-groups/${groupId}`,
+        // Question endpoints
+        GET_QUESTION_BY_ID: (questionId) => `/teacher/questions/${questionId}`,
+        GET_QUESTIONS_BY_GROUP: (groupId) => `/teacher/questions/quiz-group/${groupId}`,
+        GET_QUESTIONS_BY_SECTION: (sectionId) => `/teacher/questions/quiz-section/${sectionId}`,
+        CREATE_QUESTION: "/teacher/questions",
+        UPDATE_QUESTION: (questionId) => `/teacher/questions/${questionId}`,
+        DELETE_QUESTION: (questionId) => `/teacher/questions/${questionId}`,
+        BULK_CREATE_QUESTIONS: "/teacher/questions/bulk",
         // Essay endpoints
         CREATE_ESSAY: "/teacher/essays",
         GET_ESSAY_BY_ID: (essayId) => `/teacher/essays/${essayId}`,

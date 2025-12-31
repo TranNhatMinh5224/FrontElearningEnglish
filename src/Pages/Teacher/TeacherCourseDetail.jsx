@@ -91,7 +91,7 @@ export default function TeacherCourseDetail() {
       // Get package info
       const packageResponse = await teacherPackageService.getAll();
       const userPackageLevel = user?.teacherSubscription?.packageLevel;
-      
+
       if (packageResponse.data?.success && packageResponse.data?.data && userPackageLevel) {
         const packages = packageResponse.data.data;
         const levelMap = {
@@ -101,7 +101,7 @@ export default function TeacherCourseDetail() {
           "Professional": 3
         };
         const expectedLevel = levelMap[userPackageLevel];
-        
+
         const matchedPackage = packages.find(
           (pkg) => {
             const pkgLevel = pkg.level !== undefined ? pkg.level : (pkg.Level !== undefined ? pkg.Level : null);
@@ -115,10 +115,10 @@ export default function TeacherCourseDetail() {
 
         if (matchedPackage) {
           const maxLessons = matchedPackage.maxLessons || 0;
-          
+
           // Get current lesson count in this course
           const currentLessonCount = lessons.length || totalLessons || 0;
-          
+
           if (currentLessonCount >= maxLessons) {
             // Show limit modal
             setMaxLessonsLimit(maxLessons);
@@ -130,7 +130,7 @@ export default function TeacherCourseDetail() {
     } catch (error) {
       console.error("Error checking lesson limit:", error);
     }
-    
+
     setShowCreateLessonModal(true);
   };
 
@@ -180,7 +180,7 @@ export default function TeacherCourseDetail() {
       <div className="teacher-course-detail-container">
         <div className="breadcrumb-section">
           <span className="breadcrumb-text">
-            <span 
+            <span
               className="breadcrumb-link"
               onClick={() => navigate(ROUTE_PATHS.TEACHER_COURSE_MANAGEMENT)}
             >
@@ -197,8 +197,8 @@ export default function TeacherCourseDetail() {
             <Col md={4} className="course-info-column">
               <div className="course-info-card">
                 <div className="course-image-wrapper">
-                  <img 
-                    src={courseImage} 
+                  <img
+                    src={courseImage}
                     alt={courseTitle}
                     className="course-image"
                   />
@@ -206,28 +206,28 @@ export default function TeacherCourseDetail() {
                 <div className="course-info-content">
                   <h2 className="course-title">{courseTitle}</h2>
                   <p className="course-description">{courseDescription}</p>
-                  
+
                   <div className="course-details">
                     <div className="course-detail-item">
                       <label>Mã khóa học:</label>
-                      <input 
-                        type="text" 
-                        value={classCode} 
+                      <input
+                        type="text"
+                        value={classCode}
                         readOnly
                         className="course-code-input"
                       />
                     </div>
-                    
+
                     <div className="course-detail-item">
                       <label>Bài học:</label>
                       <span className="course-stat-value">{totalLessons}</span>
                     </div>
-                    
+
                     <div className="course-detail-item">
                       <label>Tổng số học sinh:</label>
                       <div className="course-stat-with-action">
                         <span className="course-stat-value">{totalStudents}</span>
-                        <button 
+                        <button
                           className="manage-students-btn"
                           onClick={() => navigate(`/teacher/course/${courseId}/students`)}
                         >
@@ -237,7 +237,7 @@ export default function TeacherCourseDetail() {
                     </div>
                   </div>
 
-                  <button 
+                  <button
                     className="update-course-btn"
                     onClick={() => setShowUpdateModal(true)}
                   >
@@ -258,14 +258,14 @@ export default function TeacherCourseDetail() {
                     return (
                       <div key={lessonId || index} className="lesson-item">
                         <div className="lesson-item-content">
-                          <img 
-                            src={lessonImage} 
+                          <img
+                            src={lessonImage}
                             alt={lessonTitle}
                             className="lesson-image"
                           />
                           <span className="lesson-title">{lessonTitle}</span>
                         </div>
-                        <button 
+                        <button
                           className="add-module-btn"
                           onClick={() => navigate(`/teacher/course/${courseId}/lesson/${lessonId}`)}
                         >
@@ -278,8 +278,8 @@ export default function TeacherCourseDetail() {
                 ) : (
                   <div className="no-lessons-message">Chưa có bài học nào</div>
                 )}
-                
-                <button 
+
+                <button
                   className="add-lesson-btn"
                   onClick={handleCreateLesson}
                 >

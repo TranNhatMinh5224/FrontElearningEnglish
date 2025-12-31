@@ -1,0 +1,22 @@
+.question-type-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  width: 100%;
+}
+
+.question-type-buttons .btn {
+  flex: 1;
+  min-width: 120px;
+}
+
+@media (max-width: 768px) {
+  .question-type-buttons {
+    flex-direction: column;
+  }
+  
+  .question-type-buttons .btn {
+    width: 100%;
+  }
+}
+

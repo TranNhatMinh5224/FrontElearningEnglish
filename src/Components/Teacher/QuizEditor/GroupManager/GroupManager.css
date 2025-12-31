@@ -1,0 +1,18 @@
+/* GroupManager styles - similar to SectionManager */
+.modal-content {
+  border-radius: 8px;
+}
+
+.modal-header {
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.modal-title {
+  font-weight: 600;
+  color: #333;
+}
+
+.modal-footer {
+  border-top: 1px solid #e0e0e0;
+}
+

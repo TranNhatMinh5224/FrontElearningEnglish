@@ -1,0 +1,195 @@
+.question-type-editor {
+  margin-top: 20px;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 6px;
+}
+
+.editor-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.editor-section-header h4 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.empty-options {
+  text-align: center;
+  padding: 30px;
+  color: #999;
+  background: #fff;
+  border-radius: 6px;
+  border: 2px dashed #e0e0e0;
+}
+
+.options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.option-item {
+  background: #fff;
+  padding: 15px;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+}
+
+.option-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.option-input {
+  margin-bottom: 10px;
+}
+
+.option-feedback {
+  font-size: 13px;
+}
+
+.option-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+/* Fill Blank Styles */
+.fill-blank-info {
+  margin-bottom: 15px;
+  padding: 10px;
+  background: #e3f2fd;
+  border-radius: 4px;
+}
+
+/* Matching Styles */
+.matching-info {
+  margin-bottom: 15px;
+  padding: 10px;
+  background: #e3f2fd;
+  border-radius: 4px;
+}
+
+.matching-pairs {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.matching-header {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr auto;
+  gap: 10px;
+  padding: 10px;
+  background: #f0f0f0;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.matching-column {
+  text-align: center;
+}
+
+.matching-pair {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.matching-input {
+  width: 100%;
+}
+
+.matching-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6fd5e0;
+  font-size: 18px;
+}
+
+.matching-delete {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Ordering Styles */
+.ordering-info {
+  margin-bottom: 15px;
+  padding: 10px;
+  background: #e3f2fd;
+  border-radius: 4px;
+}
+
+.ordering-items {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ordering-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fff;
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+}
+
+.ordering-order {
+  min-width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.order-number {
+  background: #6fd5e0;
+  color: white;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.ordering-input {
+  flex: 1;
+}
+
+.ordering-actions {
+  display: flex;
+  gap: 6px;
+}
+
+@media (max-width: 768px) {
+  .matching-header,
+  .matching-pair {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .matching-arrow {
+    transform: rotate(90deg);
+  }
+
+  .ordering-item {
+    flex-wrap: wrap;
+  }
+}
+
