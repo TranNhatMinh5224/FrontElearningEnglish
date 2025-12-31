@@ -74,5 +74,14 @@ export const ROUTE_PATHS = {
   TEACHER_CREATE_ESSAY: (courseId, lessonId, moduleId, assessmentId) => `/teacher/course/${courseId}/lesson/${lessonId}/module/${moduleId}/assessment/${assessmentId}/create-essay`,
   TEACHER_CREATE_QUIZ: (courseId, lessonId, moduleId, assessmentId) => `/teacher/course/${courseId}/lesson/${lessonId}/module/${moduleId}/assessment/${assessmentId}/create-quiz`,
   TEACHER_EDIT_QUIZ: (courseId, lessonId, moduleId, assessmentId, quizId) => `/teacher/course/${courseId}/lesson/${lessonId}/module/${moduleId}/assessment/${assessmentId}/edit-quiz/${quizId}`,
+
+  // Admin routes
+  ADMIN: {
+    ROOT: "/admin",
+    DASHBOARD: "/admin",
+    COURSES: "/admin/courses",
+    USERS: "/admin/users",
+    FINANCE: "/admin/finance",
+  },
 };
 

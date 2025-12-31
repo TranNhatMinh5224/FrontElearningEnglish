@@ -120,6 +120,14 @@ export default function AppRoutes() {
       <Route path="/teacher/course/:courseId/lesson/:lessonId/module/:moduleId/assessment/:assessmentId/create-quiz" element={<TeacherModuleQuizDetail />} />
       <Route path="/teacher/course/:courseId/lesson/:lessonId/module/:moduleId/assessment/:assessmentId/edit-quiz/:quizId" element={<TeacherQuizEditor />} />
       <Route path="/teacher/course/:courseId" element={<TeacherCourseDetail />} />
+
+      {/* Admin routes */}
+      <Route path="/admin" element={<AdminLayout />}>
+        <Route index element={<AdminDashboard />} />
+        <Route path="courses" element={<AdminCourseList />} />
+        <Route path="users" element={<AdminUserList />} />
+        <Route path="finance" element={<AdminDashboard />} />
+      </Route>
     </Routes>
   );
 }

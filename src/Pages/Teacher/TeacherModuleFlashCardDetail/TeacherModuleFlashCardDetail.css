@@ -170,3 +170,108 @@ textarea.form-control {
 .error-message {
   color: #d32f2f;
 }
+
+/* Image Upload Styles */
+.image-upload-area {
+  border: 2px dashed #d1d5db;
+  border-radius: 8px;
+  padding: 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background-color: #f9fafb;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: #6b7280;
+}
+
+.image-upload-area:hover {
+  border-color: #3b82f6;
+  background-color: #eff6ff;
+  color: #3b82f6;
+}
+
+.image-upload-area.is-invalid {
+  border-color: #ef4444;
+  background-color: #fef2f2;
+}
+
+.image-preview-container {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+.image-preview {
+  width: 100%;
+  max-width: 300px;
+  height: auto;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  display: block;
+}
+
+.remove-image-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+/* Audio Upload Styles */
+.audio-upload-area {
+  border: 2px dashed #d1d5db;
+  border-radius: 8px;
+  padding: 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background-color: #f9fafb;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  color: #6b7280;
+}
+
+.audio-upload-area:hover {
+  border-color: #3b82f6;
+  background-color: #eff6ff;
+  color: #3b82f6;
+}
+
+.audio-upload-area.is-invalid {
+  border-color: #ef4444;
+  background-color: #fef2f2;
+}
+
+.audio-preview-container {
+  position: relative;
+  width: 100%;
+}
+
+.audio-preview {
+  width: 100%;
+  border-radius: 8px;
+}
+
+.remove-audio-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}

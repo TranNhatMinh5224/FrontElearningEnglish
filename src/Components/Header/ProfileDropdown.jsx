@@ -11,12 +11,14 @@ export default function ProfileDropdown() {
   const { user: authUser, roles, isGuest, logout } = useAuth();
 
   const isTeacher = roles.includes("Teacher") || authUser?.teacherSubscription?.isTeacher === true;
-  // Check for any admin role: SuperAdmin, ContentAdmin, or FinanceAdmin
-  const isAdmin = roles.some(role => 
-    role === "SuperAdmin" || 
-    role === "ContentAdmin" || 
-    role === "FinanceAdmin"
-  );
+  // Check for any admin role: SuperAdmin, ContentAdmin, FinanceAdmin, or Admin
+  const isAdmin = roles.some(role => {
+    const roleName = typeof role === 'string' ? role : role?.name || role;
+    return roleName === "SuperAdmin" || 
+           roleName === "ContentAdmin" || 
+           roleName === "FinanceAdmin" ||
+           roleName === "Admin";
+  });
   const isPremium = authUser?.teacherSubscription?.subscriptionType === "Premium" || authUser?.teacherSubscription?.packageLevel === "Premium";
   
   // Check if currently on teacher interface

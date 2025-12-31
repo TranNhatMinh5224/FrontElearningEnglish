@@ -245,6 +245,13 @@ export const API_ENDPOINTS = {
         UPDATE_ESSAY: (essayId) => `/teacher/essays/${essayId}`,
         DELETE_ESSAY: (essayId) => `/teacher/essays/${essayId}`,
     },
+    // Public Dictionary endpoints
+    PUBLIC: {
+        DICTIONARY: {
+            GENERATE_FLASHCARD: "/public/dictionary/generate-flashcard",
+            LOOKUP: (word, targetLanguage = "vi") => `/public/dictionary/lookup/${word}?targetLanguage=${targetLanguage}`,
+        },
+    },
 };
 
 export { API_BASE_URL, AUTH_REFRESH_URL };

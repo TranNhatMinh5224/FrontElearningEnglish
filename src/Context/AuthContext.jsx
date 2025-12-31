@@ -38,11 +38,12 @@ export const AuthProvider = ({ children }) => {
           const res = await authService.getProfile();
           const userData = res.data.data;
           // Backend trả về displayName hoặc fullName
-          userData.fullName = userData.displayName || userData.fullName || `${userData.firstName} ${user.lastName}`.trim();
+          userData.fullName = userData.displayName || userData.fullName || `${userData.firstName} ${userData.lastName}`.trim();
           // Lưu avatarUrl vào user object
           userData.avatarUrl = userData.avatarUrl || null;
           setUser(userData);
-          setRoles(userData.roles?.map((r) => r.name) || []);
+          const rolesArray = userData.roles?.map((r) => r.name || r) || [];
+          setRoles(rolesArray);
           setIsAuthenticated(true);
           setIsGuest(false);
           setLoading(false);
@@ -91,7 +92,8 @@ export const AuthProvider = ({ children }) => {
 
       // Set state BEFORE saving tokens to prevent race condition
       setUser(user);
-      setRoles(user.roles?.map((r) => r.name) || []);
+      const rolesArray = user.roles?.map((r) => r.name || r) || [];
+      setRoles(rolesArray);
       setIsAuthenticated(true);
       setIsGuest(false);
       setLoading(false);
@@ -99,13 +101,24 @@ export const AuthProvider = ({ children }) => {
       // Now save tokens
       tokenStorage.setTokens({ accessToken, refreshToken });
 
+      // Debug: Log roles to check
+      console.log("=== LOGIN DEBUG ===");
+      console.log("User roles from backend:", user.roles);
+      console.log("Mapped roles array:", rolesArray);
+
       // Use window.location.href instead of navigate to prevent state reset
-      // Check for any admin role: SuperAdmin, ContentAdmin, or FinanceAdmin
-      const isAdmin = user.roles?.some((r) => {
-        const roleName = r.name || r;
-        return roleName === "SuperAdmin" || roleName === "ContentAdmin" || roleName === "FinanceAdmin";
+      // Check for any admin role: SuperAdmin, ContentAdmin, FinanceAdmin, or Admin
+      const isAdmin = rolesArray.some((roleName) => {
+        const normalizedRole = typeof roleName === 'string' ? roleName : roleName?.name || roleName;
+        return normalizedRole === "SuperAdmin" || 
+               normalizedRole === "ContentAdmin" || 
+               normalizedRole === "FinanceAdmin" ||
+               normalizedRole === "Admin";
       });
+      
+      console.log("Is Admin:", isAdmin);
       const redirectPath = isAdmin ? "/admin" : "/home";
+      console.log("Redirecting to:", redirectPath);
       window.location.href = redirectPath;
     } catch (error) {
       throw error; // Re-throw để component có thể catch
@@ -137,7 +150,8 @@ export const AuthProvider = ({ children }) => {
       // IMPORTANT: Set state BEFORE saving tokens to prevent race condition
       // where useEffect init runs before state is set
       setUser(user);
-      setRoles(user.roles?.map((r) => r.name) || []);
+      const rolesArray = user.roles?.map((r) => r.name || r) || [];
+      setRoles(rolesArray);
       setIsAuthenticated(true);
       setIsGuest(false);
       setLoading(false);
@@ -146,13 +160,22 @@ export const AuthProvider = ({ children }) => {
       tokenStorage.setTokens({ accessToken, refreshToken });
 
       console.log("Navigating to home/admin...");
+      console.log("User roles from backend:", user.roles);
+      console.log("Mapped roles array:", rolesArray);
+      
       // Use window.location.href instead of navigate to prevent state reset
-      // Check for any admin role: SuperAdmin, ContentAdmin, or FinanceAdmin
-      const isAdmin = user.roles?.some((r) => {
-        const roleName = r.name || r;
-        return roleName === "SuperAdmin" || roleName === "ContentAdmin" || roleName === "FinanceAdmin";
+      // Check for any admin role: SuperAdmin, ContentAdmin, FinanceAdmin, or Admin
+      const isAdmin = rolesArray.some((roleName) => {
+        const normalizedRole = typeof roleName === 'string' ? roleName : roleName?.name || roleName;
+        return normalizedRole === "SuperAdmin" || 
+               normalizedRole === "ContentAdmin" || 
+               normalizedRole === "FinanceAdmin" ||
+               normalizedRole === "Admin";
       });
+      
+      console.log("Is Admin:", isAdmin);
       const redirectPath = isAdmin ? "/admin" : "/home";
+      console.log("Redirecting to:", redirectPath);
       window.location.href = redirectPath;
       console.log("=== AuthContext.googleLogin SUCCESS ===");
     } catch (error) {
@@ -210,7 +233,8 @@ export const AuthProvider = ({ children }) => {
       console.log("Setting tokens and user state...");
       // IMPORTANT: Set state BEFORE saving tokens to prevent race condition
       setUser(user);
-      setRoles(user.roles?.map((r) => r.name) || []);
+      const rolesArray = user.roles?.map((r) => r.name || r) || [];
+      setRoles(rolesArray);
       setIsAuthenticated(true);
       setIsGuest(false);
       setLoading(false);
@@ -219,13 +243,22 @@ export const AuthProvider = ({ children }) => {
       tokenStorage.setTokens({ accessToken, refreshToken });
 
       console.log("Navigating to home/admin...");
+      console.log("User roles from backend:", user.roles);
+      console.log("Mapped roles array:", rolesArray);
+      
       // Use window.location.href instead of navigate to prevent state reset
-      // Check for any admin role: SuperAdmin, ContentAdmin, or FinanceAdmin
-      const isAdmin = user.roles?.some((r) => {
-        const roleName = r.name || r;
-        return roleName === "SuperAdmin" || roleName === "ContentAdmin" || roleName === "FinanceAdmin";
+      // Check for any admin role: SuperAdmin, ContentAdmin, FinanceAdmin, or Admin
+      const isAdmin = rolesArray.some((roleName) => {
+        const normalizedRole = typeof roleName === 'string' ? roleName : roleName?.name || roleName;
+        return normalizedRole === "SuperAdmin" || 
+               normalizedRole === "ContentAdmin" || 
+               normalizedRole === "FinanceAdmin" ||
+               normalizedRole === "Admin";
       });
+      
+      console.log("Is Admin:", isAdmin);
       const redirectPath = isAdmin ? "/admin" : "/home";
+      console.log("Redirecting to:", redirectPath);
       window.location.href = redirectPath;
       console.log("=== AuthContext.facebookLogin SUCCESS ===");
     } catch (error) {
