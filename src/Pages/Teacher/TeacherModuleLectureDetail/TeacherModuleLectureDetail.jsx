@@ -8,6 +8,8 @@ import { teacherService } from "../../../Services/teacherService";
 import { lectureService } from "../../../Services/lectureService";
 import { ROUTE_PATHS } from "../../../Routes/Paths";
 import SuccessModal from "../../../Components/Common/SuccessModal/SuccessModal";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 const LECTURE_TYPES = [
   { value: 1, label: "Content" },
@@ -102,7 +104,7 @@ export default function TeacherModuleLectureDetail() {
       };
 
       const response = await lectureService.createLecture(lectureData);
-      
+
       if (response.data?.success) {
         setShowSuccessModal(true);
         setTimeout(() => {
@@ -155,21 +157,21 @@ export default function TeacherModuleLectureDetail() {
       <div className="teacher-module-lecture-detail-container">
         <div className="breadcrumb-section">
           <span className="breadcrumb-text">
-            <span 
+            <span
               className="breadcrumb-link"
               onClick={() => navigate(ROUTE_PATHS.TEACHER_COURSE_MANAGEMENT)}
             >
               Quản lý khoá học
             </span>
             {" / "}
-            <span 
+            <span
               className="breadcrumb-link"
               onClick={() => navigate(`/teacher/course/${courseId}`)}
             >
               {courseTitle}
             </span>
             {" / "}
-            <span 
+            <span
               className="breadcrumb-link"
               onClick={() => navigate(ROUTE_PATHS.TEACHER_LESSON_DETAIL(courseId, lessonId))}
             >
@@ -183,7 +185,7 @@ export default function TeacherModuleLectureDetail() {
         <Container fluid className="create-lecture-content">
           <div className="create-lecture-card">
             <h1 className="page-title">Tạo Lecture</h1>
-            
+
             <form onSubmit={handleSubmit}>
               <div className="form-group">
                 <label className="form-label required">Tiêu đề</label>
@@ -218,14 +220,41 @@ export default function TeacherModuleLectureDetail() {
 
               <div className="form-group">
                 <label className="form-label">Nội dung (Markdown)</label>
-                <textarea
-                  className="form-control"
-                  value={markdownContent}
-                  onChange={(e) => setMarkdownContent(e.target.value)}
-                  placeholder="Nhập nội dung lecture (Markdown)"
-                  rows={15}
-                />
-                <div className="form-hint">Không bắt buộc</div>
+                <div className="markdown-editor-container">
+                  <div className="markdown-editor-left">
+                    <textarea
+                      className={`markdown-textarea ${errors.markdownContent ? "is-invalid" : ""}`}
+                      value={markdownContent}
+                      onChange={(e) => {
+                        setMarkdownContent(e.target.value);
+                        setErrors({ ...errors, markdownContent: null });
+                      }}
+                      placeholder={`Nhập nội dung lecture bằng Markdown
+
+Ví dụ:
+# Tiêu đề
+
+Đây là nội dung lecture...
+
+- Điểm 1
+- Điểm 2`}
+                    />
+                  </div>
+                  <div className="markdown-editor-right">
+                    <div className="markdown-preview">
+                      {markdownContent.trim() ? (
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                          {markdownContent}
+                        </ReactMarkdown>
+                      ) : (
+                        <div className="markdown-preview-empty">
+                          <p>Xem trước nội dung sẽ hiển thị ở đây...</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <div className="form-hint">Không bắt buộc. Sử dụng Markdown để định dạng văn bản</div>
               </div>
 
               {errors.submit && (
