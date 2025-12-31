@@ -6,6 +6,7 @@ import TeacherHeader from "../../Components/Header/TeacherHeader";
 import { useAuth } from "../../Context/AuthContext";
 import { teacherService } from "../../Services/teacherService";
 import { lectureService } from "../../Services/lectureService";
+import { flashcardService } from "../../Services/flashcardService";
 import { mochiLessonTeacher, mochiModuleTeacher } from "../../Assets/Logo";
 import CreateLessonModal from "../../Components/Teacher/CreateLessonModal/CreateLessonModal";
 import CreateModuleModal from "../../Components/Teacher/CreateModuleModal/CreateModuleModal";
@@ -134,19 +135,20 @@ export default function TeacherLessonDetail() {
     fetchModules(); // Refresh modules list
   };
 
-  // Handle module click - fetch lectures if it's a Lecture module
+  // Handle module click - fetch content based on module type
   const handleModuleClick = async (module) => {
     const contentTypeValue = module.contentType || module.ContentType;
     const contentTypeNum = typeof contentTypeValue === 'number' ? contentTypeValue : parseInt(contentTypeValue);
 
-    if (contentTypeNum === 1) {
-      // Lecture module - fetch lectures
-      setSelectedModule(module);
-      setLoadingContent(true);
-      setContentError("");
+    setSelectedModule(module);
+    setLoadingContent(true);
+    setContentError("");
 
-      try {
-        const moduleId = module.moduleId || module.ModuleId;
+    try {
+      const moduleId = module.moduleId || module.ModuleId;
+
+      if (contentTypeNum === 1) {
+        // Lecture module - fetch lectures
         const response = await lectureService.getTeacherLecturesByModule(moduleId);
 
         if (response.data?.success && response.data?.data) {
@@ -155,13 +157,23 @@ export default function TeacherLessonDetail() {
           setContentError("Không thể tải danh sách lectures");
           setModuleContent([]);
         }
-      } catch (error) {
-        console.error("Error fetching lectures:", error);
-        setContentError("Có lỗi xảy ra khi tải danh sách lectures");
-        setModuleContent([]);
-      } finally {
-        setLoadingContent(false);
+      } else if (contentTypeNum === 4) {
+        // FlashCard module - fetch flashcards
+        const response = await flashcardService.getTeacherFlashcardsByModule(moduleId);
+
+        if (response.data?.success && response.data?.data) {
+          setModuleContent(response.data.data || []);
+        } else {
+          setContentError("Không thể tải danh sách flashcards");
+          setModuleContent([]);
+        }
       }
+    } catch (error) {
+      console.error("Error fetching content:", error);
+      setContentError("Có lỗi xảy ra khi tải danh sách");
+      setModuleContent([]);
+    } finally {
+      setLoadingContent(false);
     }
   };
 
@@ -177,6 +189,21 @@ export default function TeacherLessonDetail() {
     const lectureId = lecture.lectureId || lecture.LectureId;
     const moduleId = selectedModule.moduleId || selectedModule.ModuleId;
     navigate(ROUTE_PATHS.TEACHER_EDIT_LECTURE(courseId, lessonId, moduleId, lectureId));
+  };
+
+  // Handle edit flashcard
+  const handleEditFlashcard = (flashcard) => {
+    // Backend returns flashCardId (camelCase with capital C)
+    const flashcardId = flashcard.flashCardId || flashcard.flashcardId || flashcard.FlashcardId || flashcard.FlashCardId || flashcard.id || flashcard.Id;
+    const moduleId = selectedModule.moduleId || selectedModule.ModuleId;
+
+    if (!flashcardId) {
+      console.error("Flashcard ID not found. Available keys:", Object.keys(flashcard));
+      alert("Không tìm thấy ID của flashcard. Vui lòng thử lại.");
+      return;
+    }
+
+    navigate(ROUTE_PATHS.TEACHER_EDIT_FLASHCARD(courseId, lessonId, moduleId, flashcardId));
   };
 
   if (!isAuthenticated || !isTeacher) {
@@ -262,7 +289,7 @@ export default function TeacherLessonDetail() {
             {/* Right Column - Modules List or Module Content */}
             <Col md={8} className="modules-column">
               {selectedModule ? (
-                // Module Content View (Lectures List)
+                // Module Content View (Lectures/Flashcards List)
                 <div className="modules-section">
                   <div className="module-content-header">
                     <button
@@ -278,59 +305,140 @@ export default function TeacherLessonDetail() {
                   </div>
 
                   {loadingContent ? (
-                    <div className="loading-message">Đang tải danh sách lectures...</div>
+                    <div className="loading-message">
+                      Đang tải danh sách {(() => {
+                        const contentTypeValue = selectedModule.contentType || selectedModule.ContentType;
+                        const contentTypeNum = typeof contentTypeValue === 'number' ? contentTypeValue : parseInt(contentTypeValue);
+                        return contentTypeNum === 1 ? 'lectures' : contentTypeNum === 4 ? 'flashcards' : 'nội dung';
+                      })()}...
+                    </div>
                   ) : contentError ? (
                     <div className="error-message">{contentError}</div>
                   ) : (
                     <>
                       <div className="module-content-list">
                         {moduleContent.length > 0 ? (
-                          moduleContent.map((lecture, index) => {
-                            const lectureId = lecture.lectureId || lecture.LectureId;
-                            const lectureTitle = lecture.title || lecture.Title || `Lecture ${index + 1}`;
-                            const lectureDescription = lecture.markdownContent || lecture.MarkdownContent || "";
+                          moduleContent.map((item, index) => {
+                            const contentTypeValue = selectedModule.contentType || selectedModule.ContentType;
+                            const contentTypeNum = typeof contentTypeValue === 'number' ? contentTypeValue : parseInt(contentTypeValue);
 
-                            return (
-                              <div key={lectureId || index} className="content-item">
-                                <div className="content-item-info">
-                                  <h4 className="content-item-title">{lectureTitle}</h4>
-                                  {lectureDescription && (
-                                    <p className="content-item-description">
-                                      {lectureDescription.length > 100
-                                        ? lectureDescription.substring(0, 100) + "..."
-                                        : lectureDescription}
-                                    </p>
-                                  )}
+                            if (contentTypeNum === 1) {
+                              // Lecture
+                              const lectureId = item.lectureId || item.LectureId;
+                              const lectureTitle = item.title || item.Title || `Lecture ${index + 1}`;
+                              const lectureDescription = item.markdownContent || item.MarkdownContent || "";
+
+                              return (
+                                <div key={lectureId || index} className="content-item">
+                                  <div className="content-item-info">
+                                    <h4 className="content-item-title">{lectureTitle}</h4>
+                                    {lectureDescription && (
+                                      <p className="content-item-description">
+                                        {lectureDescription.length > 100
+                                          ? lectureDescription.substring(0, 100) + "..."
+                                          : lectureDescription}
+                                      </p>
+                                    )}
+                                  </div>
+                                  <button
+                                    className="content-item-edit-btn"
+                                    onClick={() => handleEditLecture(item)}
+                                    title="Sửa"
+                                  >
+                                    <FaEdit className="edit-icon" />
+                                    Sửa
+                                  </button>
                                 </div>
-                                <button
-                                  className="content-item-edit-btn"
-                                  onClick={() => handleEditLecture(lecture)}
-                                  title="Sửa"
-                                >
-                                  <FaEdit className="edit-icon" />
-                                  Sửa
-                                </button>
-                              </div>
-                            );
+                              );
+                            } else if (contentTypeNum === 4) {
+                              // FlashCard - backend returns flashCardId (camelCase with capital C)
+                              const flashcardId = item.flashCardId || item.flashcardId || item.FlashcardId || item.FlashCardId;
+                              const word = item.word || item.Word || `Flashcard ${index + 1}`;
+                              const meaning = item.meaning || item.Meaning || "";
+                              const pronunciation = item.pronunciation || item.Pronunciation || "";
+                              const partOfSpeech = item.partOfSpeech || item.PartOfSpeech || "";
+
+                              return (
+                                <div key={flashcardId || index} className="content-item">
+                                  <div className="content-item-info">
+                                    <h4 className="content-item-title">{word}</h4>
+                                    {pronunciation && (
+                                      <p className="content-item-description" style={{ fontStyle: 'italic', color: '#6b7280' }}>
+                                        {pronunciation}
+                                      </p>
+                                    )}
+                                    {meaning && (
+                                      <p className="content-item-description">
+                                        <strong>Nghĩa:</strong> {meaning}
+                                      </p>
+                                    )}
+                                    {partOfSpeech && (
+                                      <p className="content-item-description" style={{ fontSize: '12px', color: '#9ca3af' }}>
+                                        {partOfSpeech}
+                                      </p>
+                                    )}
+                                  </div>
+                                  <button
+                                    className="content-item-edit-btn"
+                                    onClick={() => handleEditFlashcard(item)}
+                                    title="Sửa"
+                                  >
+                                    <FaEdit className="edit-icon" />
+                                    Sửa
+                                  </button>
+                                </div>
+                              );
+                            }
+                            return null;
                           })
                         ) : (
                           <div className="no-content-message">
-                            Chưa có lecture nào trong module này
+                            {(() => {
+                              const contentTypeValue = selectedModule.contentType || selectedModule.ContentType;
+                              const contentTypeNum = typeof contentTypeValue === 'number' ? contentTypeValue : parseInt(contentTypeValue);
+                              return contentTypeNum === 1
+                                ? "Chưa có lecture nào trong module này"
+                                : contentTypeNum === 4
+                                  ? "Chưa có flashcard nào trong module này"
+                                  : "Chưa có nội dung nào trong module này";
+                            })()}
                           </div>
                         )}
                       </div>
 
                       {/* Create Button */}
-                      <button
-                        className="module-create-btn lecture-btn"
-                        onClick={() => {
-                          const moduleId = selectedModule.moduleId || selectedModule.ModuleId;
-                          navigate(ROUTE_PATHS.TEACHER_CREATE_LECTURE(courseId, lessonId, moduleId));
-                        }}
-                      >
-                        <FaPlus className="add-icon" />
-                        Tạo Lecture
-                      </button>
+                      {(() => {
+                        const contentTypeValue = selectedModule.contentType || selectedModule.ContentType;
+                        const contentTypeNum = typeof contentTypeValue === 'number' ? contentTypeValue : parseInt(contentTypeValue);
+                        const moduleId = selectedModule.moduleId || selectedModule.ModuleId;
+
+                        if (contentTypeNum === 1) {
+                          return (
+                            <button
+                              className="module-create-btn lecture-btn"
+                              onClick={() => {
+                                navigate(ROUTE_PATHS.TEACHER_CREATE_LECTURE(courseId, lessonId, moduleId));
+                              }}
+                            >
+                              <FaPlus className="add-icon" />
+                              Tạo Lecture
+                            </button>
+                          );
+                        } else if (contentTypeNum === 4) {
+                          return (
+                            <button
+                              className="module-create-btn flashcard-btn"
+                              onClick={() => {
+                                navigate(ROUTE_PATHS.TEACHER_CREATE_FLASHCARD(courseId, lessonId, moduleId));
+                              }}
+                            >
+                              <FaPlus className="add-icon" />
+                              Tạo Flashcard
+                            </button>
+                          );
+                        }
+                        return null;
+                      })()}
                     </>
                   )}
                 </div>
@@ -413,11 +521,12 @@ export default function TeacherLessonDetail() {
                           key={moduleId || index}
                           className="module-item"
                           onClick={() => {
-                            if (contentTypeNum === 1) {
+                            if (contentTypeNum === 1 || contentTypeNum === 4) {
+                              // Lecture or FlashCard - show content list
                               handleModuleClick(module);
                             }
                           }}
-                          style={{ cursor: contentTypeNum === 1 ? 'pointer' : 'default' }}
+                          style={{ cursor: (contentTypeNum === 1 || contentTypeNum === 4) ? 'pointer' : 'default' }}
                         >
                           <div className="module-item-content">
                             <img
