@@ -7,6 +7,9 @@ import { useAuth } from "../../Context/AuthContext";
 import { teacherService } from "../../Services/teacherService";
 import { lectureService } from "../../Services/lectureService";
 import { flashcardService } from "../../Services/flashcardService";
+import { assessmentService } from "../../Services/assessmentService";
+import { quizService } from "../../Services/quizService";
+import { essayService } from "../../Services/essayService";
 import { mochiLessonTeacher, mochiModuleTeacher } from "../../Assets/Logo";
 import CreateLessonModal from "../../Components/Teacher/CreateLessonModal/CreateLessonModal";
 import CreateModuleModal from "../../Components/Teacher/CreateModuleModal/CreateModuleModal";
@@ -37,6 +40,7 @@ export default function TeacherLessonDetail() {
   const [moduleContent, setModuleContent] = useState([]);
   const [loadingContent, setLoadingContent] = useState(false);
   const [contentError, setContentError] = useState("");
+  const [assessmentTypes, setAssessmentTypes] = useState({}); // { assessmentId: { hasQuiz: boolean, hasEssay: boolean } }
 
   const isTeacher = roles.includes("Teacher") || user?.teacherSubscription?.isTeacher === true;
 
@@ -167,6 +171,47 @@ export default function TeacherLessonDetail() {
           setContentError("Không thể tải danh sách flashcards");
           setModuleContent([]);
         }
+      } else if (contentTypeNum === 3) {
+        // Assignment/Assessment module - fetch assessments
+        const response = await assessmentService.getTeacherAssessmentsByModule(moduleId);
+
+        if (response.data?.success && response.data?.data) {
+          const assessments = response.data.data || [];
+          setModuleContent(assessments);
+
+          // Fetch quiz and essay info for each assessment
+          const typePromises = assessments.map(async (assessment) => {
+            const assessmentId = assessment.assessmentId || assessment.AssessmentId;
+            if (!assessmentId) return null;
+
+            try {
+              const [quizRes, essayRes] = await Promise.all([
+                quizService.getTeacherQuizzesByAssessment(assessmentId),
+                essayService.getTeacherEssaysByAssessment(assessmentId)
+              ]);
+
+              const hasQuiz = quizRes.data?.success && quizRes.data?.data && quizRes.data.data.length > 0;
+              const hasEssay = essayRes.data?.success && essayRes.data?.data && essayRes.data.data.length > 0;
+
+              return { assessmentId, hasQuiz, hasEssay };
+            } catch (error) {
+              console.error(`Error fetching types for assessment ${assessmentId}:`, error);
+              return { assessmentId, hasQuiz: false, hasEssay: false };
+            }
+          });
+
+          const types = await Promise.all(typePromises);
+          const typesMap = {};
+          types.forEach(type => {
+            if (type) {
+              typesMap[type.assessmentId] = { hasQuiz: type.hasQuiz, hasEssay: type.hasEssay };
+            }
+          });
+          setAssessmentTypes(typesMap);
+        } else {
+          setContentError("Không thể tải danh sách assessments");
+          setModuleContent([]);
+        }
       }
     } catch (error) {
       console.error("Error fetching content:", error);
@@ -182,6 +227,7 @@ export default function TeacherLessonDetail() {
     setSelectedModule(null);
     setModuleContent([]);
     setContentError("");
+    setAssessmentTypes({});
   };
 
   // Handle edit lecture
@@ -204,6 +250,21 @@ export default function TeacherLessonDetail() {
     }
 
     navigate(ROUTE_PATHS.TEACHER_EDIT_FLASHCARD(courseId, lessonId, moduleId, flashcardId));
+  };
+
+  // Handle edit assessment
+  const handleEditAssessment = (assessment) => {
+    // Backend returns AssessmentId (PascalCase)
+    const assessmentId = assessment.assessmentId || assessment.AssessmentId;
+    const moduleId = selectedModule.moduleId || selectedModule.ModuleId;
+
+    if (!assessmentId) {
+      console.error("Assessment ID not found. Available keys:", Object.keys(assessment));
+      alert("Không tìm thấy ID của assessment. Vui lòng thử lại.");
+      return;
+    }
+
+    navigate(ROUTE_PATHS.TEACHER_EDIT_ASSESSMENT(courseId, lessonId, moduleId, assessmentId));
   };
 
   if (!isAuthenticated || !isTeacher) {
@@ -309,7 +370,7 @@ export default function TeacherLessonDetail() {
                       Đang tải danh sách {(() => {
                         const contentTypeValue = selectedModule.contentType || selectedModule.ContentType;
                         const contentTypeNum = typeof contentTypeValue === 'number' ? contentTypeValue : parseInt(contentTypeValue);
-                        return contentTypeNum === 1 ? 'lectures' : contentTypeNum === 4 ? 'flashcards' : 'nội dung';
+                        return contentTypeNum === 1 ? 'lectures' : contentTypeNum === 4 ? 'flashcards' : contentTypeNum === 3 ? 'assessments' : 'nội dung';
                       })()}...
                     </div>
                   ) : contentError ? (
@@ -388,6 +449,93 @@ export default function TeacherLessonDetail() {
                                   </button>
                                 </div>
                               );
+                            } else if (contentTypeNum === 3) {
+                              // Assessment - backend returns AssessmentId (PascalCase)
+                              const assessmentId = item.assessmentId || item.AssessmentId;
+                              const title = item.title || item.Title || `Assessment ${index + 1}`;
+                              const description = item.description || item.Description || "";
+                              const timeLimit = item.timeLimit || item.TimeLimit || "";
+                              const totalPoints = item.totalPoints || item.TotalPoints || 0;
+                              const passingScore = item.passingScore || item.PassingScore || 0;
+                              const isPublished = item.isPublished || item.IsPublished || false;
+
+                              // Get quiz/essay info
+                              const typeInfo = assessmentTypes[assessmentId] || { hasQuiz: false, hasEssay: false };
+
+                              return (
+                                <div key={assessmentId || index} className="content-item">
+                                  <div className="content-item-info">
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+                                      <h4 className="content-item-title" style={{ margin: 0 }}>{title}</h4>
+                                      <div style={{ display: 'flex', gap: '8px' }}>
+                                        {typeInfo.hasQuiz && (
+                                          <span style={{
+                                            padding: '4px 8px',
+                                            borderRadius: '4px',
+                                            fontSize: '11px',
+                                            fontWeight: '600',
+                                            backgroundColor: '#e3f2fd',
+                                            color: '#1976d2'
+                                          }}>
+                                            Quiz
+                                          </span>
+                                        )}
+                                        {typeInfo.hasEssay && (
+                                          <span style={{
+                                            padding: '4px 8px',
+                                            borderRadius: '4px',
+                                            fontSize: '11px',
+                                            fontWeight: '600',
+                                            backgroundColor: '#f3e5f5',
+                                            color: '#7b1fa2'
+                                          }}>
+                                            Essay
+                                          </span>
+                                        )}
+                                        {!typeInfo.hasQuiz && !typeInfo.hasEssay && (
+                                          <span style={{
+                                            padding: '4px 8px',
+                                            borderRadius: '4px',
+                                            fontSize: '11px',
+                                            fontWeight: '600',
+                                            backgroundColor: '#f5f5f5',
+                                            color: '#757575'
+                                          }}>
+                                            Chưa có nội dung
+                                          </span>
+                                        )}
+                                      </div>
+                                    </div>
+                                    {description && (
+                                      <p className="content-item-description">
+                                        {description.length > 100
+                                          ? description.substring(0, 100) + "..."
+                                          : description}
+                                      </p>
+                                    )}
+                                    <div style={{ display: 'flex', gap: '16px', marginTop: '8px', fontSize: '12px', color: '#6b7280' }}>
+                                      {timeLimit && (
+                                        <span><strong>Thời gian:</strong> {timeLimit}</span>
+                                      )}
+                                      {totalPoints > 0 && (
+                                        <span><strong>Tổng điểm:</strong> {totalPoints}</span>
+                                      )}
+                                      {passingScore > 0 && (
+                                        <span><strong>Điểm đạt:</strong> {passingScore}%</span>
+                                      )}
+                                      <span><strong>Trạng thái:</strong> {isPublished ? 'Đã xuất bản' : 'Chưa xuất bản'}</span>
+                                    </div>
+                                  </div>
+                                  <button
+                                    className="content-item-edit-btn"
+                                    onClick={() => handleEditAssessment(item)}
+                                    title="Sửa"
+                                  >
+                                    <FaEdit className="edit-icon" />
+                                    Sửa
+                                  </button>
+                                </div>
+                              );
                             }
                             return null;
                           })
@@ -400,7 +548,9 @@ export default function TeacherLessonDetail() {
                                 ? "Chưa có lecture nào trong module này"
                                 : contentTypeNum === 4
                                   ? "Chưa có flashcard nào trong module này"
-                                  : "Chưa có nội dung nào trong module này";
+                                  : contentTypeNum === 3
+                                    ? "Chưa có assessment nào trong module này"
+                                    : "Chưa có nội dung nào trong module này";
                             })()}
                           </div>
                         )}
@@ -434,6 +584,18 @@ export default function TeacherLessonDetail() {
                             >
                               <FaPlus className="add-icon" />
                               Tạo Flashcard
+                            </button>
+                          );
+                        } else if (contentTypeNum === 3) {
+                          return (
+                            <button
+                              className="module-create-btn assessment-btn"
+                              onClick={() => {
+                                navigate(ROUTE_PATHS.TEACHER_CREATE_ASSESSMENT(courseId, lessonId, moduleId));
+                              }}
+                            >
+                              <FaPlus className="add-icon" />
+                              Tạo Assessment
                             </button>
                           );
                         }
@@ -521,12 +683,12 @@ export default function TeacherLessonDetail() {
                           key={moduleId || index}
                           className="module-item"
                           onClick={() => {
-                            if (contentTypeNum === 1 || contentTypeNum === 4) {
-                              // Lecture or FlashCard - show content list
+                            if (contentTypeNum === 1 || contentTypeNum === 4 || contentTypeNum === 3) {
+                              // Lecture, FlashCard, or Assignment - show content list
                               handleModuleClick(module);
                             }
                           }}
-                          style={{ cursor: (contentTypeNum === 1 || contentTypeNum === 4) ? 'pointer' : 'default' }}
+                          style={{ cursor: (contentTypeNum === 1 || contentTypeNum === 4 || contentTypeNum === 3) ? 'pointer' : 'default' }}
                         >
                           <div className="module-item-content">
                             <img

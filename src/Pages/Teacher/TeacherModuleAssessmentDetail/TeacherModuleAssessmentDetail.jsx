@@ -10,7 +10,7 @@ import { ROUTE_PATHS } from "../../../Routes/Paths";
 import SuccessModal from "../../../Components/Common/SuccessModal/SuccessModal";
 
 export default function TeacherModuleAssessmentDetail() {
-  const { courseId, lessonId, moduleId } = useParams();
+  const { courseId, lessonId, moduleId, assessmentId } = useParams();
   const navigate = useNavigate();
   const { user, roles, isAuthenticated } = useAuth();
   const [course, setCourse] = useState(null);
@@ -25,12 +25,16 @@ export default function TeacherModuleAssessmentDetail() {
   const [timeLimit, setTimeLimit] = useState("");
   const [totalPoints, setTotalPoints] = useState(100);
   const [passingScore, setPassingScore] = useState(60);
+  const [isPublished, setIsPublished] = useState(false);
+  const [openAt, setOpenAt] = useState("");
+  const [dueAt, setDueAt] = useState("");
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [createdAssessmentId, setCreatedAssessmentId] = useState(null);
 
   const isTeacher = roles.includes("Teacher") || user?.teacherSubscription?.isTeacher === true;
+  const isEditMode = !!assessmentId;
 
   useEffect(() => {
     if (!isAuthenticated || !isTeacher) {
@@ -39,31 +43,59 @@ export default function TeacherModuleAssessmentDetail() {
     }
 
     fetchData();
-  }, [isAuthenticated, isTeacher, navigate, courseId, lessonId, moduleId]);
+  }, [isAuthenticated, isTeacher, navigate, courseId, lessonId, moduleId, assessmentId]);
 
   const fetchData = async () => {
     try {
       setLoading(true);
       setError("");
 
-      const [courseRes, lessonRes, moduleRes] = await Promise.all([
+      const promises = [
         teacherService.getCourseDetail(courseId),
         teacherService.getLessonById(lessonId),
         teacherService.getModuleById(moduleId),
-      ]);
+      ];
 
-      if (courseRes.data?.success && courseRes.data?.data) {
-        setCourse(courseRes.data.data);
+      // If edit mode, fetch assessment data
+      if (isEditMode) {
+        promises.push(assessmentService.getTeacherAssessmentById(assessmentId));
       }
 
-      if (lessonRes.data?.success && lessonRes.data?.data) {
-        setLesson(lessonRes.data.data);
+      const results = await Promise.all(promises);
+
+      if (results[0].data?.success && results[0].data?.data) {
+        setCourse(results[0].data.data);
       }
 
-      if (moduleRes.data?.success && moduleRes.data?.data) {
-        setModule(moduleRes.data.data);
+      if (results[1].data?.success && results[1].data?.data) {
+        setLesson(results[1].data.data);
+      }
+
+      if (results[2].data?.success && results[2].data?.data) {
+        setModule(results[2].data.data);
       } else {
         setError("Không thể tải thông tin module");
+      }
+
+      // If edit mode, pre-fill form with assessment data
+      if (isEditMode && results[3]?.data?.success && results[3]?.data?.data) {
+        const assessment = results[3].data.data;
+        setTitle(assessment.title || assessment.Title || "");
+        setDescription(assessment.description || assessment.Description || "");
+        setTimeLimit(assessment.timeLimit || assessment.TimeLimit || "");
+        setTotalPoints(assessment.totalPoints || assessment.TotalPoints || 100);
+        setPassingScore(assessment.passingScore || assessment.PassingScore || 60);
+        setIsPublished(assessment.isPublished || assessment.IsPublished || false);
+
+        // Format dates for input fields (YYYY-MM-DDTHH:mm)
+        if (assessment.openAt || assessment.OpenAt) {
+          const openDate = new Date(assessment.openAt || assessment.OpenAt);
+          setOpenAt(openDate.toISOString().slice(0, 16));
+        }
+        if (assessment.dueAt || assessment.DueAt) {
+          const dueDate = new Date(assessment.dueAt || assessment.DueAt);
+          setDueAt(dueDate.toISOString().slice(0, 16));
+        }
       }
     } catch (err) {
       console.error("Error fetching data:", err);
@@ -95,31 +127,47 @@ export default function TeacherModuleAssessmentDetail() {
     setSubmitting(true);
     try {
       const assessmentData = {
-        moduleId: parseInt(moduleId),
+        moduleId: parseInt(moduleId), // Required for both create and update
         title: title.trim(),
         description: description.trim() || null,
         timeLimit: timeLimit.trim() || null,
         totalPoints: totalPoints,
         passingScore: passingScore,
-        isPublished: false,
+        isPublished: isPublished,
+        openAt: openAt ? new Date(openAt).toISOString() : null,
+        dueAt: dueAt ? new Date(dueAt).toISOString() : null,
       };
 
-      const response = await assessmentService.createAssessment(assessmentData);
-      
-      if (response.data?.success) {
-        const assessmentId = response.data.data?.assessmentId || response.data.data?.AssessmentId;
-        setCreatedAssessmentId(assessmentId);
-        setShowSuccessModal(true);
-        // Sau khi tạo thành công, chuyển đến trang chọn Essay/Quiz
-        setTimeout(() => {
-          navigate(ROUTE_PATHS.TEACHER_ASSESSMENT_TYPE_SELECTION(courseId, lessonId, moduleId, assessmentId));
-        }, 1500);
+      let response;
+      if (isEditMode) {
+        // Update assessment
+        response = await assessmentService.updateAssessment(assessmentId, assessmentData);
       } else {
-        throw new Error(response.data?.message || "Tạo assessment thất bại");
+        // Create assessment
+        response = await assessmentService.createAssessment(assessmentData);
+      }
+
+      if (response.data?.success) {
+        if (isEditMode) {
+          setShowSuccessModal(true);
+          setTimeout(() => {
+            navigate(ROUTE_PATHS.TEACHER_LESSON_DETAIL(courseId, lessonId));
+          }, 1500);
+        } else {
+          const newAssessmentId = response.data.data?.assessmentId || response.data.data?.AssessmentId;
+          setCreatedAssessmentId(newAssessmentId);
+          setShowSuccessModal(true);
+          // Sau khi tạo thành công, chuyển đến trang chọn Essay/Quiz
+          setTimeout(() => {
+            navigate(ROUTE_PATHS.TEACHER_ASSESSMENT_TYPE_SELECTION(courseId, lessonId, moduleId, newAssessmentId));
+          }, 1500);
+        }
+      } else {
+        throw new Error(response.data?.message || (isEditMode ? "Cập nhật assessment thất bại" : "Tạo assessment thất bại"));
       }
     } catch (error) {
-      console.error("Error creating assessment:", error);
-      setErrors({ submit: error.response?.data?.message || error.message || "Có lỗi xảy ra khi tạo assessment" });
+      console.error(`Error ${isEditMode ? 'updating' : 'creating'} assessment:`, error);
+      setErrors({ submit: error.response?.data?.message || error.message || `Có lỗi xảy ra khi ${isEditMode ? 'cập nhật' : 'tạo'} assessment` });
     } finally {
       setSubmitting(false);
     }
@@ -160,35 +208,35 @@ export default function TeacherModuleAssessmentDetail() {
       <div className="teacher-module-assessment-detail-container">
         <div className="breadcrumb-section">
           <span className="breadcrumb-text">
-            <span 
+            <span
               className="breadcrumb-link"
               onClick={() => navigate(ROUTE_PATHS.TEACHER_COURSE_MANAGEMENT)}
             >
               Quản lý khoá học
             </span>
             {" / "}
-            <span 
+            <span
               className="breadcrumb-link"
               onClick={() => navigate(`/teacher/course/${courseId}`)}
             >
               {courseTitle}
             </span>
             {" / "}
-            <span 
+            <span
               className="breadcrumb-link"
               onClick={() => navigate(ROUTE_PATHS.TEACHER_LESSON_DETAIL(courseId, lessonId))}
             >
               {lessonTitle}
             </span>
             {" / "}
-            <span className="breadcrumb-current">Tạo Assessment</span>
+            <span className="breadcrumb-current">{isEditMode ? "Sửa Assessment" : "Tạo Assessment"}</span>
           </span>
         </div>
 
         <Container fluid className="create-assessment-content">
           <div className="create-assessment-card">
-            <h1 className="page-title">Tạo Assessment</h1>
-            
+            <h1 className="page-title">{isEditMode ? "Sửa Assessment" : "Tạo Assessment"}</h1>
+
             <form onSubmit={handleSubmit}>
               <div className="form-group">
                 <label className="form-label required">Tiêu đề</label>
@@ -264,6 +312,19 @@ export default function TeacherModuleAssessmentDetail() {
                 </div>
               </div>
 
+              <div className="form-group">
+                <label className="form-label">
+                  <input
+                    type="checkbox"
+                    checked={isPublished}
+                    onChange={(e) => setIsPublished(e.target.checked)}
+                    style={{ marginRight: '8px' }}
+                  />
+                  Đã xuất bản
+                </label>
+                <div className="form-hint">Đánh dấu nếu assessment đã sẵn sàng để học sinh làm</div>
+              </div>
+
               {errors.submit && (
                 <div className="alert alert-danger mt-3">{errors.submit}</div>
               )}
@@ -282,7 +343,7 @@ export default function TeacherModuleAssessmentDetail() {
                   className="btn btn-primary"
                   disabled={!title.trim() || totalPoints <= 0 || passingScore < 0 || passingScore > 100 || submitting}
                 >
-                  {submitting ? "Đang tạo..." : "Tạo"}
+                  {submitting ? (isEditMode ? "Đang cập nhật..." : "Đang tạo...") : (isEditMode ? "Cập nhật" : "Tạo")}
                 </button>
               </div>
             </form>
@@ -293,8 +354,8 @@ export default function TeacherModuleAssessmentDetail() {
       <SuccessModal
         isOpen={showSuccessModal}
         onClose={() => setShowSuccessModal(false)}
-        title="Tạo assessment thành công"
-        message="Assessment của bạn đã được tạo thành công!"
+        title={isEditMode ? "Cập nhật assessment thành công" : "Tạo assessment thành công"}
+        message={isEditMode ? "Assessment của bạn đã được cập nhật thành công!" : "Assessment của bạn đã được tạo thành công!"}
         autoClose={true}
         autoCloseDelay={1500}
       />
