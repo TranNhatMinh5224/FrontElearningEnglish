@@ -1,0 +1,53 @@
+.create-buttons-container {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+
+.create-quiz-btn {
+    flex: 1;
+    min-width: 200px;
+    background: linear-gradient(135deg, #9c27b0 0%, #7b1fa2 100%);
+    border: none;
+    padding: 15px 30px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 8px;
+    transition: all 0.3s;
+}
+
+.create-quiz-btn:hover {
+    background: linear-gradient(135deg, #7b1fa2 0%, #6a1b9a 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(156, 39, 176, 0.3);
+}
+
+.create-essay-btn {
+    flex: 1;
+    min-width: 200px;
+    background: linear-gradient(135deg, #6fd5e0 0%, #0097A7 100%);
+    border: none;
+    padding: 15px 30px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 8px;
+    transition: all 0.3s;
+}
+
+.create-essay-btn:hover {
+    background: linear-gradient(135deg, #0097A7 0%, #00838f 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(111, 213, 224, 0.3);
+}
+
+@media (max-width: 768px) {
+    .create-buttons-container {
+        flex-direction: column;
+    }
+
+    .create-quiz-btn,
+    .create-essay-btn {
+        width: 100%;
+    }
+}

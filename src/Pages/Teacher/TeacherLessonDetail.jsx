@@ -684,9 +684,12 @@ export default function TeacherLessonDetail() {
                           key={moduleId || index}
                           className="module-item"
                           onClick={() => {
-                            if (contentTypeNum === 1 || contentTypeNum === 4 || contentTypeNum === 3) {
-                              // Lecture, FlashCard, or Assignment - show content list
+                            if (contentTypeNum === 1 || contentTypeNum === 4) {
+                              // Lecture, FlashCard - show content list
                               handleModuleClick(module);
+                            } else if (contentTypeNum === 3) {
+                              // Assignment - navigate to assignment management page
+                              navigate(ROUTE_PATHS.TEACHER_ASSIGNMENT_MANAGEMENT(courseId, lessonId, moduleId));
                             }
                           }}
                           style={{ cursor: (contentTypeNum === 1 || contentTypeNum === 4 || contentTypeNum === 3) ? 'pointer' : 'default' }}

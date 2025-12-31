@@ -72,7 +72,9 @@ export const ROUTE_PATHS = {
   TEACHER_EDIT_ASSESSMENT: (courseId, lessonId, moduleId, assessmentId) => `/teacher/course/${courseId}/lesson/${lessonId}/module/${moduleId}/edit-assessment/${assessmentId}`,
   TEACHER_ASSESSMENT_TYPE_SELECTION: (courseId, lessonId, moduleId, assessmentId) => `/teacher/course/${courseId}/lesson/${lessonId}/module/${moduleId}/assessment/${assessmentId}/select-type`,
   TEACHER_CREATE_ESSAY: (courseId, lessonId, moduleId, assessmentId) => `/teacher/course/${courseId}/lesson/${lessonId}/module/${moduleId}/assessment/${assessmentId}/create-essay`,
+  TEACHER_EDIT_ESSAY: (courseId, lessonId, moduleId, assessmentId, essayId) => `/teacher/course/${courseId}/lesson/${lessonId}/module/${moduleId}/assessment/${assessmentId}/edit-essay/${essayId}`,
   TEACHER_CREATE_QUIZ: (courseId, lessonId, moduleId, assessmentId) => `/teacher/course/${courseId}/lesson/${lessonId}/module/${moduleId}/assessment/${assessmentId}/create-quiz`,
   TEACHER_EDIT_QUIZ: (courseId, lessonId, moduleId, assessmentId, quizId) => `/teacher/course/${courseId}/lesson/${lessonId}/module/${moduleId}/assessment/${assessmentId}/edit-quiz/${quizId}`,
+  TEACHER_ASSIGNMENT_MANAGEMENT: (courseId, lessonId, moduleId) => `/teacher/course/${courseId}/lesson/${lessonId}/module/${moduleId}/assignment-management`,
 };
 

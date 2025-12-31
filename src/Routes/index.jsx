@@ -46,6 +46,7 @@ import TeacherAssessmentTypeSelection from "../Pages/Teacher/TeacherAssessmentTy
 import TeacherModuleQuizDetail from "../Pages/Teacher/TeacherModuleQuizDetail/TeacherModuleQuizDetail";
 import TeacherModuleEssayDetail from "../Pages/Teacher/TeacherModuleEssayDetail/TeacherModuleEssayDetail";
 import TeacherQuizEditor from "../Pages/Teacher/TeacherQuizEditor/TeacherQuizEditor";
+import TeacherAssignmentManagement from "../Pages/Teacher/TeacherAssignmentManagement/TeacherAssignmentManagement";
 
 // Admin Imports
 import AdminLayout from "../Layouts/AdminLayout/AdminLayout";
@@ -119,6 +120,7 @@ export default function AppRoutes() {
       <Route path="/teacher/course/:courseId/lesson/:lessonId/module/:moduleId/assessment/:assessmentId/create-essay" element={<TeacherModuleEssayDetail />} />
       <Route path="/teacher/course/:courseId/lesson/:lessonId/module/:moduleId/assessment/:assessmentId/create-quiz" element={<TeacherModuleQuizDetail />} />
       <Route path="/teacher/course/:courseId/lesson/:lessonId/module/:moduleId/assessment/:assessmentId/edit-quiz/:quizId" element={<TeacherQuizEditor />} />
+      <Route path="/teacher/course/:courseId/lesson/:lessonId/module/:moduleId/assignment-management" element={<TeacherAssignmentManagement />} />
       <Route path="/teacher/course/:courseId" element={<TeacherCourseDetail />} />
     </Routes>
   );

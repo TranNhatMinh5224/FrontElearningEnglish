@@ -1,0 +1,108 @@
+.quiz-list-container {
+    margin-bottom: 30px;
+}
+
+.section-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.empty-message {
+    text-align: center;
+    padding: 40px 20px;
+    color: #999;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.quiz-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.quiz-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    transition: all 0.2s;
+    background: #fff;
+}
+
+.quiz-card:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-color: #6fd5e0;
+}
+
+.quiz-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 15px;
+}
+
+.quiz-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+    flex: 1;
+}
+
+.quiz-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.action-btn {
+    background: transparent;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.edit-btn {
+    color: #1976d2;
+}
+
+.edit-btn:hover {
+    background: #e3f2fd;
+    color: #1565c0;
+}
+
+.delete-btn {
+    color: #d32f2f;
+}
+
+.delete-btn:hover {
+    background: #ffebee;
+    color: #c62828;
+}
+
+.quiz-card-footer {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.status-badge {
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.status-badge.published {
+    background: #c8e6c9;
+    color: #2e7d32;
+}
+
+.status-badge.draft {
+    background: #ffe0b2;
+    color: #e65100;
+}
