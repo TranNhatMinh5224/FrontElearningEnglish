@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Container, Row, Col } from "react-bootstrap";
-import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
+import { FaEdit, FaTrash, FaPlus, FaList } from "react-icons/fa";
 import TeacherHeader from "../../../Components/Header/TeacherHeader";
 import { useAuth } from "../../../Context/AuthContext";
 import { quizService } from "../../../Services/quizService";
@@ -96,6 +96,15 @@ export default function TeacherQuizSectionManagement() {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Navigation handlers
+  const handleManageQuestionsSection = (sectionId) => {
+    navigate(ROUTE_PATHS.TEACHER_QUESTION_MANAGEMENT_SECTION(courseId, lessonId, moduleId, assessmentId, quizId, sectionId));
+  };
+
+  const handleManageQuestionsGroup = (groupId) => {
+    navigate(ROUTE_PATHS.TEACHER_QUESTION_MANAGEMENT_GROUP(courseId, lessonId, moduleId, assessmentId, quizId, groupId));
   };
 
   // Section handlers
@@ -283,6 +292,13 @@ export default function TeacherQuizSectionManagement() {
                       </div>
                       <div className="section-actions">
                         <button
+                          className="btn btn-info text-white me-2"
+                          onClick={() => handleManageQuestionsSection(sectionId)}
+                          title="Quản lý câu hỏi lẻ"
+                        >
+                          <FaList className="me-1" /> Câu hỏi lẻ
+                        </button>
+                        <button
                           className="btn btn-edit-section"
                           onClick={() => handleEditSection(section)}
                           title="Sửa Section"
@@ -335,6 +351,13 @@ export default function TeacherQuizSectionManagement() {
                                     <span className="badge bg-info">Tổng điểm: {groupSumScore}</span>
                                   </div>
                                   <div className="group-actions">
+                                    <button
+                                      className="btn btn-sm btn-info text-white me-2"
+                                      onClick={() => handleManageQuestionsGroup(groupId)}
+                                      title="Quản lý câu hỏi"
+                                    >
+                                       <FaList />
+                                    </button>
                                     <button
                                       className="btn btn-edit-group"
                                       onClick={() => handleEditGroup(group)}

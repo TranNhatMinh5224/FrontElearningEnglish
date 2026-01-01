@@ -1,0 +1,12 @@
+.options-container {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+}
+
+.options-container .form-check-input {
+    cursor: pointer;
+    width: 1.2em;
+    height: 1.2em;
+}

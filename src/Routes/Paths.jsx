@@ -68,8 +68,10 @@ export const ROUTE_PATHS = {
   TEACHER_EDIT_LECTURE: (courseId, lessonId, moduleId, lectureId) => `/teacher/course/${courseId}/lesson/${lessonId}/module/${moduleId}/lecture/${lectureId}/edit`,
   TEACHER_CREATE_FLASHCARD: (courseId, lessonId, moduleId) => `/teacher/course/${courseId}/lesson/${lessonId}/module/${moduleId}/create-flashcard`,
   TEACHER_EDIT_FLASHCARD: (courseId, lessonId, moduleId, flashcardId) => `/teacher/course/${courseId}/lesson/${lessonId}/module/${moduleId}/edit-flashcard/${flashcardId}`,
-  TEACHER_QUIZ_ESSAY_MANAGEMENT: (courseId, lessonId, moduleId, assessmentId) => `/teacher/course/${courseId}/lesson/${lessonId}/module/${moduleId}/assessment/${assessmentId}/manage`,
-  TEACHER_QUIZ_SECTION_MANAGEMENT: (courseId, lessonId, moduleId, assessmentId, quizId) => `/teacher/course/${courseId}/lesson/${lessonId}/module/${moduleId}/assessment/${assessmentId}/quiz/${quizId}/sections`,
+      TEACHER_QUIZ_ESSAY_MANAGEMENT: (courseId, lessonId, moduleId, assessmentId) => `/teacher/course/${courseId}/lesson/${lessonId}/module/${moduleId}/assessment/${assessmentId}/manage`,
+      TEACHER_QUIZ_SECTION_MANAGEMENT: (courseId, lessonId, moduleId, assessmentId, quizId) => `/teacher/course/${courseId}/lesson/${lessonId}/module/${moduleId}/assessment/${assessmentId}/quiz/${quizId}/sections`,
+      TEACHER_QUESTION_MANAGEMENT_SECTION: (courseId, lessonId, moduleId, assessmentId, quizId, sectionId) => `/teacher/course/${courseId}/lesson/${lessonId}/module/${moduleId}/assessment/${assessmentId}/quiz/${quizId}/section/${sectionId}/questions`,
+      TEACHER_QUESTION_MANAGEMENT_GROUP: (courseId, lessonId, moduleId, assessmentId, quizId, groupId) => `/teacher/course/${courseId}/lesson/${lessonId}/module/${moduleId}/assessment/${assessmentId}/quiz/${quizId}/group/${groupId}/questions`,
 
   // Admin routes
   ADMIN: {

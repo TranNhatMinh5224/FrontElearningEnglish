@@ -15,7 +15,7 @@ export default function QuestionCard({ question, answer, onChange, questionNumbe
         const questionType = question.type !== undefined ? question.type : (question.Type !== undefined ? question.Type : 0);
 
         switch (questionType) {
-            case 0: // MultipleChoice
+            case 1: // MultipleChoice
                 return (
                     <MultipleChoiceQuestion
                         question={question}
@@ -23,7 +23,7 @@ export default function QuestionCard({ question, answer, onChange, questionNumbe
                         onChange={onChange}
                     />
                 );
-            case 1: // MultipleAnswers
+            case 2: // MultipleAnswers
                 return (
                     <MultipleChoiceQuestion
                         question={question}
@@ -32,7 +32,7 @@ export default function QuestionCard({ question, answer, onChange, questionNumbe
                         multiple={true}
                     />
                 );
-            case 2: // TrueFalse
+            case 3: // TrueFalse
                 return (
                     <TrueFalseQuestion
                         question={question}
@@ -40,7 +40,7 @@ export default function QuestionCard({ question, answer, onChange, questionNumbe
                         onChange={onChange}
                     />
                 );
-            case 3: // FillBlank
+            case 4: // FillBlank
                 return (
                     <FillBlankQuestion
                         question={question}
@@ -48,7 +48,7 @@ export default function QuestionCard({ question, answer, onChange, questionNumbe
                         onChange={onChange}
                     />
                 );
-            case 4: // Matching
+            case 5: // Matching
                 return (
                     <MatchingQuestion
                         question={question}
@@ -56,7 +56,7 @@ export default function QuestionCard({ question, answer, onChange, questionNumbe
                         onChange={onChange}
                     />
                 );
-            case 5: // Ordering
+            case 6: // Ordering
                 return (
                     <OrderingQuestion
                         question={question}

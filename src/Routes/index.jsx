@@ -43,6 +43,7 @@ import EditLecture from "../Pages/Teacher/TeacherModuleLectureDetail/EditLecture
 import TeacherModuleFlashCardDetail from "../Pages/Teacher/TeacherModuleFlashCardDetail/TeacherModuleFlashCardDetail";
 import TeacherQuizEssayManagement from "../Pages/Teacher/TeacherQuizEssayManagement/TeacherQuizEssayManagement";
 import TeacherQuizSectionManagement from "../Pages/Teacher/TeacherQuizSectionManagement/TeacherQuizSectionManagement";
+import TeacherQuestionManagement from "../Pages/Teacher/TeacherQuestionManagement/TeacherQuestionManagement";
 
 // Admin Imports
 import AdminLayout from "../Layouts/AdminLayout/AdminLayout";
@@ -112,6 +113,8 @@ export default function AppRoutes() {
       <Route path="/teacher/course/:courseId/lesson/:lessonId/module/:moduleId/edit-flashcard/:flashcardId" element={<TeacherModuleFlashCardDetail />} />
       <Route path="/teacher/course/:courseId/lesson/:lessonId/module/:moduleId/assessment/:assessmentId/manage" element={<TeacherQuizEssayManagement />} />
       <Route path="/teacher/course/:courseId/lesson/:lessonId/module/:moduleId/assessment/:assessmentId/quiz/:quizId/sections" element={<TeacherQuizSectionManagement />} />
+      <Route path="/teacher/course/:courseId/lesson/:lessonId/module/:moduleId/assessment/:assessmentId/quiz/:quizId/section/:sectionId/questions" element={<TeacherQuestionManagement />} />
+      <Route path="/teacher/course/:courseId/lesson/:lessonId/module/:moduleId/assessment/:assessmentId/quiz/:quizId/group/:groupId/questions" element={<TeacherQuestionManagement />} />
       <Route path="/teacher/course/:courseId" element={<TeacherCourseDetail />} />
 
       {/* Admin routes */}
