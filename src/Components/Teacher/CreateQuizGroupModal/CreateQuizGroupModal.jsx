@@ -60,17 +60,23 @@ export default function CreateQuizGroupModal({ show, onClose, onSuccess, quizSec
         setName(group.name || group.Name || "");
         setDescription(group.description || group.Description || "");
         setTitle(group.title || group.Title || "");
-        setSumScore((group.sumScore !== undefined ? group.sumScore : (group.SumScore !== undefined ? group.SumScore : 0)).toString());
-        setVideoDuration((group.videoDuration !== undefined ? group.videoDuration : (group.VideoDuration !== undefined ? group.VideoDuration : "")).toString());
         
-        // Handle image
-        const imageUrl = group.imgUrl || group.ImgUrl;
+        // Safely handle sumScore
+        const scoreVal = group.sumScore !== undefined ? group.sumScore : (group.SumScore !== undefined ? group.SumScore : 0);
+        setSumScore((scoreVal ?? 0).toString());
+        
+        // Safely handle videoDuration
+        const durationVal = group.videoDuration !== undefined ? group.videoDuration : (group.VideoDuration !== undefined ? group.VideoDuration : "");
+        setVideoDuration((durationVal ?? "").toString());
+        
+        // Handle image - check multiple property cases
+        const imageUrl = group.imgUrl || group.ImgUrl || group.imageUrl || group.ImageUrl;
         if (imageUrl) {
           setImagePreview(imageUrl);
         }
         
-        // Handle video
-        const videoUrl = group.videoUrl || group.VideoUrl;
+        // Handle video - check multiple property cases
+        const videoUrl = group.videoUrl || group.VideoUrl || group.videoUrl || group.VideoUrl;
         if (videoUrl) {
           setVideoPreview(videoUrl);
         }

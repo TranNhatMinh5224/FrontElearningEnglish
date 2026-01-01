@@ -1,8 +1,11 @@
-import React, { useState, useEffect } from "react";
-import { Modal, Button, Form, Row, Col, InputGroup } from "react-bootstrap";
-import { FaPlus, FaTrash, FaArrowUp, FaArrowDown } from "react-icons/fa";
+import React, { useState, useEffect, useRef } from "react";
+import { Modal, Button, Form, Row, Col } from "react-bootstrap";
+import { FaPlus, FaTrash, FaArrowUp, FaArrowDown, FaImage, FaVideo, FaMusic, FaTimes } from "react-icons/fa";
 import { questionService } from "../../../Services/questionService";
+import { fileService } from "../../../Services/fileService";
 import "./CreateQuestionModal.css";
+
+const QUESTION_BUCKET = "questions";
 
 // Question Types from Backend Enum
 const QUESTION_TYPES = {
@@ -32,6 +35,14 @@ const CreateQuestionModal = ({
     options: [],
     matchingPairs: [], // For Matching type { key: "", value: "" }
   });
+  
+  // Media State
+  const [mediaPreview, setMediaPreview] = useState(null);
+  const [mediaTempKey, setMediaTempKey] = useState(null);
+  const [mediaType, setMediaType] = useState(null); // 'image', 'video', 'audio'
+  const [uploadingMedia, setUploadingMedia] = useState(false);
+  const fileInputRef = useRef(null);
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -45,16 +56,21 @@ const CreateQuestionModal = ({
         // Try to parse Matching pairs if stored in CorrectAnswersJson or Metadata
         if (questionToUpdate.type === QUESTION_TYPES.Matching && questionToUpdate.correctAnswersJson) {
            try {
-             initialPairs = typeof questionToUpdate.correctAnswersJson === 'string' 
+             const parsed = typeof questionToUpdate.correctAnswersJson === 'string' 
                 ? JSON.parse(questionToUpdate.correctAnswersJson) 
-                : questionToUpdate.correctAnswersJson; // Handle if it's already an object
+                : questionToUpdate.correctAnswersJson; 
+             
+             if (Array.isArray(parsed)) {
+                 initialPairs = parsed;
+             }
            } catch (e) {
+             console.error("Error parsing matching pairs:", e);
              initialPairs = [{ key: "", value: "" }];
            }
         }
         
-        // Also handle matchingPairs if it was passed directly (from bulk draft)
-        if (questionToUpdate.matchingPairs) {
+        // Handle bulk draft matchingPairs
+        if (questionToUpdate.matchingPairs && Array.isArray(questionToUpdate.matchingPairs)) {
             initialPairs = questionToUpdate.matchingPairs;
         }
 
@@ -63,13 +79,30 @@ const CreateQuestionModal = ({
           explanation: questionToUpdate.explanation || "",
           points: questionToUpdate.points || 10,
           type: questionToUpdate.type || QUESTION_TYPES.MultipleChoice,
-          options: initialOptions,
-          matchingPairs: initialPairs.length > 0 ? initialPairs : [{ key: "", value: "" }],
+          options: Array.isArray(initialOptions) ? initialOptions : [],
+          matchingPairs: Array.isArray(initialPairs) && initialPairs.length > 0 ? initialPairs : [{ key: "", value: "" }],
         });
+
+        // Load existing media
+        const url = questionToUpdate.mediaUrl || questionToUpdate.MediaUrl;
+        if (url) {
+            setMediaPreview(url);
+            // Infer type from URL roughly if needed
+            const lowerUrl = url.toLowerCase();
+            if (lowerUrl.match(/\.(mp4|webm|mov)$/)) setMediaType('video');
+            else if (lowerUrl.match(/\.(mp3|wav|ogg)$/)) setMediaType('audio');
+            else setMediaType('image');
+        }
+
       } else {
         resetForm(QUESTION_TYPES.MultipleChoice);
       }
       setError("");
+    } else {
+        // Reset media on close
+        setMediaPreview(null);
+        setMediaTempKey(null);
+        setMediaType(null);
     }
   }, [show, questionToUpdate]);
 
@@ -91,7 +124,7 @@ const CreateQuestionModal = ({
       ];
     } else if (type === QUESTION_TYPES.Ordering) {
       defaultOptions = [
-        { text: "", isCorrect: true }, // Order implies correctness
+        { text: "", isCorrect: true },
         { text: "", isCorrect: true },
         { text: "", isCorrect: true },
       ];
@@ -110,6 +143,9 @@ const CreateQuestionModal = ({
       options: defaultOptions,
       matchingPairs: defaultPairs,
     });
+    setMediaPreview(null);
+    setMediaTempKey(null);
+    setMediaType(null);
   };
 
   const handleTypeChange = (e) => {
@@ -175,6 +211,57 @@ const CreateQuestionModal = ({
     setFormData({ ...formData, matchingPairs: newPairs });
   };
 
+  // --- Media Handlers ---
+  const handleMediaChange = async (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+
+      // Determine type
+      let type = 'image';
+      if (file.type.startsWith('video/')) type = 'video';
+      else if (file.type.startsWith('audio/')) type = 'audio';
+      else if (!file.type.startsWith('image/')) {
+          setError("Chỉ hỗ trợ file ảnh, video hoặc âm thanh.");
+          return;
+      }
+
+      if (file.size > 100 * 1024 * 1024) { // 100MB limit
+          setError("File quá lớn (giới hạn 100MB).");
+          return;
+      }
+
+      setUploadingMedia(true);
+      setError("");
+
+      try {
+          const previewUrl = URL.createObjectURL(file);
+          setMediaPreview(previewUrl);
+          setMediaType(type);
+
+          const response = await fileService.uploadTempFile(file, QUESTION_BUCKET, "temp");
+          if (response.data?.success && response.data?.data) {
+              setMediaTempKey(response.data.data.tempKey || response.data.data.TempKey);
+          } else {
+              setError("Upload thất bại.");
+              setMediaPreview(null);
+          }
+      } catch (err) {
+          console.error(err);
+          setError("Lỗi khi upload file.");
+          setMediaPreview(null);
+      } finally {
+          setUploadingMedia(false);
+          if (fileInputRef.current) fileInputRef.current.value = "";
+      }
+  };
+
+  const handleRemoveMedia = () => {
+      setMediaPreview(null);
+      setMediaTempKey(null);
+      setMediaType(null);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
   // --- Validation & Submit ---
   const validateForm = () => {
     if (!formData.stemText.trim()) return "Vui lòng nhập nội dung câu hỏi";
@@ -196,7 +283,6 @@ const CreateQuestionModal = ({
     }
 
     if (formData.type === QUESTION_TYPES.FillBlank) {
-        // Check regex for [...]
         const regex = /\[(.*?)\]/g;
         if (!regex.test(formData.stemText)) return "Vui lòng dùng dấu ngoặc vuông [từ đúng] để đánh dấu từ cần điền.";
     }
@@ -216,7 +302,7 @@ const CreateQuestionModal = ({
 
     try {
       const payload = {
-        questionId: questionToUpdate?.questionId, // Might be null for new
+        questionId: questionToUpdate?.questionId,
         stemText: formData.stemText,
         explanation: formData.explanation,
         points: formData.points,
@@ -224,32 +310,29 @@ const CreateQuestionModal = ({
         quizSectionId: sectionId || null,
         quizGroupId: groupId || null,
         options: [],
-        correctAnswersJson: null
+        correctAnswersJson: null,
+        // Add Media fields
+        mediaTempKey: mediaTempKey,
+        mediaType: mediaType,
       };
 
-      // Prepare payload based on type
       if (formData.type === QUESTION_TYPES.Matching) {
-        // Save pairs in correctAnswersJson
         payload.correctAnswersJson = JSON.stringify(formData.matchingPairs);
-        // Save original pairs in payload too (for draft editing reuse)
         payload.matchingPairs = formData.matchingPairs;
-        
-        // Populate options for Student View (Left items + Right items)
-        // MatchingQuestion.jsx expects a flat list and splits it in half (Left then Right)
-        const leftOptions = formData.matchingPairs.map(p => ({ text: p.key, isCorrect: false }));
+        const leftOptions = formData.matchingPairs.map((p, index) => ({ 
+            text: p.key, 
+            isCorrect: index === 0 
+        }));
         const rightOptions = formData.matchingPairs.map(p => ({ text: p.value, isCorrect: false }));
         payload.options = [...leftOptions, ...rightOptions];
 
       } else if (formData.type === QUESTION_TYPES.FillBlank) {
-         // StemText contains the brackets. Backend logic should handle this.
-         // Just in case, we can pass correct answers in Options
          const matches = [...formData.stemText.matchAll(/\[(.*?)\]/g)];
          payload.options = matches.map(m => ({
              text: m[1],
              isCorrect: true
          }));
       } else {
-        // MCQ, TrueFalse, Ordering
         payload.options = formData.options.map(opt => ({
             text: opt.text,
             isCorrect: opt.isCorrect,
@@ -257,14 +340,14 @@ const CreateQuestionModal = ({
         }));
       }
 
-      // --- BULK MODE HANDLING ---
       if (isBulkMode && onSaveDraft) {
+        // Add preview url for draft display (optional)
+        payload.mediaPreview = mediaPreview; 
         onSaveDraft(payload);
         onClose();
         return;
       }
 
-      // --- NORMAL API MODE ---
       let response;
       if (questionToUpdate) {
         response = await questionService.updateQuestion(questionToUpdate.questionId, payload);
@@ -447,6 +530,43 @@ const CreateQuestionModal = ({
             />
           </Form.Group>
 
+          {/* Media Upload Section */}
+          <Form.Group className="mb-3">
+              <Form.Label>Media đính kèm (Ảnh / Video / Audio)</Form.Label>
+              <div className="media-upload-container border p-3 rounded bg-light">
+                  {!mediaPreview ? (
+                      <div className="d-flex gap-3 justify-content-center">
+                          <Button variant="outline-primary" onClick={() => fileInputRef.current?.click()} disabled={uploadingMedia}>
+                              <FaPlus className="me-2"/> {uploadingMedia ? "Đang tải..." : "Chọn File"}
+                          </Button>
+                          <input 
+                              type="file" 
+                              ref={fileInputRef} 
+                              onChange={handleMediaChange} 
+                              style={{ display: 'none' }}
+                              accept="image/*,video/*,audio/*"
+                          />
+                      </div>
+                  ) : (
+                      <div className="position-relative text-center">
+                          {mediaType === 'image' && <img src={mediaPreview} alt="Preview" className="img-fluid rounded" style={{ maxHeight: '200px' }} />}
+                          {mediaType === 'video' && <video src={mediaPreview} controls style={{ maxHeight: '200px', width: '100%' }} />}
+                          {mediaType === 'audio' && <audio src={mediaPreview} controls style={{ width: '100%' }} />}
+                          
+                          <Button 
+                              variant="danger" 
+                              size="sm" 
+                              className="position-absolute top-0 end-0 m-1"
+                              onClick={handleRemoveMedia}
+                              title="Xóa file"
+                          >
+                              <FaTimes />
+                          </Button>
+                      </div>
+                  )}
+              </div>
+          </Form.Group>
+
           <div className="mb-3">
             <Form.Label>Thiết lập đáp án</Form.Label>
             <div className="options-container">
@@ -478,7 +598,7 @@ const CreateQuestionModal = ({
         <Button variant="secondary" onClick={onClose}>
           Hủy
         </Button>
-        <Button variant="primary" onClick={handleSubmit} disabled={loading}>
+        <Button variant="primary" onClick={handleSubmit} disabled={loading || uploadingMedia}>
           {loading ? "Đang xử lý..." : questionToUpdate ? "Cập nhật" : "Tạo câu hỏi"}
         </Button>
       </Modal.Footer>

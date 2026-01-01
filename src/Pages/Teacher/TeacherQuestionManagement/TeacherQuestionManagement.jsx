@@ -180,14 +180,16 @@ export default function TeacherQuestionManagement() {
       <div className="teacher-question-management-container">
         <Container>
           {/* Header */}
-          <div className="d-flex align-items-center mb-4 pt-4">
-            <Button variant="outline-secondary" className="me-3" onClick={handleBack}>
-              <FaArrowLeft /> Quay lại
-            </Button>
-            <div>
-              <h2 className="mb-0 text-primary fw-bold">Quản lý câu hỏi</h2>
-              <div className="text-muted">
-                {contextData.title} {contextData.subtitle && `- ${contextData.subtitle}`}
+          <div className="question-header-section">
+            <div className="d-flex align-items-center">
+              <Button variant="outline-secondary" className="me-3" onClick={handleBack}>
+                <FaArrowLeft /> Quay lại
+              </Button>
+              <div>
+                <h2 className="mb-0 text-primary fw-bold">Quản lý câu hỏi</h2>
+                <div className="text-muted">
+                  {contextData.title} {contextData.subtitle && `- ${contextData.subtitle}`}
+                </div>
               </div>
             </div>
           </div>

@@ -3,10 +3,22 @@
     padding: 15px;
     border-radius: 8px;
     border: 1px solid #dee2e6;
+    max-height: 400px;
+    overflow-y: auto;
 }
 
 .options-container .form-check-input {
     cursor: pointer;
     width: 1.2em;
     height: 1.2em;
+}
+
+/* Matching specific styles */
+.options-container .row {
+    margin-bottom: 10px;
+}
+
+/* Ordering specific styles */
+.badge.bg-secondary {
+    min-width: 25px;
 }
