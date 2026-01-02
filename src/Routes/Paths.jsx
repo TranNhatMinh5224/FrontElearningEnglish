@@ -47,6 +47,9 @@ export const ROUTE_PATHS = {
     `/course/${courseId}/lesson/${lessonId}/module/${moduleId}/pronunciation`,
   ASSIGNMENT_DETAIL: (courseId, lessonId, moduleId) =>
     `/course/${courseId}/lesson/${lessonId}/module/${moduleId}/assignment`,
+  
+  ASSESSMENT_DETAIL: (courseId, lessonId, moduleId, assessmentId) =>
+    `/course/${courseId}/lesson/${lessonId}/module/${moduleId}/assignment/${assessmentId}`,
 
   // Quiz routes
   QUIZ_DETAIL: (courseId, lessonId, moduleId, quizId, attemptId) =>

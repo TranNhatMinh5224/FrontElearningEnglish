@@ -40,7 +40,6 @@ export default function QuizDetail() {
             return [];
         }
         
-        // Backend trả về QuizSections (PascalCase)
         const sections = quizAttempt.QuizSections || quizAttempt.quizSections || [];
         console.log("getAllQuestions - sections:", sections.length);
         
@@ -51,26 +50,46 @@ export default function QuizDetail() {
         
         const allQuestions = [];
         sections.forEach((section, sectionIdx) => {
-            // Backend trả về Questions và QuizGroups (PascalCase)
-            const questions = section.Questions || section.questions || [];
-            const groups = section.QuizGroups || section.quizGroups || [];
+            // New Structure: QuizSections -> Items (Group/Question)
+            const items = section.Items || section.items || [];
             
-            console.log(`Section ${sectionIdx}: ${questions.length} direct questions, ${groups.length} groups`);
-            
-            // Questions directly in section
-            if (Array.isArray(questions) && questions.length > 0) {
-                allQuestions.push(...questions);
-            }
-            
-            // Questions in groups
-            if (Array.isArray(groups) && groups.length > 0) {
-                groups.forEach((group, groupIdx) => {
-                    const groupQuestions = group.Questions || group.questions || [];
-                    console.log(`Group ${groupIdx}: ${groupQuestions.length} questions`);
-                    if (Array.isArray(groupQuestions) && groupQuestions.length > 0) {
-                        allQuestions.push(...groupQuestions);
+            if (items.length > 0) {
+                console.log(`Section ${sectionIdx}: Found ${items.length} items`);
+                items.forEach(item => {
+                    const type = item.ItemType || item.itemType;
+                    
+                    if (type === "Question") {
+                        // Item itself acts as a question wrapper or contains question props
+                        // Make sure we have a valid question object
+                        if (item.QuestionId || item.questionId) {
+                            allQuestions.push(item);
+                        }
+                    } else if (type === "Group") {
+                        const groupQuestions = item.Questions || item.questions || [];
+                        if (Array.isArray(groupQuestions)) {
+                            allQuestions.push(...groupQuestions);
+                        }
                     }
                 });
+            } else {
+                // Fallback: Legacy/Alternative Structure (Direct Questions/QuizGroups lists)
+                const questions = section.Questions || section.questions || [];
+                const groups = section.QuizGroups || section.quizGroups || [];
+                
+                console.log(`Section ${sectionIdx} (Legacy): ${questions.length} direct questions, ${groups.length} groups`);
+                
+                if (Array.isArray(questions) && questions.length > 0) {
+                    allQuestions.push(...questions);
+                }
+                
+                if (Array.isArray(groups) && groups.length > 0) {
+                    groups.forEach((group) => {
+                        const groupQuestions = group.Questions || group.questions || [];
+                        if (Array.isArray(groupQuestions) && groupQuestions.length > 0) {
+                            allQuestions.push(...groupQuestions);
+                        }
+                    });
+                }
             }
         });
         
@@ -131,6 +150,50 @@ export default function QuizDetail() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [quizId, attemptId]);
 
+    // Auto-save progress to localStorage whenever quizAttempt updates
+    useEffect(() => {
+        if (quizAttempt) {
+            const status = quizAttempt.Status !== undefined ? quizAttempt.Status : quizAttempt.status;
+            console.log(`💾 [AutoSave] Check Status: ${status} (Type: ${typeof status})`);
+
+            // Loose check for status 0 or 1, OR if status is missing (assume active)
+            // Backend Enum: 0=Started, 1=InProgress
+            if (status == 0 || status == 1 || status === undefined) {
+                const aId = quizAttempt.attemptId || quizAttempt.AttemptId || attemptId;
+                const qId = quizAttempt.quizId || quizAttempt.QuizId || quizId;
+                
+                if (aId && qId) {
+                    const progressKey = `quiz_in_progress_${qId}`;
+                    const progressData = {
+                        quizId: qId,
+                        attemptId: aId,
+                        courseId,
+                        lessonId,
+                        moduleId,
+                        startedAt: quizAttempt.StartedAt || quizAttempt.startedAt,
+                        status: status ?? 1 // Default to 1 if missing
+                    };
+                    
+                    console.log(`💾 [AutoSave] WRITING to ${progressKey}`, progressData);
+                    try {
+                        localStorage.setItem(progressKey, JSON.stringify(progressData));
+                        // Verify immediately
+                        const verify = localStorage.getItem(progressKey);
+                        console.log(`💾 [AutoSave] Verification read:`, verify ? "Success" : "Failed");
+                    } catch (e) {
+                        console.error("💾 [AutoSave] Write Failed:", e);
+                    }
+                } else {
+                    console.warn("💾 [AutoSave] Missing IDs - aId:", aId, "qId:", qId);
+                }
+            } else {
+                const qId = quizAttempt.quizId || quizAttempt.QuizId || quizId;
+                console.log(`🗑️ [AutoSave] Status ${status} is not active. Removing key for ${qId}`);
+                if (qId) localStorage.removeItem(`quiz_in_progress_${qId}`);
+            }
+        }
+    }, [quizAttempt, quizId, courseId, lessonId, moduleId, attemptId]);
+
     const fetchQuizAttempt = async () => {
         try {
             setLoading(true);
@@ -157,20 +220,15 @@ export default function QuizDetail() {
                         console.log("✅ [QuizDetail] Resume successful");
                         
                         // Check status from resumed attempt
-                        const status = attempt.Status || attempt.status;
+                        const status = attempt.Status !== undefined ? attempt.Status : attempt.status;
                         console.log("📊 [QuizDetail] Attempt status from resume:", status);
                         
-                        // Status 1 = InProgress, 2 = Submitted, 3 = Graded, etc.
-                        if (status !== 1) {
+                        // Status 0 = Started, 1 = InProgress -> Both are valid for resuming
+                        // Status 2 = Submitted, 3 = Graded -> Cannot resume
+                        if (status !== 0 && status !== 1) {
                             // Attempt đã submit hoặc không còn InProgress
-                            console.error("❌ [QuizDetail] Attempt is not in progress. Status:", status);
-                            console.error("❌ [QuizDetail] Attempt details:", {
-                                attemptId,
-                                status,
-                                submittedAt: attempt.SubmittedAt || attempt.submittedAt,
-                                startedAt: attempt.StartedAt || attempt.startedAt
-                            });
-                            setError("Bài quiz này đã được nộp. Vui lòng quay lại danh sách bài tập để làm quiz mới.");
+                            console.error("❌ [QuizDetail] Attempt is not in progress/started. Status:", status);
+                            setError("Bài quiz này đã được nộp hoặc kết thúc. Vui lòng quay lại danh sách bài tập.");
                             setLoading(false);
                             return;
                         }
@@ -301,57 +359,86 @@ export default function QuizDetail() {
                 const sections = attempt.QuizSections || attempt.quizSections || [];
                 console.log("Sections found:", sections.length);
                 
-                // Kiểm tra xem có questions không
+                // Kiểm tra xem có questions không (Logic updated for Items structure)
                 let totalQuestions = 0;
                 sections.forEach((section, idx) => {
-                    const sectionQuestions = section.Questions || section.questions || [];
-                    const groups = section.QuizGroups || section.quizGroups || [];
-                    let groupQuestions = 0;
-                    groups.forEach(group => {
-                        const gq = group.Questions || group.questions || [];
-                        groupQuestions += gq.length;
-                    });
-                    totalQuestions += sectionQuestions.length + groupQuestions;
-                    console.log(`Section ${idx}: ${sectionQuestions.length} direct questions, ${groups.length} groups with ${groupQuestions} questions`);
+                    // Check new Items structure first
+                    const items = section.Items || section.items || [];
+                    if (items.length > 0) {
+                        items.forEach(item => {
+                            const type = item.ItemType || item.itemType;
+                            if (type === "Question") {
+                                totalQuestions++;
+                            } else if (type === "Group") {
+                                const gq = item.Questions || item.questions || [];
+                                totalQuestions += gq.length;
+                            }
+                        });
+                    } else {
+                        // Fallback Legacy
+                        const sectionQuestions = section.Questions || section.questions || [];
+                        const groups = section.QuizGroups || section.quizGroups || [];
+                        let groupQuestions = 0;
+                        groups.forEach(group => {
+                            const gq = group.Questions || group.questions || [];
+                            groupQuestions += gq.length;
+                        });
+                        totalQuestions += sectionQuestions.length + groupQuestions;
+                    }
+                    console.log(`Section ${idx}: found ${totalQuestions} questions so far`);
                 });
-                console.log("Total questions:", totalQuestions);
+                console.log("Total questions found:", totalQuestions);
                 
+                // FORCE PROCEED even if 0 questions found (to debug saving logic)
                 if (totalQuestions === 0) {
-                    console.error("No questions found in attempt!");
-                    setError("Không tìm thấy câu hỏi trong quiz. Vui lòng thử lại.");
-                    fetchedKeyRef.current = null;
-                    isFetchingRef.current = false;
-                    setLoading(false);
-                    return;
+                    console.warn("⚠️ Warning: No questions found by counter, but proceeding to set state.");
                 }
                 
+                console.log("✅ Setting quizAttempt state:", attempt);
                 setQuizAttempt(attempt);
                 
-                // Load existing answers - handle both camelCase and PascalCase
+                // Load existing answers - handle both camelCase and PascalCase (Updated for Items)
                 const existingAnswers = {};
                 
                 sections.forEach(section => {
-                    const questions = section.Questions || section.questions || [];
-                    const groups = section.QuizGroups || section.quizGroups || [];
-                    
-                    questions.forEach(q => {
-                        const questionId = q.QuestionId || q.questionId;
-                        const userAnswer = q.UserAnswer !== undefined ? q.UserAnswer : (q.userAnswer !== undefined ? q.userAnswer : null);
-                        if (userAnswer !== null && userAnswer !== undefined) {
-                            existingAnswers[questionId] = userAnswer;
-                        }
-                    });
-                    
-                    groups.forEach(group => {
-                        const groupQuestions = group.Questions || group.questions || [];
-                        groupQuestions.forEach(q => {
-                            const questionId = q.QuestionId || q.questionId;
-                            const userAnswer = q.UserAnswer !== undefined ? q.UserAnswer : (q.userAnswer !== undefined ? q.userAnswer : null);
-                            if (userAnswer !== null && userAnswer !== undefined) {
-                                existingAnswers[questionId] = userAnswer;
+                    const items = section.Items || section.items || [];
+                    if (items.length > 0) {
+                        items.forEach(item => {
+                            const type = item.ItemType || item.itemType;
+                            if (type === "Question") {
+                                const q = item;
+                                const questionId = q.QuestionId || q.questionId;
+                                const userAnswer = q.UserAnswer !== undefined ? q.UserAnswer : (q.userAnswer !== undefined ? q.userAnswer : null);
+                                if (userAnswer !== null && userAnswer !== undefined) existingAnswers[questionId] = userAnswer;
+                            } else if (type === "Group") {
+                                const groupQuestions = item.Questions || item.questions || [];
+                                groupQuestions.forEach(q => {
+                                    const questionId = q.QuestionId || q.questionId;
+                                    const userAnswer = q.UserAnswer !== undefined ? q.UserAnswer : (q.userAnswer !== undefined ? q.userAnswer : null);
+                                    if (userAnswer !== null && userAnswer !== undefined) existingAnswers[questionId] = userAnswer;
+                                });
                             }
                         });
-                    });
+                    } else {
+                        // Legacy loading answers
+                        const questions = section.Questions || section.questions || [];
+                        const groups = section.QuizGroups || section.quizGroups || [];
+                        
+                        questions.forEach(q => {
+                            const questionId = q.QuestionId || q.questionId;
+                            const userAnswer = q.UserAnswer !== undefined ? q.UserAnswer : (q.userAnswer !== undefined ? q.userAnswer : null);
+                            if (userAnswer !== null && userAnswer !== undefined) existingAnswers[questionId] = userAnswer;
+                        });
+                        
+                        groups.forEach(group => {
+                            const groupQuestions = group.Questions || group.questions || [];
+                            groupQuestions.forEach(q => {
+                                const questionId = q.QuestionId || q.questionId;
+                                const userAnswer = q.UserAnswer !== undefined ? q.UserAnswer : (q.userAnswer !== undefined ? q.userAnswer : null);
+                                if (userAnswer !== null && userAnswer !== undefined) existingAnswers[questionId] = userAnswer;
+                            });
+                        });
+                    }
                 });
                 setAnswers(existingAnswers);
 

@@ -8,11 +8,11 @@ import { Card, Row, Col, Badge } from "react-bootstrap";
 import "./QuestionCard.css";
 
 export default function QuestionCard({ question, answer, onChange, questionNumber, totalQuestions }) {
+    // Handle both camelCase and PascalCase
+    const questionType = question?.type !== undefined ? question.type : (question?.Type !== undefined ? question.Type : 0);
+
     const renderQuestion = () => {
         if (!question) return null;
-
-        // Handle both camelCase and PascalCase
-        const questionType = question.type !== undefined ? question.type : (question.Type !== undefined ? question.Type : 0);
 
         switch (questionType) {
             case 1: // MultipleChoice
@@ -99,9 +99,11 @@ export default function QuestionCard({ question, answer, onChange, questionNumbe
                     </Col>
                 </Row>
                 <div className="question-content">
-                    <div className="question-text">
-                        {question.questionText || question.QuestionText || question.stemText || question.StemText || "Câu hỏi"}
-                    </div>
+                    {questionType !== 4 && (
+                        <div className="question-text">
+                            {question.questionText || question.QuestionText || question.stemText || question.StemText || "Câu hỏi"}
+                        </div>
+                    )}
                     {(question.mediaUrl || question.MediaUrl) && (
                         <div className="question-media">
                             {(() => {

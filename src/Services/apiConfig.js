@@ -103,6 +103,7 @@ export const API_ENDPOINTS = {
     // Quiz Attempts
     QUIZ_ATTEMPTS: {
         START: (quizId) => `/user/quiz-attempts/start/${quizId}`,
+        CHECK_ACTIVE: (quizId) => `/user/quiz-attempts/check-active/${quizId}`,
         SUBMIT_ANSWER: "/user/quiz-attempts/submit-answer",
         UPDATE_ANSWER: (attemptId) => `/user/quiz-attempts/update-answer/${attemptId}`,
         SUBMIT: (attemptId) => `/user/quiz-attempts/submit/${attemptId}`, // Backend: POST /api/user/quiz-attempts/submit/{attemptId}
