@@ -30,14 +30,15 @@ import LessonDetail from "../Pages/LessonDetail/LessonDetail";
 import LectureDetail from "../Pages/LectureDetail/LectureDetail";
 import FlashCardDetail from "../Pages/FlashCardDetail/FlashCardDetail";
 import AssignmentDetail from "../Pages/AssignmentDetail/AssignmentDetail";
+import AssessmentDetail from "../Pages/AssessmentDetail/AssessmentDetail";
 import QuizDetail from "../Pages/QuizDetail/QuizDetail";
 import QuizResults from "../Pages/QuizResults/QuizResults";
 import EssayDetail from "../Pages/EssayDetail/EssayDetail";
 import PronunciationDetail from "../Pages/PronunciationDetail/PronunciationDetail";
-import CourseManagement from "../Pages/Teacher/CourseManagement";
-import TeacherCourseDetail from "../Pages/Teacher/TeacherCourseDetail";
-import TeacherLessonDetail from "../Pages/Teacher/TeacherLessonDetail";
-import TeacherStudentManagement from "../Pages/Teacher/TeacherStudentManagement";
+import CourseManagement from "../Pages/Teacher/TeacherCourseManagement/CourseManagement";
+import TeacherCourseDetail from "../Pages/Teacher/TeacherCourseDetail/TeacherCourseDetail";
+import TeacherLessonDetail from "../Pages/Teacher/TeacherLessonDetail/TeacherLessonDetail";
+import TeacherStudentManagement from "../Pages/Teacher/TeacherStudentManagement/TeacherStudentManagement";
 import TeacherModuleLectureDetail from "../Pages/Teacher/TeacherModuleLectureDetail/TeacherModuleLectureDetail";
 import EditLecture from "../Pages/Teacher/TeacherModuleLectureDetail/EditLecture";
 import TeacherModuleFlashCardDetail from "../Pages/Teacher/TeacherModuleFlashCardDetail/TeacherModuleFlashCardDetail";
@@ -92,6 +93,7 @@ export default function AppRoutes() {
       <Route path="/course/:courseId/lesson/:lessonId/module/:moduleId/lecture/:lectureId" element={<LectureDetail />} />
       <Route path="/course/:courseId/lesson/:lessonId/module/:moduleId/flashcards" element={<FlashCardDetail />} />
       <Route path="/course/:courseId/lesson/:lessonId/module/:moduleId/pronunciation" element={<PronunciationDetail />} />
+      <Route path="/course/:courseId/lesson/:lessonId/module/:moduleId/assignment/:assessmentId" element={<AssessmentDetail />} />
       <Route path="/course/:courseId/lesson/:lessonId/module/:moduleId/assignment" element={<AssignmentDetail />} />
       <Route path="/course/:courseId/lesson/:lessonId/module/:moduleId/quiz/:quizId/attempt/:attemptId/results" element={<QuizResults />} />
       <Route path="/course/:courseId/lesson/:lessonId/module/:moduleId/quiz/:quizId/attempt/:attemptId" element={<QuizDetail />} />

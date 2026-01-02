@@ -1,24 +1,79 @@
-.student-detail-modal .modal-content {
-  border-radius: 12px;
-  border: none;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+/* Override Bootstrap modal styles - make it wider and centered */
+.student-detail-modal-dialog,
+.modal .student-detail-modal-dialog,
+.modal.show .student-detail-modal-dialog,
+.student-detail-modal .modal-dialog.student-detail-modal-dialog,
+.modal.student-detail-modal .modal-dialog.student-detail-modal-dialog,
+.modal.show.student-detail-modal .modal-dialog.student-detail-modal-dialog,
+body .modal .student-detail-modal-dialog,
+body .modal.show .student-detail-modal-dialog,
+body .student-detail-modal .modal-dialog.student-detail-modal-dialog,
+html body .modal .student-detail-modal-dialog,
+html body .modal.show .student-detail-modal-dialog,
+html body .student-detail-modal .modal-dialog.student-detail-modal-dialog {
+  max-width: 900px !important;
+  width: 90% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+body .modal.show .student-detail-modal .modal-dialog.student-detail-modal-dialog,
+body .modal.show.student-detail-modal .modal-dialog.student-detail-modal-dialog,
+html body .modal.show .student-detail-modal-dialog,
+html body .modal.show .student-detail-modal .modal-dialog.student-detail-modal-dialog {
+  max-width: 900px !important;
+  width: 90% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  display: flex !important;
+  align-items: center !important;
+  min-height: calc(100% - 1rem) !important;
+}
+
+.student-detail-modal-dialog.modal-dialog-centered,
+.modal.student-detail-modal .modal-dialog.student-detail-modal-dialog.modal-dialog-centered,
+body .student-detail-modal .modal-dialog.student-detail-modal-dialog.modal-dialog-centered,
+html body .student-detail-modal-dialog.modal-dialog-centered,
+html body .modal.student-detail-modal .modal-dialog.student-detail-modal-dialog.modal-dialog-centered {
+  max-width: 900px !important;
+  width: 90% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  display: flex !important;
+  align-items: center !important;
+  min-height: calc(100% - 1rem) !important;
+}
+
+.student-detail-modal .modal-content,
+.modal.student-detail-modal .modal-content,
+body .student-detail-modal .modal-content,
+html body .student-detail-modal .modal-content {
+  border-radius: 16px !important;
+  border: none !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15) !important;
+  max-width: none !important;
+  width: 100% !important;
+  max-height: 90vh !important;
+  display: flex !important;
+  flex-direction: column !important;
 }
 
 .student-detail-modal .modal-header {
-  border-bottom: 1px solid #e0e0e0;
-  padding: 20px 24px;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 24px 28px;
 }
 
 .student-detail-modal .modal-title {
   font-size: 24px;
-  font-weight: bold;
-  color: #333;
+  font-weight: 700;
+  color: #1f2937;
 }
 
 .student-detail-modal .modal-body {
-  padding: 24px;
-  max-height: 70vh;
+  padding: 28px;
   overflow-y: auto;
+  flex: 1;
+  max-height: calc(90vh - 140px); /* Subtract header + footer height */
 }
 
 .student-detail-content {
@@ -215,8 +270,9 @@
 }
 
 .student-detail-modal .modal-footer {
-  border-top: 1px solid #e0e0e0;
-  padding: 16px 24px;
+  border-top: 1px solid #e5e7eb;
+  padding: 20px 28px;
+  gap: 12px;
 }
 
 .close-btn {

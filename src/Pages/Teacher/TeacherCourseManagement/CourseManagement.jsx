@@ -2,16 +2,16 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Pagination } from "react-bootstrap";
 import "./CourseManagement.css";
-import TeacherHeader from "../../Components/Header/TeacherHeader";
-import { useAuth } from "../../Context/AuthContext";
-import { teacherService } from "../../Services/teacherService";
-import { teacherPackageService } from "../../Services/teacherPackageService";
+import TeacherHeader from "../../../Components/Header/TeacherHeader";
+import { useAuth } from "../../../Context/AuthContext";
+import { teacherService } from "../../../Services/teacherService";
+import { teacherPackageService } from "../../../Services/teacherPackageService";
 import { FaPlus, FaChalkboardTeacher } from "react-icons/fa";
-import { mochiCourseTeacher } from "../../Assets/Logo";
-import { ROUTE_PATHS } from "../../Routes/Paths";
-import CreateCourseModal from "../../Components/Teacher/CreateCourseModal/CreateCourseModal";
-import CourseLimitModal from "../../Components/Common/CourseLimitModal/CourseLimitModal";
-import SuccessModal from "../../Components/Common/SuccessModal/SuccessModal";
+import { mochiCourseTeacher } from "../../../Assets/Logo";
+import { ROUTE_PATHS } from "../../../Routes/Paths";
+import CreateCourseModal from "../../../Components/Teacher/CreateCourseModal/CreateCourseModal";
+import CourseLimitModal from "../../../Components/Common/CourseLimitModal/CourseLimitModal";
+import SuccessModal from "../../../Components/Common/SuccessModal/SuccessModal";
 
 export default function CourseManagement() {
   const { user, roles, isAuthenticated } = useAuth();

@@ -71,8 +71,15 @@ export default function StudentDetailModal({ show, onClose, student, courseId })
   const lastUpdated = progress?.lastUpdated || progress?.LastUpdated;
 
   return (
-    <Modal show={show} onHide={onClose} size="lg" centered className="student-detail-modal">
-      <Modal.Header closeButton>
+    <Modal 
+      show={show} 
+      onHide={onClose} 
+      centered 
+      className="student-detail-modal" 
+      dialogClassName="student-detail-modal-dialog"
+      style={{ zIndex: 1050 }}
+    >
+      <Modal.Header>
         <Modal.Title>Thông tin học viên</Modal.Title>
       </Modal.Header>
       <Modal.Body>

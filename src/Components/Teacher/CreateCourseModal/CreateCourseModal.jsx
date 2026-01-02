@@ -276,12 +276,16 @@ export default function CreateCourseModal({ show, onClose, onSuccess, courseData
       let submitData;
       
       if (isUpdateMode && courseData) {
-        // Update mode: chỉ gửi các trường có thể cập nhật (không gửi type và maxStudent)
-        // maxStudent không cho phép update vì nó phụ thuộc vào gói hiện tại của giáo viên
+        // Update mode: gửi các trường có thể cập nhật
         submitData = {
           title: title.trim(),
           description: description.trim(),
         };
+
+        // Thêm maxStudent nếu có giá trị (từ package đã được load)
+        if (maxStudent > 0) {
+          submitData.maxStudent = maxStudent;
+        }
 
         // Chỉ thêm imageTempKey và imageType nếu có upload ảnh mới
         if (imageTempKey && imageType) {

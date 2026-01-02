@@ -2,6 +2,43 @@ import axiosClient from "./axiosClient";
 import { API_ENDPOINTS } from "./apiConfig";
 
 export const essaySubmissionService = {
+    // Student methods
+    // Submit essay (create new submission)
+    submit: (data) => {
+        return axiosClient.post(API_ENDPOINTS.ESSAY_SUBMISSIONS.SUBMIT, data);
+    },
+
+    // Get submission by ID
+    getSubmissionById: (submissionId) => {
+        return axiosClient.get(API_ENDPOINTS.ESSAY_SUBMISSIONS.GET_BY_ID(submissionId));
+    },
+
+    // Get submission status for an essay
+    getSubmissionStatus: (essayId) => {
+        return axiosClient.get(API_ENDPOINTS.ESSAY_SUBMISSIONS.GET_SUBMISSION_STATUS(essayId));
+    },
+
+    // Update submission
+    updateSubmission: (submissionId, data) => {
+        return axiosClient.put(API_ENDPOINTS.ESSAY_SUBMISSIONS.UPDATE(submissionId), data);
+    },
+
+    // Delete submission
+    deleteSubmission: (submissionId) => {
+        return axiosClient.delete(API_ENDPOINTS.ESSAY_SUBMISSIONS.DELETE(submissionId));
+    },
+
+    // Get my submissions
+    getMySubmissions: () => {
+        return axiosClient.get(API_ENDPOINTS.ESSAY_SUBMISSIONS.MY_SUBMISSIONS);
+    },
+
+    // Request AI grading
+    requestAiGrading: (submissionId) => {
+        return axiosClient.post(API_ENDPOINTS.ESSAY_SUBMISSIONS.REQUEST_AI_GRADING(submissionId));
+    },
+
+    // Teacher methods
     // Get submissions by essay ID with pagination
     getSubmissionsByEssay: (essayId, page = 1, pageSize = 10) => {
         return axiosClient.get(API_ENDPOINTS.TEACHER.GET_ESSAY_SUBMISSIONS_BY_ESSAY(essayId), {

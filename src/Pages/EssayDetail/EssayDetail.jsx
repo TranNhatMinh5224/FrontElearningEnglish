@@ -10,7 +10,7 @@ import { fileService } from "../../Services/fileService";
 import { moduleService } from "../../Services/moduleService";
 import { courseService } from "../../Services/courseService";
 import { lessonService } from "../../Services/lessonService";
-import { FaFileUpload, FaTimes, FaEdit, FaClock, FaCheckCircle, FaTimesCircle } from "react-icons/fa";
+import { FaFileUpload, FaTimes, FaEdit, FaClock, FaCheckCircle, FaVolumeUp, FaPlay, FaPause, FaForward, FaBackward } from "react-icons/fa";
 import "./EssayDetail.css";
 
 export default function EssayDetail() {
@@ -20,7 +20,6 @@ export default function EssayDetail() {
     const [essay, setEssay] = useState(null);
     const [course, setCourse] = useState(null);
     const [lesson, setLesson] = useState(null);
-    const [module, setModule] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [submitting, setSubmitting] = useState(false);
@@ -45,6 +44,8 @@ export default function EssayDetail() {
 
     const fileInputRef = useRef(null);
     const moduleStartedRef = useRef(false);
+    const audioRef = useRef(null);
+    const [isPlaying, setIsPlaying] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -74,12 +75,6 @@ export default function EssayDetail() {
                 const lessonResponse = await lessonService.getLessonById(lessonId);
                 if (lessonResponse.data?.success && lessonResponse.data?.data) {
                     setLesson(lessonResponse.data.data);
-                }
-
-                // Fetch module info
-                const moduleResponse = await moduleService.getModuleById(moduleId);
-                if (moduleResponse.data?.success && moduleResponse.data?.data) {
-                    setModule(moduleResponse.data.data);
                 }
 
                 // Fetch essay info
@@ -189,6 +184,138 @@ export default function EssayDetail() {
         }
     };
 
+    const handleAudioClick = async (e) => {
+        e.stopPropagation();
+        
+        // Toggle play/pause if audio already loaded
+        if (audioRef.current) {
+            if (isPlaying) {
+                audioRef.current.pause();
+                setIsPlaying(false);
+            } else {
+                audioRef.current.play();
+                setIsPlaying(true);
+            }
+            return;
+        }
+        
+        // Load and play audio for the first time
+        const audioUrl = essay?.audioUrl || essay?.AudioUrl;
+        if (!audioUrl) {
+            console.warn("No audio URL provided");
+            return;
+        }
+
+        try {
+            // Try fetching audio as blob first (to bypass CORS and handle 403)
+            // Similar to FlashCardViewer approach
+            try {
+                const response = await fetch(audioUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'audio/mpeg, audio/*',
+                    },
+                    mode: 'cors',
+                    credentials: 'include', // Include credentials (cookies/auth headers) for authenticated requests
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const blob = await response.blob();
+                const blobUrl = URL.createObjectURL(blob);
+                const audio = new Audio(blobUrl);
+                
+                audio.onended = () => {
+                    // Clean up blob URL when audio ends
+                    URL.revokeObjectURL(blobUrl);
+                    audioRef.current = null;
+                    setIsPlaying(false);
+                };
+                
+                audio.onerror = (err) => {
+                    console.error("Error playing audio from blob:", err);
+                    URL.revokeObjectURL(blobUrl);
+                    audioRef.current = null;
+                    setIsPlaying(false);
+                    setNotification({
+                        isOpen: true,
+                        type: "error",
+                        message: "Không thể phát âm thanh. Vui lòng thử lại."
+                    });
+                };
+                
+                audioRef.current = audio;
+                await audio.play();
+                setIsPlaying(true);
+                console.log("Audio playing successfully via blob");
+            } catch (fetchError) {
+                // If fetch fails (403, CORS, etc.), try direct audio URL as fallback
+                console.log("Fetch failed, trying direct audio URL:", fetchError);
+                try {
+                    const audio = new Audio(audioUrl);
+                    audioRef.current = audio;
+                    
+                    // Set crossOrigin to anonymous to allow CORS
+                    audio.crossOrigin = "anonymous";
+                    
+                    audio.onended = () => {
+                        audioRef.current = null;
+                        setIsPlaying(false);
+                    };
+                    
+                    audio.onerror = (err) => {
+                        console.error("Error playing audio from direct URL:", err);
+                        audioRef.current = null;
+                        setIsPlaying(false);
+                        setNotification({
+                            isOpen: true,
+                            type: "error",
+                            message: "Không thể phát âm thanh. Vui lòng thử lại."
+                        });
+                    };
+                    
+                    await audio.play();
+                    setIsPlaying(true);
+                    console.log("Audio playing successfully via direct URL");
+                } catch (directError) {
+                    console.error("Both blob fetch and direct URL failed:", directError);
+                    setNotification({
+                        isOpen: true,
+                        type: "error",
+                        message: "Không thể phát âm thanh. Vui lòng thử lại."
+                    });
+                }
+            }
+        } catch (err) {
+            console.error("Error playing audio:", err);
+            console.error("Error name:", err.name);
+            console.error("Error message:", err.message);
+            console.error("Audio URL:", audioUrl);
+            setNotification({
+                isOpen: true,
+                type: "error",
+                message: "Không thể phát âm thanh. Vui lòng thử lại."
+            });
+        }
+    };
+
+    const handleSeekBackward = () => {
+        if (audioRef.current) {
+            audioRef.current.currentTime = Math.max(0, audioRef.current.currentTime - 10);
+        }
+    };
+
+    const handleSeekForward = () => {
+        if (audioRef.current) {
+            audioRef.current.currentTime = Math.min(
+                audioRef.current.duration,
+                audioRef.current.currentTime + 10
+            );
+        }
+    };
+
     const handleUploadFile = async () => {
         if (!selectedFile) return;
 
@@ -218,37 +345,44 @@ export default function EssayDetail() {
 
                 setAttachmentTempKey(tempKey);
 
-                // Backend chỉ cho phép AttachmentType tối đa 50 ký tự
-                // Dùng extension-based type mapping với type ngắn gọn (tất cả <= 50 ký tự)
+                // Backend validator yêu cầu MIME type chính xác:
+                // - PDF: application/pdf
+                // - DOC: application/msword
+                // - DOCX: application/vnd.openxmlformats-officedocument.wordprocessingml.document
                 const extension = selectedFile?.name?.split('.').pop()?.toLowerCase();
 
-                // Type mapping ngắn gọn (tất cả đều <= 50 ký tự)
+                // Type mapping theo backend validator (CreateEssaySubmissionDtoValidator)
                 const typeMap = {
-                    'pdf': 'application/pdf', // 15 chars
-                    'doc': 'application/msword', // 20 chars
-                    'docx': 'application/docx', // 18 chars (shortened from full MIME type)
-                    'txt': 'text/plain', // 12 chars
-                    'docm': 'application/docm', // 18 chars (shortened)
-                    'dotx': 'application/dotx', // 18 chars (shortened)
-                    'dotm': 'application/dotm' // 18 chars (shortened)
+                    'pdf': 'application/pdf',
+                    'doc': 'application/msword',
+                    'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                    // Các loại khác không được backend chấp nhận, nhưng để an toàn vẫn map
+                    'txt': 'text/plain',
+                    'docm': 'application/vnd.ms-word.document.macroEnabled.12',
+                    'dotx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.template',
+                    'dotm': 'application/vnd.ms-word.template.macroEnabled.12'
                 };
 
-                // Ưu tiên dùng type từ mapping (ngắn gọn), nếu không có thì dùng imageType, cuối cùng là default
+                // Ưu tiên dùng type từ mapping, nếu không có thì dùng imageType từ server
                 let finalAttachmentType = typeMap[extension];
 
-                // Nếu không có trong mapping, dùng imageType hoặc tạo từ extension
+                // Nếu không có trong mapping, kiểm tra imageType từ server
                 if (!finalAttachmentType) {
-                    if (imageType && imageType.length <= 50) {
-                        finalAttachmentType = imageType;
+                    // Kiểm tra nếu imageType từ server là MIME type hợp lệ cho backend
+                    if (imageType) {
+                        // Nếu là MIME type đầy đủ cho docx
+                        if (imageType.includes('vnd.openxmlformats-officedocument.wordprocessingml.document')) {
+                            finalAttachmentType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+                        } else if (imageType === 'application/msword' || imageType === 'application/pdf') {
+                            finalAttachmentType = imageType;
+                        } else {
+                            // Fallback: dùng type từ file nếu hợp lệ
+                            finalAttachmentType = imageType;
+                        }
                     } else {
-                        // Tạo type đơn giản từ extension
-                        finalAttachmentType = extension ? `application/${extension}` : 'application/octet-stream';
+                        // Fallback cuối cùng
+                        finalAttachmentType = 'application/octet-stream';
                     }
-                }
-
-                // Đảm bảo không vượt quá 50 ký tự (fallback safety)
-                if (finalAttachmentType.length > 50) {
-                    finalAttachmentType = finalAttachmentType.substring(0, 50);
                 }
 
                 setAttachmentType(finalAttachmentType);
@@ -566,7 +700,6 @@ export default function EssayDetail() {
     const essayTitle = essay?.title || essay?.Title || "Essay";
     const courseTitle = course?.title || course?.Title || "Khóa học";
     const lessonTitle = lesson?.title || lesson?.Title || "Bài học";
-    const moduleName = module?.name || module?.Name || "Module";
 
     // Safety check: ensure all required objects exist before rendering
     if (!essay) {
@@ -616,6 +749,15 @@ export default function EssayDetail() {
                                 {essay?.description && (
                                     <p className="essay-description">{essay.description || essay.Description}</p>
                                 )}
+                                {essay?.imageUrl && (
+                                    <div className="essay-image-container">
+                                        <img 
+                                            src={essay.imageUrl} 
+                                            alt={essayTitle || "Essay image"} 
+                                            className="essay-image"
+                                        />
+                                    </div>
+                                )}
                             </div>
                         </Col>
                     </Row>
@@ -626,6 +768,38 @@ export default function EssayDetail() {
                                 <h2 className="section-title">
                                     {currentSubmission ? "Cập nhật bài Essay" : "Nộp bài Essay"}
                                 </h2>
+                                <p className="essay-good-luck">Chúc các em thi tốt goodLuck!</p>
+
+                                {essay?.audioUrl && (
+                                    <div className="essay-audio-player">
+                                        <button 
+                                            className="audio-control-btn"
+                                            onClick={handleSeekBackward}
+                                            title="Lùi lại 10s"
+                                            disabled={!audioRef.current}
+                                        >
+                                            <FaBackward />
+                                        </button>
+                                        <button 
+                                            className="audio-control-btn play-pause-btn"
+                                            onClick={handleAudioClick}
+                                            title={isPlaying ? "Tạm dừng" : "Phát"}
+                                        >
+                                            {isPlaying ? <FaPause /> : <FaPlay />}
+                                        </button>
+                                        <button 
+                                            className="audio-control-btn"
+                                            onClick={handleSeekForward}
+                                            title="Tiến 10s"
+                                            disabled={!audioRef.current}
+                                        >
+                                            <FaForward />
+                                        </button>
+                                        <span className="audio-label">
+                                            <FaVolumeUp className="me-1" /> Nghe đề bài
+                                        </span>
+                                    </div>
+                                )}
 
                                 {currentSubmission && (
                                     <div className="alert alert-info mb-3" role="alert">

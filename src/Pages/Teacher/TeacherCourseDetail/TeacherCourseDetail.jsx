@@ -2,17 +2,17 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Container, Row, Col } from "react-bootstrap";
 import "./TeacherCourseDetail.css";
-import TeacherHeader from "../../Components/Header/TeacherHeader";
-import { useAuth } from "../../Context/AuthContext";
-import { teacherService } from "../../Services/teacherService";
-import { teacherPackageService } from "../../Services/teacherPackageService";
-import { mochiCourseTeacher, mochiLessonTeacher } from "../../Assets/Logo";
-import CreateCourseModal from "../../Components/Teacher/CreateCourseModal/CreateCourseModal";
-import CreateLessonModal from "../../Components/Teacher/CreateLessonModal/CreateLessonModal";
-import SuccessModal from "../../Components/Common/SuccessModal/SuccessModal";
-import LessonLimitModal from "../../Components/Common/LessonLimitModal/LessonLimitModal";
+import TeacherHeader from "../../../Components/Header/TeacherHeader";
+import { useAuth } from "../../../Context/AuthContext";
+import { teacherService } from "../../../Services/teacherService";
+import { teacherPackageService } from "../../../Services/teacherPackageService";
+import { mochiCourseTeacher, mochiLessonTeacher } from "../../../Assets/Logo";
+import CreateCourseModal from "../../../Components/Teacher/CreateCourseModal/CreateCourseModal";
+import CreateLessonModal from "../../../Components/Teacher/CreateLessonModal/CreateLessonModal";
+import SuccessModal from "../../../Components/Common/SuccessModal/SuccessModal";
+import LessonLimitModal from "../../../Components/Common/LessonLimitModal/LessonLimitModal";
 import { FaPlus } from "react-icons/fa";
-import { ROUTE_PATHS } from "../../Routes/Paths";
+import { ROUTE_PATHS } from "../../../Routes/Paths";
 
 export default function TeacherCourseDetail() {
   const { courseId } = useParams();

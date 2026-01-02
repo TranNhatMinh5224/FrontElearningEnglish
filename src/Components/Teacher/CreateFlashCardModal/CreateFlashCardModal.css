@@ -1,87 +1,15 @@
-.create-flashcard-modal-dialog {
-  max-width: 900px !important;
-  width: 90% !important;
+.custom-width-modal-1080 {
+    max-width: 1080px !important;
+    width: 90% !important;
 }
 
-.create-flashcard-modal .modal-content {
-  border-radius: 16px;
-  border: none;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-  max-height: 90vh;
-  display: flex;
-  flex-direction: column;
+.custom-width-modal-1080 .modal-content {
+    max-width: none !important;
+    width: 100% !important;
+    border-radius: 12px;
 }
 
-.create-flashcard-modal .modal-body {
-  padding: 28px;
-  overflow-y: auto;
-  flex: 1;
-  max-height: calc(90vh - 140px);
+.required:after {
+    content: " *";
+    color: red;
 }
-
-.create-flashcard-modal .form-group {
-  margin-bottom: 24px;
-}
-
-.create-flashcard-modal .form-label {
-  display: block;
-  font-size: 14px;
-  font-weight: 600;
-  color: #374151;
-  margin-bottom: 8px;
-}
-
-.create-flashcard-modal .form-label.required {
-  color: #3b82f6;
-}
-
-.create-flashcard-modal .form-control {
-  width: 100%;
-  padding: 12px 16px;
-  font-size: 15px;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  transition: all 0.2s ease;
-}
-
-.create-flashcard-modal .form-control:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-.create-flashcard-modal .form-control.is-invalid {
-  border-color: #ef4444;
-}
-
-.create-flashcard-modal .form-hint {
-  font-size: 12px;
-  color: #6b7280;
-  margin-top: 6px;
-}
-
-.create-flashcard-modal .invalid-feedback {
-  display: block;
-  font-size: 12px;
-  color: #ef4444;
-  margin-top: 4px;
-}
-
-.create-flashcard-modal .modal-footer .btn {
-  padding: 10px 24px;
-  font-size: 15px;
-  font-weight: 600;
-  border-radius: 8px;
-  min-width: 100px;
-}
-
-.create-flashcard-modal .modal-footer .btn-primary {
-  background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
-  border: none;
-  color: white;
-}
-
-.create-flashcard-modal .modal-footer .btn-primary:hover:not(:disabled) {
-  opacity: 0.9;
-}
-

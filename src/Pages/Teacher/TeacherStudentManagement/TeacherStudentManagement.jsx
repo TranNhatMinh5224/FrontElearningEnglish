@@ -2,13 +2,13 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Container, Row, Col, Pagination } from "react-bootstrap";
 import "./TeacherStudentManagement.css";
-import TeacherHeader from "../../Components/Header/TeacherHeader";
-import { useAuth } from "../../Context/AuthContext";
-import { teacherService } from "../../Services/teacherService";
-import { ROUTE_PATHS } from "../../Routes/Paths";
-import StudentDetailModal from "../../Components/Teacher/StudentDetailModal/StudentDetailModal";
-import AddStudentModal from "../../Components/Teacher/AddStudentModal/AddStudentModal";
-import SuccessModal from "../../Components/Common/SuccessModal/SuccessModal";
+import TeacherHeader from "../../../Components/Header/TeacherHeader";
+import { useAuth } from "../../../Context/AuthContext";
+import { teacherService } from "../../../Services/teacherService";
+import { ROUTE_PATHS } from "../../../Routes/Paths";
+import StudentDetailModal from "../../../Components/Teacher/StudentDetailModal/StudentDetailModal";
+import AddStudentModal from "../../../Components/Teacher/AddStudentModal/AddStudentModal";
+import SuccessModal from "../../../Components/Common/SuccessModal/SuccessModal";
 import { FaPlus, FaUser } from "react-icons/fa";
 
 export default function TeacherStudentManagement() {

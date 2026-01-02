@@ -1,41 +1,49 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Container } from "react-bootstrap";
-import "./TeacherModuleLectureDetail.css";
+import { Container, Button, Card, Badge } from "react-bootstrap";
+import { FaPlus, FaArrowLeft, FaEdit, FaTrash, FaBook, FaVideo, FaHeadphones, FaFileAlt, FaGamepad } from "react-icons/fa";
 import TeacherHeader from "../../../Components/Header/TeacherHeader";
 import { useAuth } from "../../../Context/AuthContext";
 import { teacherService } from "../../../Services/teacherService";
 import { lectureService } from "../../../Services/lectureService";
-import { ROUTE_PATHS } from "../../../Routes/Paths";
+import CreateLectureModal from "../../../Components/Teacher/CreateLectureModal/CreateLectureModal";
+import ConfirmModal from "../../../Components/Common/ConfirmModal/ConfirmModal";
 import SuccessModal from "../../../Components/Common/SuccessModal/SuccessModal";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
+import { ROUTE_PATHS } from "../../../Routes/Paths";
+import "./TeacherModuleLectureDetail.css";
 
-const LECTURE_TYPES = [
-  { value: 1, label: "Content" },
-  { value: 2, label: "Video" },
-  { value: 3, label: "Audio" },
-  { value: 4, label: "Document" },
-  { value: 5, label: "Interactive" },
-];
+const LECTURE_ICONS = {
+  1: <FaBook className="text-primary" />,
+  2: <FaVideo className="text-danger" />,
+  3: <FaHeadphones className="text-warning" />,
+  4: <FaFileAlt className="text-secondary" />,
+  5: <FaGamepad className="text-success" />,
+};
+
+const LECTURE_LABELS = {
+  1: "Nội dung",
+  2: "Video",
+  3: "Audio",
+  4: "Tài liệu",
+  5: "Tương tác",
+};
 
 export default function TeacherModuleLectureDetail() {
   const { courseId, lessonId, moduleId } = useParams();
   const navigate = useNavigate();
   const { user, roles, isAuthenticated } = useAuth();
-  const [course, setCourse] = useState(null);
-  const [lesson, setLesson] = useState(null);
+  
   const [module, setModule] = useState(null);
+  const [lectures, setLectures] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-
-  // Form state
-  const [title, setTitle] = useState("");
-  const [markdownContent, setMarkdownContent] = useState("");
-  const [lectureType, setLectureType] = useState(1);
-  const [errors, setErrors] = useState({});
-  const [submitting, setSubmitting] = useState(false);
+  
+  // Modals
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [lectureToUpdate, setLectureToUpdate] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [lectureToDelete, setLectureToDelete] = useState(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
 
   const isTeacher = roles.includes("Teacher") || user?.teacherSubscription?.isTeacher === true;
 
@@ -44,254 +52,147 @@ export default function TeacherModuleLectureDetail() {
       navigate("/home");
       return;
     }
-
     fetchData();
-  }, [isAuthenticated, isTeacher, navigate, courseId, lessonId, moduleId]);
+  }, [moduleId]);
 
   const fetchData = async () => {
+    setLoading(true);
     try {
-      setLoading(true);
-      setError("");
-
-      const [courseRes, lessonRes, moduleRes] = await Promise.all([
-        teacherService.getCourseDetail(courseId),
-        teacherService.getLessonById(lessonId),
+      const [moduleRes, lecturesRes] = await Promise.all([
         teacherService.getModuleById(moduleId),
+        lectureService.getTeacherLecturesByModule(moduleId)
       ]);
 
-      if (courseRes.data?.success && courseRes.data?.data) {
-        setCourse(courseRes.data.data);
-      }
-
-      if (lessonRes.data?.success && lessonRes.data?.data) {
-        setLesson(lessonRes.data.data);
-      }
-
-      if (moduleRes.data?.success && moduleRes.data?.data) {
-        setModule(moduleRes.data.data);
-      } else {
-        setError("Không thể tải thông tin module");
-      }
+      if (moduleRes.data?.success) setModule(moduleRes.data.data);
+      if (lecturesRes.data?.success) setLectures(lecturesRes.data.data || []);
+      
     } catch (err) {
-      console.error("Error fetching data:", err);
-      setError("Không thể tải thông tin");
+      console.error(err);
     } finally {
       setLoading(false);
     }
   };
 
-  const validateForm = () => {
-    const newErrors = {};
-    if (!title.trim()) {
-      newErrors.title = "Tiêu đề là bắt buộc";
-    }
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+  const handleCreateSuccess = () => {
+    setSuccessMessage("Tạo lecture thành công!");
+    setShowSuccessModal(true);
+    fetchData();
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!validateForm()) return;
+  const handleUpdateSuccess = () => {
+    setSuccessMessage("Cập nhật lecture thành công!");
+    setShowSuccessModal(true);
+    fetchData();
+  };
 
-    setSubmitting(true);
+  const handleDeleteClick = (lecture) => {
+    setLectureToDelete(lecture);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!lectureToDelete) return;
     try {
-      const lectureData = {
-        moduleId: parseInt(moduleId),
-        title: title.trim(),
-        markdownContent: markdownContent.trim() || null,
-        type: lectureType,
-        orderIndex: 0,
-      };
-
-      const response = await lectureService.createLecture(lectureData);
-
-      if (response.data?.success) {
+      const lectureId = lectureToDelete.lectureId || lectureToDelete.LectureId;
+      const res = await lectureService.deleteLecture(lectureId);
+      if (res.data?.success) {
+        setSuccessMessage("Xóa lecture thành công!");
         setShowSuccessModal(true);
-        setTimeout(() => {
-          navigate(ROUTE_PATHS.TEACHER_LESSON_DETAIL(courseId, lessonId));
-        }, 1500);
+        setShowDeleteModal(false);
+        fetchData();
       } else {
-        throw new Error(response.data?.message || "Tạo lecture thất bại");
+        alert("Xóa thất bại: " + res.data?.message);
       }
-    } catch (error) {
-      console.error("Error creating lecture:", error);
-      setErrors({ submit: error.response?.data?.message || error.message || "Có lỗi xảy ra khi tạo lecture" });
-    } finally {
-      setSubmitting(false);
+    } catch (err) {
+      console.error(err);
+      alert("Lỗi khi xóa lecture");
     }
   };
-
-  if (!isAuthenticated || !isTeacher) {
-    return null;
-  }
-
-  if (loading) {
-    return (
-      <>
-        <TeacherHeader />
-        <div className="teacher-module-lecture-detail-container">
-          <div className="loading-message">Đang tải thông tin...</div>
-        </div>
-      </>
-    );
-  }
-
-  if (error || !module) {
-    return (
-      <>
-        <TeacherHeader />
-        <div className="teacher-module-lecture-detail-container">
-          <div className="error-message">{error || "Không tìm thấy module"}</div>
-        </div>
-      </>
-    );
-  }
-
-  const courseTitle = course?.title || course?.Title || courseId;
-  const lessonTitle = lesson?.title || lesson?.Title || "Bài học";
-  const moduleName = module.name || module.Name || "Module";
 
   return (
     <>
       <TeacherHeader />
       <div className="teacher-module-lecture-detail-container">
-        <div className="breadcrumb-section">
-          <span className="breadcrumb-text">
-            <span
-              className="breadcrumb-link"
-              onClick={() => navigate(ROUTE_PATHS.TEACHER_COURSE_MANAGEMENT)}
-            >
-              Quản lý khoá học
-            </span>
-            {" / "}
-            <span
-              className="breadcrumb-link"
-              onClick={() => navigate(`/teacher/course/${courseId}`)}
-            >
-              {courseTitle}
-            </span>
-            {" / "}
-            <span
-              className="breadcrumb-link"
-              onClick={() => navigate(ROUTE_PATHS.TEACHER_LESSON_DETAIL(courseId, lessonId))}
-            >
-              {lessonTitle}
-            </span>
-            {" / "}
-            <span className="breadcrumb-current">Tạo Lecture</span>
-          </span>
-        </div>
-
-        <Container fluid className="create-lecture-content">
-          <div className="create-lecture-card">
-            <h1 className="page-title">Tạo Lecture</h1>
-
-            <form onSubmit={handleSubmit}>
-              <div className="form-group">
-                <label className="form-label required">Tiêu đề</label>
-                <input
-                  type="text"
-                  className={`form-control ${errors.title ? "is-invalid" : ""}`}
-                  value={title}
-                  onChange={(e) => {
-                    setTitle(e.target.value);
-                    setErrors({ ...errors, title: null });
-                  }}
-                  placeholder="Nhập tiêu đề lecture"
-                />
-                {errors.title && <div className="invalid-feedback">{errors.title}</div>}
-                <div className="form-hint">*Bắt buộc</div>
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Loại lecture</label>
-                <select
-                  className="form-control"
-                  value={lectureType}
-                  onChange={(e) => setLectureType(parseInt(e.target.value))}
-                >
-                  {LECTURE_TYPES.map((type) => (
-                    <option key={type.value} value={type.value}>
-                      {type.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Nội dung (Markdown)</label>
-                <div className="markdown-editor-container">
-                  <div className="markdown-editor-left">
-                    <textarea
-                      className={`markdown-textarea ${errors.markdownContent ? "is-invalid" : ""}`}
-                      value={markdownContent}
-                      onChange={(e) => {
-                        setMarkdownContent(e.target.value);
-                        setErrors({ ...errors, markdownContent: null });
-                      }}
-                      placeholder={`Nhập nội dung lecture bằng Markdown
-
-Ví dụ:
-# Tiêu đề
-
-Đây là nội dung lecture...
-
-- Điểm 1
-- Điểm 2`}
-                    />
-                  </div>
-                  <div className="markdown-editor-right">
-                    <div className="markdown-preview">
-                      {markdownContent.trim() ? (
-                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                          {markdownContent}
-                        </ReactMarkdown>
-                      ) : (
-                        <div className="markdown-preview-empty">
-                          <p>Xem trước nội dung sẽ hiển thị ở đây...</p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
+        <Container>
+          <div className="d-flex align-items-center justify-content-between mb-4 mt-4">
+            <div className="d-flex align-items-center">
+                <Button variant="outline-secondary" className="me-3" onClick={() => navigate(ROUTE_PATHS.TEACHER_LESSON_DETAIL(courseId, lessonId))}>
+                    <FaArrowLeft /> Quay lại
+                </Button>
+                <div>
+                    <h2 className="mb-0 fw-bold text-primary">Quản lý bài giảng</h2>
+                    <div className="text-muted">{module?.name || "Module"}</div>
                 </div>
-                <div className="form-hint">Không bắt buộc. Sử dụng Markdown để định dạng văn bản</div>
-              </div>
-
-              {errors.submit && (
-                <div className="alert alert-danger mt-3">{errors.submit}</div>
-              )}
-
-              <div className="form-actions">
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  onClick={() => navigate(ROUTE_PATHS.TEACHER_LESSON_DETAIL(courseId, lessonId))}
-                  disabled={submitting}
-                >
-                  Huỷ
-                </button>
-                <button
-                  type="submit"
-                  className="btn btn-primary"
-                  disabled={!title.trim() || submitting}
-                >
-                  {submitting ? "Đang tạo..." : "Tạo"}
-                </button>
-              </div>
-            </form>
+            </div>
+            <Button variant="primary" onClick={() => { setLectureToUpdate(null); setShowCreateModal(true); }}>
+                <FaPlus className="me-2" /> Tạo Lecture mới
+            </Button>
           </div>
+
+          {loading ? (
+             <div className="text-center py-5"><div className="spinner-border text-primary"></div></div>
+          ) : lectures.length === 0 ? (
+             <div className="text-center py-5 bg-light rounded text-muted">
+                 <p>Chưa có bài giảng nào trong module này.</p>
+                 <Button variant="primary" onClick={() => { setLectureToUpdate(null); setShowCreateModal(true); }}>Tạo bài giảng đầu tiên</Button>
+             </div>
+          ) : (
+             <div className="lecture-list">
+                 {lectures.map((lec, idx) => (
+                     <Card key={lec.lectureId || idx} className="mb-3 border-0 shadow-sm lecture-card">
+                         <Card.Body className="d-flex align-items-center justify-content-between">
+                             <div className="d-flex align-items-center gap-3">
+                                 <div className="lecture-icon p-3 bg-light rounded-circle" style={{fontSize: '1.5rem'}}>
+                                     {LECTURE_ICONS[lec.type] || <FaBook />}
+                                 </div>
+                                 <div>
+                                     <h5 className="mb-1 fw-bold">{lec.title}</h5>
+                                     <Badge bg="info" className="fw-normal">{LECTURE_LABELS[lec.type] || "Không xác định"}</Badge>
+                                 </div>
+                             </div>
+                             <div className="action-buttons">
+                                 <Button variant="light" className="me-2" onClick={() => { setLectureToUpdate(lec); setShowCreateModal(true); }}>
+                                     <FaEdit className="text-primary"/>
+                                 </Button>
+                                 <Button variant="light" onClick={() => handleDeleteClick(lec)}>
+                                     <FaTrash className="text-danger"/>
+                                 </Button>
+                             </div>
+                         </Card.Body>
+                     </Card>
+                 ))}
+             </div>
+          )}
         </Container>
       </div>
 
-      <SuccessModal
+      <CreateLectureModal 
+        show={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        onSuccess={lectureToUpdate ? handleUpdateSuccess : handleCreateSuccess}
+        moduleId={moduleId}
+        lectureToUpdate={lectureToUpdate}
+      />
+
+      <ConfirmModal 
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={confirmDelete}
+        title="Xóa Lecture?"
+        message="Hành động này không thể hoàn tác."
+        confirmText="Xóa"
+        cancelText="Hủy"
+        type="danger"
+      />
+
+      <SuccessModal 
         isOpen={showSuccessModal}
         onClose={() => setShowSuccessModal(false)}
-        title="Tạo lecture thành công"
-        message="Lecture của bạn đã được tạo thành công!"
+        title="Thành công"
+        message={successMessage}
         autoClose={true}
         autoCloseDelay={1500}
       />
     </>
   );
 }
-

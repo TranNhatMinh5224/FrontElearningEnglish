@@ -22,43 +22,32 @@ export default function QuizResults() {
                 setLoading(true);
                 setError("");
 
-                // Get result from submit response or fetch by attemptId
-                const response = await quizAttemptService.getById(attemptId);
+                // ƯU TIÊN 1: Lấy từ localStorage (Dữ liệu này được QuizDetail lưu ngay khi nộp thành công)
+                const savedResult = localStorage.getItem(`quiz_result_${attemptId}`);
+                if (savedResult) {
+                    console.log("✅ [QuizResults] Found result in localStorage");
+                    setResult(JSON.parse(savedResult));
+                    setLoading(false);
+                    return;
+                }
+
+                // ƯU TIÊN 2: Nếu F5 hoặc mất cache, thử gọi Resume API (Backend thường trả về kết quả nếu đã nộp)
+                console.log("🔍 [QuizResults] Fetching via Resume API as fallback...");
+                const response = await quizAttemptService.resume(attemptId);
                 
                 if (response.data?.success && response.data?.data) {
-                    // If already submitted, get result
-                    // Otherwise, try to get from submit endpoint
                     const attemptData = response.data.data;
-                    const status = attemptData.Status || attemptData.status;
+                    console.log("📥 [QuizResults] Data from Resume API:", attemptData);
                     
-                    if (isSubmitted(status)) {
-                        // Attempt is submitted, fetch result
-                        // The result should be in the submit response, but we can also parse from attempt
-                        // For now, we'll need to call submit again or get result differently
-                        // Actually, we should pass result data from QuizDetail after submit
-                        // For now, let's try to get it from localStorage or state
-                        const savedResult = localStorage.getItem(`quiz_result_${attemptId}`);
-                        if (savedResult) {
-                            setResult(JSON.parse(savedResult));
-                        } else {
-                            // Try to reconstruct from attempt data
-                            setError("Không thể tải kết quả. Vui lòng thử lại.");
-                        }
-                    } else {
-                        setError("Bài quiz chưa được nộp.");
-                    }
+                    // Map attempt data to result format if needed
+                    // Nếu backend trả về kết quả chấm điểm trong attempt
+                    setResult(attemptData);
                 } else {
-                    setError("Không thể tải kết quả quiz.");
+                    setError("Không tìm thấy kết quả bài thi này.");
                 }
             } catch (err) {
                 console.error("Error fetching results:", err);
-                // Try to get from localStorage
-                const savedResult = localStorage.getItem(`quiz_result_${attemptId}`);
-                if (savedResult) {
-                    setResult(JSON.parse(savedResult));
-                } else {
-                    setError(err.response?.data?.message || "Không thể tải kết quả quiz.");
-                }
+                setError("Không thể tải kết quả quiz. Có thể bài thi không tồn tại hoặc đã hết hạn.");
             } finally {
                 setLoading(false);
             }
@@ -162,6 +151,10 @@ export default function QuizResults() {
 
     const { totalScore, percentage, isPassed, correctAnswers, submittedAt, timeSpentSeconds } = result;
 
+    // Tính toán tổng điểm tối đa dựa trên điểm đạt được và tỷ lệ %
+    // MaxScore = (totalScore * 100) / percentage
+    const maxScore = (percentage > 0) ? (totalScore * 100) / percentage : (totalScore > 0 ? totalScore : 0);
+
     return (
         <>
             <MainHeader />
@@ -181,41 +174,49 @@ export default function QuizResults() {
                                             )}
                                         </div>
                                         <h2 className="results-title">
-                                            {isPassed ? "Chúc mừng! Bạn đã vượt qua bài quiz" : "Bạn chưa vượt qua bài quiz"}
+                                            {isPassed ? "Chúc mừng! Bạn đã hoàn thành bài thi" : "Kết quả làm bài của bạn"}
                                         </h2>
                                         <div className="results-score">
-                                            <span className="score-value">{totalScore.toFixed(1)}</span>
-                                            <span className="score-percentage">({percentage.toFixed(1)}%)</span>
+                                            <div className="score-display">
+                                                <span className="score-current">{totalScore.toFixed(1)}</span>
+                                                <span className="score-separator">/</span>
+                                                <span className="score-total">{Math.round(maxScore)}</span>
+                                            </div>
+                                            <div className="score-percentage-badge">
+                                                <Badge bg={isPassed ? "success" : "danger"}>
+                                                    {percentage.toFixed(1)}%
+                                                </Badge>
+                                            </div>
                                         </div>
                                     </div>
 
                                     {/* Summary Stats */}
                                     <div className="results-summary">
-                                        <Row>
+                                        <Row className="g-3">
                                             <Col md={4}>
-                                                <div className="summary-item">
-                                                    <FaClock className="summary-icon" />
+                                                <div className="summary-item border rounded p-3 h-100 bg-white shadow-sm">
+                                                    <FaClock className="summary-icon text-primary mb-2" size={24} />
                                                     <div className="summary-content">
-                                                        <div className="summary-label">Thời gian làm bài</div>
-                                                        <div className="summary-value">{formatTime(timeSpentSeconds)}</div>
+                                                        <div className="summary-label text-muted small">Thời gian làm bài</div>
+                                                        <div className="summary-value fw-bold">{formatTime(timeSpentSeconds)}</div>
                                                     </div>
                                                 </div>
                                             </Col>
                                             <Col md={4}>
-                                                <div className="summary-item">
-                                                    <FaCheckCircle className="summary-icon" />
+                                                <div className="summary-item border rounded p-3 h-100 bg-white shadow-sm">
+                                                    <FaCheckCircle className="summary-icon text-success mb-2" size={24} />
                                                     <div className="summary-content">
-                                                        <div className="summary-label">Điểm số</div>
-                                                        <div className="summary-value">{totalScore.toFixed(1)} điểm</div>
+                                                        <div className="summary-label text-muted small">Điểm số đạt được</div>
+                                                        <div className="summary-value fw-bold text-success">{totalScore.toFixed(1)} điểm</div>
                                                     </div>
                                                 </div>
                                             </Col>
                                             <Col md={4}>
-                                                <div className="summary-item">
-                                                    <FaClock className="summary-icon" />
+                                                <div className="summary-item border rounded p-3 h-100 bg-white shadow-sm">
+                                                    <FaTrophy className="summary-icon text-warning mb-2" size={24} />
                                                     <div className="summary-content">
-                                                        <div className="summary-label">Nộp bài lúc</div>
-                                                        <div className="summary-value">{formatDate(submittedAt)}</div>
+                                                        <div className="summary-label text-muted small">Nộp bài lúc</div>
+                                                        <div className="summary-value fw-bold">{formatDate(submittedAt)}</div>
                                                     </div>
                                                 </div>
                                             </Col>

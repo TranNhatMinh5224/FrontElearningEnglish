@@ -103,6 +103,7 @@ export const API_ENDPOINTS = {
     // Quiz Attempts
     QUIZ_ATTEMPTS: {
         START: (quizId) => `/user/quiz-attempts/start/${quizId}`,
+        CHECK_ACTIVE: (quizId) => `/user/quiz-attempts/check-active/${quizId}`,
         SUBMIT_ANSWER: "/user/quiz-attempts/submit-answer",
         UPDATE_ANSWER: (attemptId) => `/user/quiz-attempts/update-answer/${attemptId}`,
         SUBMIT: (attemptId) => `/user/quiz-attempts/submit/${attemptId}`, // Backend: POST /api/user/quiz-attempts/submit/{attemptId}
@@ -141,6 +142,7 @@ export const API_ENDPOINTS = {
         GET_SUBMISSION_STATUS: (essayId) => `/user/essay-submissions/submission-status/essay/${essayId}`,
         UPDATE: (submissionId) => `/user/essay-submissions/update/${submissionId}`,
         DELETE: (submissionId) => `/user/essay-submissions/delete/${submissionId}`,
+        REQUEST_AI_GRADING: (submissionId) => `/user/essay-submissions/${submissionId}/request-ai-grading`,
     },
     // Pronunciation Assessments
     PRONUNCIATION_ASSESSMENTS: {

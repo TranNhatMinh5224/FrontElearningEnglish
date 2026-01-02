@@ -41,23 +41,45 @@
 }
 
 .results-score {
+    margin-top: 20px;
     display: flex;
-    align-items: baseline;
-    justify-content: center;
-    gap: 8px;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
 }
 
-.score-value {
-    font-size: 48px;
-    font-weight: 700;
-    color: var(--color-secondary-cyan, #41d6e3);
+.score-display {
+    font-size: 3rem;
+    font-weight: 800;
+    color: #333;
 }
 
-.score-percentage {
-    font-size: 24px;
-    font-weight: 600;
-    color: var(--color-text-secondary, #6b7280);
+.score-current {
+    color: #0d6efd;
 }
+
+.score-separator {
+    margin: 0 10px;
+    color: #ccc;
+}
+
+.score-total {
+    color: #6c757d;
+}
+
+.score-percentage-badge {
+    font-size: 1.2rem;
+}
+
+.summary-item {
+    transition: transform 0.2s;
+}
+
+.summary-item:hover {
+    transform: translateY(-5px);
+}
+
+
 
 .results-summary {
     padding: 30px 20px;
