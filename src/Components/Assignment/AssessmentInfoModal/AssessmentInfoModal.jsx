@@ -107,55 +107,36 @@ export default function AssessmentInfoModal({
 
     const checkQuizProgress = async (rawQuizId) => {
         setCheckingProgress(true);
-        const quizId = parseInt(rawQuizId); // Force int
-        console.log("🔍 [AssessmentInfoModal] Checking progress for quizId:", quizId);
+        const quizId = parseInt(rawQuizId); 
+        console.log("🔍 [AssessmentInfoModal] Checking active attempt via API for quizId:", quizId);
         
-        const savedKey = `quiz_in_progress_${quizId}`;
-        const savedProgress = localStorage.getItem(savedKey);
-        
-        console.log(`📂 [LocalStorage] Key: ${savedKey}, Value:`, savedProgress ? "Found" : "Null");
+        try {
+            // New logic: Call backend API instead of checking localStorage
+            const response = await quizAttemptService.checkActiveAttempt(quizId);
+            console.log("📥 [AssessmentInfoModal] CheckActive API Response:", response.data);
 
-        if (savedProgress) {
-            try {
-                const progress = JSON.parse(savedProgress);
-                console.log("📄 Parsed:", progress);
-
-                if (progress.attemptId) {
-                    console.log("📞 Calling Resume API for attempt:", progress.attemptId);
-                    try {
-                        const resumeResponse = await quizAttemptService.resume(progress.attemptId);
-                        console.log("📥 Resume API Result:", resumeResponse.data);
-
-                        if (resumeResponse.data?.success && resumeResponse.data?.data) {
-                            const attempt = resumeResponse.data.data;
-                            const status = attempt.Status !== undefined ? attempt.Status : attempt.status;
-                            console.log("📊 Attempt Status:", status);
-                            
-                            // Check if Started (0) or InProgress (1)
-                            if (status === 0 || status === 1) {
-                                console.log("✅ Valid InProgress Attempt Found!");
-                                setInProgressAttempt(progress);
-                            } else {
-                                console.warn("❌ Status not resumable (Not 0 or 1)");
-                                localStorage.removeItem(savedKey);
-                            }
-                        } else {
-                            console.warn("❌ Resume API failed logic");
-                            localStorage.removeItem(savedKey);
-                        }
-                    } catch (err) {
-                        console.error("❌ Resume API Error:", err);
-                        if (err.response?.status === 404 || err.response?.status === 400) {
-                            localStorage.removeItem(savedKey);
-                        }
-                    }
-                }
-            } catch (err) {
-                console.error("❌ JSON Parse Error");
-                localStorage.removeItem(savedKey);
+            if (response.data?.success && response.data?.data) {
+                const activeAttempt = response.data.data;
+                const status = activeAttempt.Status !== undefined ? activeAttempt.Status : activeAttempt.status;
+                
+                console.log("✅ [AssessmentInfoModal] Active attempt found in DB:", activeAttempt);
+                
+                // If backend returns an active attempt, we show the Continue button
+                setInProgressAttempt({
+                    attemptId: activeAttempt.attemptId || activeAttempt.AttemptId,
+                    quizId: activeAttempt.quizId || activeAttempt.QuizId || quizId,
+                    status: status
+                });
+            } else {
+                console.log("ℹ️ [AssessmentInfoModal] No active attempt found for this user/quiz.");
+                setInProgressAttempt(null);
             }
+        } catch (err) {
+            console.error("❌ [AssessmentInfoModal] Error calling checkActiveAttempt API:", err);
+            setInProgressAttempt(null);
+        } finally {
+            setCheckingProgress(false);
         }
-        setCheckingProgress(false);
     };
 
     const fetchBoth = async (assessmentId) => {
@@ -459,14 +440,14 @@ export default function AssessmentInfoModal({
 
                         <div className="assessment-info-footer">
                             <div className="footer-buttons-vertical">
-                                {isQuiz && inProgressAttempt && (
+                                {isQuiz && (
                                     <Button
-                                        variant="primary"
-                                        className="assessment-continue-btn w-100"
+                                        variant="outline-primary"
+                                        className="assessment-continue-btn w-100 mb-2"
                                         onClick={() => handleStart(false)}
-                                        disabled={loading || checkingProgress}
+                                        disabled={loading || checkingProgress || !inProgressAttempt}
                                     >
-                                        {loading || checkingProgress ? "Đang tải..." : "Tiếp tục làm"}
+                                        {loading || checkingProgress ? "Đang tải..." : "Tiếp tục bài đang làm"}
                                     </Button>
                                 )}
                                 <Button
@@ -475,11 +456,11 @@ export default function AssessmentInfoModal({
                                     onClick={() => handleStart(true)}
                                     disabled={loading || checkingProgress || (!quiz && !essay)}
                                 >
-                                    {loading || checkingProgress ? "Đang tải..." : (isQuiz ? "Bắt đầu làm Quiz" : "Bắt đầu viết Essay")}
+                                    {loading || checkingProgress ? "Đang tải..." : (isQuiz ? "Bắt đầu làm bài mới" : "Bắt đầu viết Essay")}
                                 </Button>
                                 <Button
                                     variant="outline-secondary"
-                                    className="footer-cancel-btn w-100"
+                                    className="footer-cancel-btn w-100 mt-2"
                                     onClick={onClose}
                                 >
                                     Hủy
