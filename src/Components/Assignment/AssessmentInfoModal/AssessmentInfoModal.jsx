@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Button, Row, Col } from "react-bootstrap";
+import { Button } from "react-bootstrap";
 import { FaQuestionCircle, FaEdit, FaClock, FaCheckCircle, FaTimesCircle, FaList, FaRedo, FaRandom } from "react-icons/fa";
+import { useSubmissionStatus } from "../../../hooks/useSubmissionStatus";
 import { quizAttemptService } from "../../../Services/quizAttemptService";
 import { essayService } from "../../../Services/essayService";
 import { quizService } from "../../../Services/quizService";
@@ -13,6 +14,7 @@ export default function AssessmentInfoModal({
     onStartQuiz,
     onStartEssay
 }) {
+    const { isInProgress } = useSubmissionStatus();
     const [quiz, setQuiz] = useState(null);
     const [essay, setEssay] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -40,22 +42,25 @@ export default function AssessmentInfoModal({
         setError("");
 
         try {
-            // Kiểm tra xem assessment có quiz hay essay
-            const titleLower = assessment.title?.toLowerCase() || "";
-            const isQuiz = titleLower.includes("quiz") || titleLower.includes("test") || titleLower.includes("kiểm tra");
-            const isEssay = titleLower.includes("essay") || titleLower.includes("luận") || titleLower.includes("viết");
+            const assessmentId = assessment.assessmentId || assessment.AssessmentId;
+            
+            // Check both quiz and essay by calling APIs (don't rely on title)
+            let hasQuiz = false;
+            let hasEssay = false;
 
-            if (isQuiz) {
-                // Lấy quiz theo assessmentId
-                try {
-                    const quizResponse = await quizService.getByAssessment(assessment.assessmentId);
-                    if (quizResponse.data?.success && quizResponse.data?.data && quizResponse.data.data.length > 0) {
-                        const quizData = quizResponse.data.data[0];
-                        setQuiz(quizData); // Lấy quiz đầu tiên
+            // Check if assessment has quiz
+            try {
+                const quizResponse = await quizService.getByAssessment(assessmentId);
+                if (quizResponse.data?.success && quizResponse.data?.data) {
+                    // Handle both array and single object response
+                    const quizData = Array.isArray(quizResponse.data.data) ? quizResponse.data.data : [quizResponse.data.data];
+                    if (quizData.length > 0) {
+                        hasQuiz = true;
+                        setQuiz(quizData[0]); // Lấy quiz đầu tiên
                         
                         // Check for in-progress attempt
                         setCheckingProgress(true);
-                        const quizId = quizData.quizId || quizData.QuizId;
+                        const quizId = quizData[0].quizId || quizData[0].QuizId;
                         console.log("🔍 [AssessmentInfoModal] Checking in-progress attempt for quizId:", quizId);
                         
                         const savedProgress = localStorage.getItem(`quiz_in_progress_${quizId}`);
@@ -75,7 +80,7 @@ export default function AssessmentInfoModal({
                                             const status = attempt.Status || attempt.status;
                                             console.log("📊 [AssessmentInfoModal] Attempt status:", status);
                                             
-                                            if (status === 1) { // InProgress
+                                            if (isInProgress(status)) {
                                                 setInProgressAttempt(progress);
                                                 console.log("✅ [AssessmentInfoModal] In-progress attempt verified:", progress.attemptId);
                                             } else {
@@ -110,20 +115,30 @@ export default function AssessmentInfoModal({
                         }
                         setCheckingProgress(false);
                     }
-                } catch (err) {
-                    console.error("❌ [AssessmentInfoModal] Error fetching quiz:", err);
-                    setCheckingProgress(false);
                 }
-            } else if (isEssay) {
-                // Lấy essay theo assessmentId
-                try {
-                    const essayResponse = await essayService.getByAssessment(assessment.assessmentId);
-                    if (essayResponse.data?.success && essayResponse.data?.data && essayResponse.data.data.length > 0) {
-                        setEssay(essayResponse.data.data[0]); // Lấy essay đầu tiên
+            } catch (err) {
+                console.error("❌ [AssessmentInfoModal] Error fetching quiz:", err);
+                setCheckingProgress(false);
+            }
+
+            // Check if assessment has essay
+            try {
+                const essayResponse = await essayService.getByAssessment(assessmentId);
+                if (essayResponse.data?.success && essayResponse.data?.data) {
+                    // Handle both array and single object response
+                    const essayData = Array.isArray(essayResponse.data.data) ? essayResponse.data.data : [essayResponse.data.data];
+                    if (essayData.length > 0) {
+                        hasEssay = true;
+                        setEssay(essayData[0]); // Lấy essay đầu tiên
                     }
-                } catch (err) {
-                    console.error("Error fetching essay:", err);
                 }
+            } catch (err) {
+                console.error("❌ [AssessmentInfoModal] Error fetching essay:", err);
+            }
+
+            // If neither quiz nor essay found, show error
+            if (!hasQuiz && !hasEssay) {
+                setError("Không tìm thấy quiz hoặc essay cho assessment này");
             }
         } catch (err) {
             console.error("Error fetching assessment details:", err);
@@ -230,9 +245,8 @@ export default function AssessmentInfoModal({
 
     if (!isOpen || !assessment) return null;
 
-    const titleLower = assessment.title?.toLowerCase() || "";
-    const isQuiz = titleLower.includes("quiz") || titleLower.includes("test") || titleLower.includes("kiểm tra");
-    const isEssay = titleLower.includes("essay") || titleLower.includes("luận") || titleLower.includes("viết");
+    // Determine type based on actual quiz/essay data, not title
+    const isQuiz = !!quiz;
 
     return (
         <div className="modal-overlay assessment-info-modal-overlay" onClick={onClose}>

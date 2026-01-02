@@ -1,0 +1,46 @@
+.teacher-question-management-container {
+    background-color: #f5f7fa;
+    min-height: 100vh;
+    padding-top: 80px; /* Adjust based on your header height */
+    padding-bottom: 50px;
+}
+
+.question-header-section {
+    padding-top: 20px;
+    margin-bottom: 30px;
+}
+
+.question-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: 1px solid rgba(0,0,0,0.05) !important;
+}
+
+.question-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+}
+
+.question-index .badge {
+    font-size: 0.9rem;
+    width: 40px;
+}
+
+.options-preview li {
+    font-size: 0.95rem;
+    padding-left: 10px;
+    border-left: 2px solid transparent;
+}
+
+.options-preview li.text-success {
+    border-left-color: #198754;
+    background-color: rgba(25, 135, 84, 0.05);
+}
+
+.action-buttons .btn {
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

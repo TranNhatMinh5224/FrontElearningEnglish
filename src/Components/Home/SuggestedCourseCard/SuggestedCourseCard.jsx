@@ -37,7 +37,7 @@ export default function SuggestedCourseCard({ course, isEnrolled = false, showEn
             <div className="course-image-wrapper">
                 <img 
                     src={imageUrl || "https://via.placeholder.com/300x200"} 
-                    alt={title}
+                    alt={`Ảnh khóa học ${title}`}
                     className="course-image"
                 />
             </div>

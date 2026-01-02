@@ -1,0 +1,71 @@
+/* Force Modal Width - Overriding global modal-content */
+.create-question-modal-xl {
+    width: 60% !important; /* Độ rộng 60% như yêu cầu */
+    min-width: 800px; /* Đảm bảo không quá nhỏ trên màn hình bé */
+    max-width: 95vw !important; /* Giới hạn tối đa theo màn hình */
+    margin: 1.75rem auto;
+}
+
+/* Ép buộc modal-content bên trong không bị giới hạn bởi các file CSS khác */
+.create-question-modal-xl .modal-content {
+    max-width: none !important; 
+    width: 100% !important;
+    height: 90vh;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding: 0 !important; /* Xóa padding 32px nếu nó làm xấu layout */
+}
+
+.create-question-modal-xl .modal-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0;
+}
+
+/* Tabs Styling */
+.custom-tabs .nav-link {
+    color: #495057;
+    font-weight: 500;
+    border-radius: 0;
+    padding: 1rem 1.5rem;
+}
+.custom-tabs .nav-link.active {
+    color: #0d6efd;
+    font-weight: bold;
+    border-bottom: 2px solid #0d6efd;
+    background-color: #fff;
+}
+
+/* Options Container */
+.options-grid {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+}
+
+.option-item {
+    background: #fff;
+    padding: 10px;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.option-item:hover {
+    border-color: #cbd3da;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.scale-125 {
+    transform: scale(1.25);
+}
+
+.matching-arrow {
+    font-size: 1.2rem;
+    color: #0d6efd;
+}

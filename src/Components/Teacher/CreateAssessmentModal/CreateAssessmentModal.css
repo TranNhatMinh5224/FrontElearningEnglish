@@ -1,0 +1,290 @@
+/* Override Bootstrap modal styles - make it wider and centered */
+/* Use highest specificity to override global modal rules */
+
+/* Base styles - target all possible selector combinations */
+.create-assessment-modal-dialog,
+.modal .create-assessment-modal-dialog,
+.modal.show .create-assessment-modal-dialog,
+.create-assessment-modal .modal-dialog.create-assessment-modal-dialog,
+.modal.create-assessment-modal .modal-dialog.create-assessment-modal-dialog,
+.modal.show.create-assessment-modal .modal-dialog.create-assessment-modal-dialog,
+body .modal .create-assessment-modal-dialog,
+body .modal.show .create-assessment-modal-dialog,
+body .create-assessment-modal .modal-dialog.create-assessment-modal-dialog,
+html body .modal .create-assessment-modal-dialog,
+html body .modal.show .create-assessment-modal-dialog,
+html body .create-assessment-modal .modal-dialog.create-assessment-modal-dialog {
+  max-width: 900px !important;
+  width: 90% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* Override global modal.show rule - highest specificity */
+body .modal.show .create-assessment-modal .modal-dialog.create-assessment-modal-dialog,
+body .modal.show.create-assessment-modal .modal-dialog.create-assessment-modal-dialog,
+html body .modal.show .create-assessment-modal-dialog,
+html body .modal.show .create-assessment-modal .modal-dialog.create-assessment-modal-dialog {
+  max-width: 900px !important;
+  width: 90% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  display: flex !important;
+  align-items: center !important;
+  min-height: calc(100% - 1rem) !important;
+}
+
+/* Ensure centered alignment works correctly with Bootstrap centered class */
+.create-assessment-modal-dialog.modal-dialog-centered,
+.modal.create-assessment-modal .modal-dialog.create-assessment-modal-dialog.modal-dialog-centered,
+body .create-assessment-modal .modal-dialog.create-assessment-modal-dialog.modal-dialog-centered,
+html body .create-assessment-modal-dialog.modal-dialog-centered,
+html body .modal.create-assessment-modal .modal-dialog.create-assessment-modal-dialog.modal-dialog-centered {
+  max-width: 900px !important;
+  width: 90% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  display: flex !important;
+  align-items: center !important;
+  min-height: calc(100% - 1rem) !important;
+}
+
+/* Override modal-content from other modals */
+.create-assessment-modal .modal-content,
+.modal.create-assessment-modal .modal-content,
+body .create-assessment-modal .modal-content,
+html body .create-assessment-modal .modal-content {
+  border-radius: 16px !important;
+  border: none !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15) !important;
+  max-width: none !important;
+  width: 100% !important;
+  max-height: 90vh !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.create-assessment-modal .modal-header {
+  border-bottom: 1px solid #e5e7eb;
+  padding: 24px 28px;
+}
+
+.create-assessment-modal .modal-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.create-assessment-modal .modal-body {
+  padding: 28px;
+  overflow-y: auto;
+  flex: 1;
+  max-height: calc(90vh - 140px); /* Subtract header + footer height */
+}
+
+.create-assessment-modal .modal-footer {
+  border-top: 1px solid #e5e7eb;
+  padding: 20px 28px;
+  gap: 12px;
+}
+
+.create-assessment-modal .form-group {
+  margin-bottom: 24px;
+}
+
+.create-assessment-modal .form-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 8px;
+}
+
+.create-assessment-modal .form-label.required {
+  color: #3b82f6;
+}
+
+.create-assessment-modal .form-control {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 15px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  background-color: #fff;
+}
+
+.create-assessment-modal .form-control:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.create-assessment-modal .form-control.is-invalid {
+  border-color: #ef4444;
+}
+
+.create-assessment-modal .form-control.is-invalid:focus {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.create-assessment-modal textarea.form-control {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.create-assessment-modal .form-hint {
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 6px;
+}
+
+.create-assessment-modal .invalid-feedback {
+  display: block;
+  font-size: 12px;
+  color: #ef4444;
+  margin-top: 4px;
+}
+
+/* Publish Status Toggle */
+.publish-status-container {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 20px;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  background-color: #f9fafb;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.publish-status-container:hover {
+  border-color: #3b82f6;
+  background-color: #eff6ff;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.publish-status-container.published {
+  border-color: #10b981;
+  background-color: #ecfdf5;
+}
+
+.publish-status-container.published:hover {
+  border-color: #10b981;
+  background-color: #d1fae5;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+.publish-status-toggle {
+  position: relative;
+  width: 56px;
+  height: 32px;
+  min-width: 56px;
+  background-color: #d1d5db;
+  border-radius: 16px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.publish-status-toggle.published {
+  background-color: #10b981;
+}
+
+.publish-status-toggle-slider {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 24px;
+  height: 24px;
+  background-color: #fff;
+  border-radius: 50%;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.publish-status-toggle.published .publish-status-toggle-slider {
+  transform: translateX(24px);
+  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.4);
+}
+
+.publish-status-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.publish-status-label {
+  font-size: 16px;
+  font-weight: 600;
+  color: #1f2937;
+  transition: color 0.3s ease;
+}
+
+.publish-status-container.published .publish-status-label {
+  color: #059669;
+}
+
+.publish-status-description {
+  font-size: 13px;
+  color: #6b7280;
+  line-height: 1.5;
+  transition: color 0.3s ease;
+}
+
+.publish-status-container.published .publish-status-description {
+  color: #047857;
+}
+
+/* Buttons */
+.create-assessment-modal .modal-footer .btn {
+  padding: 10px 24px;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 8px;
+  border: none;
+  transition: all 0.2s ease;
+  min-width: 100px;
+}
+
+.create-assessment-modal .modal-footer .btn-secondary {
+  background-color: #f3f4f6;
+  color: #374151;
+}
+
+.create-assessment-modal .modal-footer .btn-secondary:hover {
+  background-color: #e5e7eb;
+}
+
+.create-assessment-modal .modal-footer .btn-primary {
+  background: linear-gradient(135deg, #41d6e3 0%, #6fd5e0 100%);
+  color: white;
+}
+
+.create-assessment-modal .modal-footer .btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #6fd5e0 0%, #8cdcf8 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(65, 214, 227, 0.3);
+}
+
+.create-assessment-modal .modal-footer .btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Alert */
+.create-assessment-modal .alert {
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.create-assessment-modal .alert-danger {
+  background-color: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+

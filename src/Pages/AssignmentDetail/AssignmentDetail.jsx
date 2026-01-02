@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Container, Row, Col } from "react-bootstrap";
 import MainHeader from "../../Components/Header/MainHeader";
+import { useSubmissionStatus } from "../../hooks/useSubmissionStatus";
 import QuizCard from "../../Components/Assignment/QuizCard/QuizCard";
 import EssayCard from "../../Components/Assignment/EssayCard/EssayCard";
 import AssessmentInfoModal from "../../Components/Assignment/AssessmentInfoModal/AssessmentInfoModal";
@@ -18,6 +19,7 @@ import "./AssignmentDetail.css";
 export default function AssignmentDetail() {
     const { courseId, lessonId, moduleId } = useParams();
     const navigate = useNavigate();
+    const { isInProgress } = useSubmissionStatus();
     const [assessments, setAssessments] = useState([]);
     const [module, setModule] = useState(null);
     const [lesson, setLesson] = useState(null);
@@ -67,7 +69,66 @@ export default function AssignmentDetail() {
                 // Fetch assessments
                 const assessmentsResponse = await assessmentService.getByModule(moduleId);
                 if (assessmentsResponse.data?.success && assessmentsResponse.data?.data) {
-                    setAssessments(assessmentsResponse.data.data);
+                    // Filter only published assessments for students
+                    const allAssessments = assessmentsResponse.data.data;
+                    const publishedAssessments = allAssessments.filter(a =>
+                        a.isPublished !== undefined ? a.isPublished : (a.IsPublished !== undefined ? a.IsPublished : false)
+                    );
+
+                    // Verify each assessment has actual quiz or essay
+                    const verifiedAssessments = [];
+                    for (const assessment of publishedAssessments) {
+                        const assessmentId = assessment.assessmentId || assessment.AssessmentId;
+                        let hasQuiz = false;
+                        let hasEssay = false;
+
+                        // Check if assessment has quiz
+                        try {
+                            const quizRes = await quizService.getByAssessment(assessmentId);
+                            console.log(`[AssignmentDetail] Quiz check for assessment ${assessmentId}:`, quizRes.data);
+                            if (quizRes.data?.success && quizRes.data?.data) {
+                                // Handle both array and single object response
+                                const quizData = Array.isArray(quizRes.data.data) ? quizRes.data.data : [quizRes.data.data];
+                                if (quizData.length > 0) {
+                                    hasQuiz = true;
+                                }
+                            }
+                        } catch (err) {
+                            console.error(`Error checking quiz for assessment ${assessmentId}:`, err);
+                            // Don't fail silently - log the error but continue
+                        }
+
+                        // Check if assessment has essay
+                        try {
+                            const essayRes = await essayService.getByAssessment(assessmentId);
+                            console.log(`[AssignmentDetail] Essay check for assessment ${assessmentId}:`, essayRes.data);
+                            if (essayRes.data?.success && essayRes.data?.data) {
+                                // Handle both array and single object response
+                                const essayData = Array.isArray(essayRes.data.data) ? essayRes.data.data : [essayRes.data.data];
+                                if (essayData.length > 0) {
+                                    hasEssay = true;
+                                }
+                            }
+                        } catch (err) {
+                            console.error(`Error checking essay for assessment ${assessmentId}:`, err);
+                            // Don't fail silently - log the error but continue
+                        }
+
+                        // Only include assessment if it has at least one quiz or essay
+                        if (hasQuiz || hasEssay) {
+                            verifiedAssessments.push({
+                                ...assessment,
+                                hasQuiz,
+                                hasEssay,
+                            });
+                        } else {
+                            console.log(`[AssignmentDetail] Assessment ${assessmentId} has no quiz or essay, excluding from list`);
+                        }
+                    }
+
+                    console.log(`[AssignmentDetail] Verified assessments:`, verifiedAssessments);
+
+                    setAssessments(verifiedAssessments);
                 } else {
                     setError(assessmentsResponse.data?.message || "Không thể tải danh sách bài tập");
                 }
@@ -84,16 +145,10 @@ export default function AssignmentDetail() {
         }
     }, [moduleId, courseId, lessonId]);
 
-    // Phân loại assessments thành Quiz và Essay dựa trên title
-    // Có thể một assessment có cả quiz và essay, nên phân loại dựa trên title
-    const quizzes = assessments.filter(a => {
-        const titleLower = a.title?.toLowerCase() || "";
-        return titleLower.includes("quiz") || titleLower.includes("test") || titleLower.includes("kiểm tra");
-    });
-    const essays = assessments.filter(a => {
-        const titleLower = a.title?.toLowerCase() || "";
-        return titleLower.includes("essay") || titleLower.includes("luận") || titleLower.includes("viết");
-    });
+    // Phân loại assessments thành Quiz và Essay dựa trên actual data (hasQuiz/hasEssay)
+    // Một assessment có thể có cả quiz và essay
+    const quizzes = assessments.filter(a => a.hasQuiz === true);
+    const essays = assessments.filter(a => a.hasEssay === true);
 
     // Check for in-progress quiz attempts from localStorage and verify with backend
     useEffect(() => {
@@ -104,14 +159,14 @@ export default function AssignmentDetail() {
             }
 
             console.log("🔍 [AssignmentDetail] Checking in-progress quizzes for", quizzes.length, "quizzes");
-            
+
             const progressMap = {};
 
             // For each quiz assessment, check localStorage first, then verify with backend
             for (const assessment of quizzes) {
                 try {
                     console.log("🔎 [AssignmentDetail] Checking assessment:", assessment.assessmentId, assessment.title);
-                    
+
                     // Get quiz by assessment
                     const quizResponse = await quizService.getByAssessment(assessment.assessmentId);
                     if (!quizResponse.data?.success || !quizResponse.data?.data || quizResponse.data.data.length === 0) {
@@ -126,27 +181,27 @@ export default function AssignmentDetail() {
                     // Check localStorage first
                     const savedProgressKey = `quiz_in_progress_${quizId}`;
                     const savedProgress = localStorage.getItem(savedProgressKey);
-                    
+
                     if (savedProgress) {
                         try {
                             const progress = JSON.parse(savedProgress);
                             const attemptId = progress.attemptId;
-                            
+
                             if (attemptId) {
                                 console.log("💾 [AssignmentDetail] Found saved progress in localStorage, verifying with backend:", attemptId);
-                                
+
                                 // Verify attempt is still valid by calling resume API (not getById because it doesn't exist for user)
                                 try {
                                     const resumeResponse = await quizAttemptService.resume(attemptId);
                                     console.log("📥 [AssignmentDetail] RESUME API response:", resumeResponse.data);
-                                    
+
                                     if (resumeResponse.data?.success && resumeResponse.data?.data) {
                                         const attempt = resumeResponse.data.data;
                                         const status = attempt.Status || attempt.status;
                                         console.log("📊 [AssignmentDetail] Attempt status:", status);
-                                        
-                                        // Status 1 = InProgress
-                                        if (status === 1) {
+
+                                        // Check if status is InProgress
+                                        if (isInProgress(status)) {
                                             const verifiedProgress = {
                                                 quizId,
                                                 attemptId,
@@ -157,9 +212,9 @@ export default function AssignmentDetail() {
                                                 status: status,
                                                 assessmentId: assessment.assessmentId
                                             };
-                                            
+
                                             progressMap[assessment.assessmentId] = verifiedProgress;
-                                            
+
                                             // Update localStorage with verified data
                                             localStorage.setItem(savedProgressKey, JSON.stringify(verifiedProgress));
                                             console.log("✅ [AssignmentDetail] Verified in-progress attempt:", attemptId);
@@ -180,7 +235,7 @@ export default function AssignmentDetail() {
                                         response: err.response?.data,
                                         status: err.response?.status
                                     });
-                                    
+
                                     // Nếu không verify được (404, 400, etc.), xóa khỏi localStorage
                                     if (err.response?.status === 404 || err.response?.status === 400) {
                                         localStorage.removeItem(savedProgressKey);
@@ -225,7 +280,7 @@ export default function AssignmentDetail() {
     const handleStartQuiz = async (assessmentData, isNewAttempt = false) => {
         try {
             console.log("🚀 [AssignmentDetail] handleStartQuiz called:", { assessmentData, isNewAttempt });
-            
+
             // If attemptId is already provided from modal, use it
             if (assessmentData.attemptId && assessmentData.quizId && !isNewAttempt) {
                 console.log("✅ [AssignmentDetail] Using provided attemptId:", assessmentData.attemptId);
@@ -263,7 +318,7 @@ export default function AssignmentDetail() {
             console.log("🆕 [AssignmentDetail] Starting new quiz attempt for quizId:", quizId);
             const attemptResponse = await quizAttemptService.start(quizId);
             console.log("📥 [AssignmentDetail] START API response:", attemptResponse.data);
-            
+
             if (attemptResponse.data?.success && attemptResponse.data?.data) {
                 const attemptId = attemptResponse.data.data.attemptId || attemptResponse.data.data.AttemptId;
                 console.log("✅ [AssignmentDetail] New attempt created:", attemptId);
@@ -296,7 +351,7 @@ export default function AssignmentDetail() {
     const handleContinueQuiz = async (assessment) => {
         const progress = inProgressQuizzes[assessment.assessmentId];
         console.log("▶️ [AssignmentDetail] handleContinueQuiz called:", { assessment, progress });
-        
+
         if (progress && progress.attemptId) {
             console.log("✅ [AssignmentDetail] Navigating to in-progress attempt:", progress.attemptId);
             navigate(`/course/${courseId}/lesson/${lessonId}/module/${moduleId}/quiz/${progress.quizId}/attempt/${progress.attemptId}`);
@@ -313,21 +368,21 @@ export default function AssignmentDetail() {
     const handleStartEssay = async (assessmentData) => {
         try {
             console.log("🚀 [AssignmentDetail] handleStartEssay called:", assessmentData);
-            
+
             // If essayId is already provided from modal, use it directly
             if (assessmentData.essayId) {
                 console.log("✅ [AssignmentDetail] Using provided essayId:", assessmentData.essayId);
                 navigate(`/course/${courseId}/lesson/${lessonId}/module/${moduleId}/essay/${assessmentData.essayId}`);
                 return;
             }
-            
+
             // Otherwise, get essay by assessment
             const essayResponse = await essayService.getByAssessment(assessmentData.assessmentId);
             if (essayResponse.data?.success && essayResponse.data?.data && essayResponse.data.data.length > 0) {
                 const essay = essayResponse.data.data[0];
                 const essayId = essay.essayId || essay.EssayId;
                 console.log("✅ [AssignmentDetail] Found essay, navigating to EssayDetail:", essayId);
-                
+
                 // Navigate to essay detail page
                 navigate(`/course/${courseId}/lesson/${lessonId}/module/${moduleId}/essay/${essayId}`);
             } else {
@@ -345,10 +400,6 @@ export default function AssignmentDetail() {
                 message: err.response?.data?.message || "Không thể bắt đầu làm essay"
             });
         }
-    };
-
-    const handleBackClick = () => {
-        navigate(`/course/${courseId}/lesson/${lessonId}`);
     };
 
     if (loading) {

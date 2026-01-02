@@ -12,7 +12,7 @@ export default function ModuleCard({ module, onClick, onPronunciationClick }) {
     const {
         moduleId,
         name = "Module",
-        contentType = 1, // 1=Lecture, 2=Quiz, 3=Assignment, 4=FlashCard
+        contentType = 1, // 1=Lecture, 2=FlashCard, 3=Assessment
         contentTypeName = "Lecture",
         isCompleted = false,
         description = "",
@@ -32,19 +32,17 @@ export default function ModuleCard({ module, onClick, onPronunciationClick }) {
     const isNotStarted = !finalIsCompleted && startedAt === null;
 
     // Check if this is a flashcard module
-    const isFlashCard = finalContentType === 4 || finalContentTypeName.toLowerCase().includes("flashcard");
+    const isFlashCard = finalContentType === 2 || finalContentTypeName.toLowerCase().includes("flashcard");
 
-    // Get icon and class name based on content type (1=Lecture, 2=Quiz, 3=Assignment, 4=FlashCard)
+    // Get icon and class name based on content type (1=Lecture, 2=FlashCard, 3=Assessment)
     const getIconConfig = (type, typeName) => {
         const typeLower = (typeName || "").toLowerCase();
         if (type === 1 || typeLower.includes("lecture")) {
             return { icon: <FaBookOpen />, className: "lecture" };
-        } else if (type === 4 || typeLower.includes("flashcard") || typeLower.includes("flash")) {
+        } else if (type === 2 || typeLower.includes("flashcard") || typeLower.includes("flash")) {
             return { icon: <FaFileAlt />, className: "flashcard" };
-        } else if (type === 3 || typeLower.includes("assignment") || typeLower.includes("essay")) {
+        } else if (type === 3 || typeLower.includes("assessment") || typeLower.includes("assignment") || typeLower.includes("essay")) {
             return { icon: <FaEdit />, className: "assignment" };
-        } else if (type === 2 || typeLower.includes("quiz") || typeLower.includes("test")) {
-            return { icon: <FaGraduationCap />, className: "quiz" };
         }
         return { icon: <FaBookOpen />, className: "lecture" };
     };

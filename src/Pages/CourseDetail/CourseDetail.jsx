@@ -15,6 +15,7 @@ import { useAuth } from "../../Context/AuthContext";
 import { useNotificationRefresh } from "../../Context/NotificationContext";
 import { ROUTE_PATHS } from "../../Routes/Paths";
 import LoginRequiredModal from "../../Components/Common/LoginRequiredModal/LoginRequiredModal";
+import SEO from "../../Components/SEO/SEO";
 
 export default function CourseDetail() {
     const { courseId } = useParams();
@@ -109,40 +110,10 @@ export default function CourseDetail() {
         }
     };
 
-    const handlePayment = async () => {
-        setIsProcessing(true);
-        try {
-            // Call payment process API to create payment record
-            const paymentResponse = await paymentService.processPayment({
-                ProductId: parseInt(courseId),
-                typeproduct: 1 // ProductType.Course = 1
-            });
-
-            if (paymentResponse.data?.success) {
-                // Payment record created, navigate to payment page to show QR code
-                const paymentId = paymentResponse.data.data.paymentId;
-                setShowEnrollmentModal(false);
-                // Navigate to payment page with courseId
-                navigate(`/payment?courseId=${courseId}&paymentId=${paymentId}`);
-            } else {
-                const errorMsg = paymentResponse.data?.message || "Không thể xử lý thanh toán. Vui lòng thử lại.";
-                setNotification({
-                    isOpen: true,
-                    type: "error",
-                    message: errorMsg
-                });
-            }
-        } catch (err) {
-            console.error("Error processing payment:", err);
-            const errorMsg = err.response?.data?.message || "Không thể xử lý thanh toán. Vui lòng thử lại.";
-            setNotification({
-                isOpen: true,
-                type: "error",
-                message: errorMsg
-            });
-        } finally {
-            setIsProcessing(false);
-        }
+    const handlePayment = () => {
+        // Close modal and navigate to payment page with course information
+        setShowEnrollmentModal(false);
+        navigate(`${ROUTE_PATHS.PAYMENT}?courseId=${courseId}&typeproduct=1`);
     };
 
     const handleStartLearning = () => {
@@ -172,8 +143,19 @@ export default function CourseDetail() {
         );
     }
 
+    const courseTitle = course?.title || course?.Title || "Khóa học";
+    const courseDescription = course?.description || course?.descriptionMarkdown || "Khóa học tiếng Anh chất lượng tại Catalunya English";
+    const courseImage = course?.imageUrl || "/logo512.png";
+
     return (
         <>
+            <SEO
+                title={`${courseTitle} - Catalunya English`}
+                description={courseDescription}
+                keywords={`${courseTitle}, học tiếng anh, khóa học tiếng anh online, Catalunya English`}
+                image={courseImage}
+                url={typeof window !== "undefined" ? `${window.location.origin}/course/${courseId}` : ""}
+            />
             <MainHeader />
             <div className="course-detail-container">
                 <Container fluid>

@@ -1,0 +1,498 @@
+/* Override Bootstrap modal styles - make it almost full width and centered */
+/* Use highest specificity to override PaymentDetailModal.css global rules */
+
+/* Base styles - target all possible selector combinations */
+.create-course-modal-dialog,
+.modal .create-course-modal-dialog,
+.modal.show .create-course-modal-dialog,
+.create-course-modal .modal-dialog.create-course-modal-dialog,
+.modal.create-course-modal .modal-dialog.create-course-modal-dialog,
+.modal.show.create-course-modal .modal-dialog.create-course-modal-dialog,
+body .modal .create-course-modal-dialog,
+body .modal.show .create-course-modal-dialog,
+body .create-course-modal .modal-dialog.create-course-modal-dialog,
+html body .modal .create-course-modal-dialog,
+html body .modal.show .create-course-modal-dialog {
+  max-width: 1200px !important;
+  width: 90% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* Override global modal.show rule from PaymentDetailModal.css - highest specificity */
+body .modal.show .create-course-modal .modal-dialog.create-course-modal-dialog,
+body .modal.show.create-course-modal .modal-dialog.create-course-modal-dialog,
+html body .modal.show .create-course-modal-dialog,
+html body .modal.show .create-course-modal .modal-dialog.create-course-modal-dialog {
+  max-width: 1200px !important;
+  width: 90% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  display: flex !important;
+  align-items: center !important;
+  min-height: calc(100% - 1rem) !important;
+}
+
+/* Ensure centered alignment works correctly with Bootstrap centered class */
+.create-course-modal-dialog.modal-dialog-centered,
+.modal.create-course-modal .modal-dialog.create-course-modal-dialog.modal-dialog-centered,
+body .create-course-modal .modal-dialog.create-course-modal-dialog.modal-dialog-centered,
+html body .create-course-modal-dialog.modal-dialog-centered,
+html body .modal.create-course-modal .modal-dialog.create-course-modal-dialog.modal-dialog-centered {
+  max-width: 1200px !important;
+  width: 90% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  display: flex !important;
+  align-items: center !important;
+  min-height: calc(100% - 1rem) !important;
+}
+
+/* Override modal-content from JoinClassModal.css and LoginRequiredModal.css */
+.create-course-modal .modal-content,
+.modal.create-course-modal .modal-content,
+body .create-course-modal .modal-content,
+html body .create-course-modal .modal-content {
+  border-radius: 16px !important;
+  border: none !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15) !important;
+  max-width: none !important;
+  width: 100% !important;
+}
+
+.create-course-modal .modal-header {
+  border-bottom: 1px solid #e5e7eb;
+  padding: 24px 28px;
+}
+
+.create-course-modal .modal-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.create-course-modal .modal-body {
+  padding: 28px;
+}
+
+.create-course-modal .modal-footer {
+  border-top: 1px solid #e5e7eb;
+  padding: 20px 28px;
+  gap: 12px;
+}
+
+.create-course-modal .form-group {
+  margin-bottom: 24px;
+}
+
+.create-course-modal .form-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 8px;
+}
+
+.create-course-modal .form-label.required {
+  color: #3b82f6;
+}
+
+.create-course-modal .form-control {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 15px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  background-color: #fff;
+}
+
+.create-course-modal .form-control:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.create-course-modal .form-control.is-invalid {
+  border-color: #ef4444;
+}
+
+.create-course-modal .form-control.is-invalid:focus {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.create-course-modal textarea.form-control {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.create-course-modal .form-hint {
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 6px;
+}
+
+.create-course-modal .invalid-feedback {
+  display: block;
+  font-size: 12px;
+  color: #ef4444;
+  margin-top: 4px;
+}
+
+.create-course-modal .error-message {
+  font-size: 12px;
+  color: #ef4444;
+  margin-top: 4px;
+}
+
+/* Image Upload */
+.create-course-modal .image-upload-area {
+  width: 100%;
+  min-height: 120px;
+  border: 2px dashed #d1d5db;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background-color: #f9fafb;
+  padding: 20px;
+}
+
+.create-course-modal .image-upload-area:hover {
+  border-color: #3b82f6;
+  background-color: #eff6ff;
+}
+
+.create-course-modal .image-upload-area.uploading {
+  border-color: #3b82f6;
+  background-color: #eff6ff;
+  cursor: wait;
+}
+
+.create-course-modal .image-upload-area.error {
+  border-color: #ef4444;
+  background-color: #fef2f2;
+}
+
+.create-course-modal .upload-icon {
+  font-size: 32px;
+  color: #6b7280;
+}
+
+.create-course-modal .image-upload-area:hover .upload-icon,
+.create-course-modal .image-upload-area.uploading .upload-icon {
+  color: #3b82f6;
+}
+
+.create-course-modal .upload-text {
+  font-size: 14px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.create-course-modal .image-preview-wrapper {
+  position: relative;
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+}
+
+.create-course-modal .image-preview {
+  width: 100%;
+  height: auto;
+  max-height: 300px;
+  object-fit: cover;
+  display: block;
+}
+
+.create-course-modal .remove-image-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: white;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+}
+
+.create-course-modal .remove-image-btn:hover {
+  background-color: rgba(0, 0, 0, 0.8);
+  transform: scale(1.1);
+}
+
+.create-course-modal .remove-image-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Buttons */
+.create-course-modal .modal-footer .btn {
+  padding: 10px 24px;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 8px;
+  border: none;
+  transition: all 0.2s ease;
+  min-width: 100px;
+}
+
+.create-course-modal .modal-footer .btn-secondary {
+  background-color: #f3f4f6;
+  color: #374151;
+}
+
+.create-course-modal .modal-footer .btn-secondary:hover {
+  background-color: #e5e7eb;
+}
+
+.create-course-modal .modal-footer .btn-primary {
+  background: linear-gradient(135deg, #41d6e3 0%, #6fd5e0 100%);
+  color: white;
+}
+
+.create-course-modal .modal-footer .btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #6fd5e0 0%, #8cdcf8 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(65, 214, 227, 0.3);
+}
+
+.create-course-modal .modal-footer .btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Alert */
+.create-course-modal .alert {
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.create-course-modal .alert-danger {
+  background-color: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+/* Markdown Editor */
+.create-course-modal .markdown-editor-container {
+  display: flex;
+  gap: 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  overflow: hidden;
+  height: 400px;
+  background-color: #fff;
+}
+
+.create-course-modal .markdown-editor-left,
+.create-course-modal .markdown-editor-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.create-course-modal .markdown-editor-left {
+  border-right: 1px solid #e5e7eb;
+}
+
+.create-course-modal .markdown-textarea {
+  width: 100%;
+  flex: 1;
+  padding: 16px;
+  font-size: 14px;
+  font-family: 'Courier New', Consolas, 'Liberation Mono', Menlo, monospace;
+  border: none;
+  outline: none;
+  resize: none;
+  background-color: #fafafa;
+  color: #1f2937;
+  line-height: 1.6;
+}
+
+.create-course-modal .markdown-textarea:focus {
+  background-color: #fff;
+}
+
+.create-course-modal .markdown-textarea.is-invalid {
+  background-color: #fef2f2;
+}
+
+.create-course-modal .markdown-preview {
+  flex: 1;
+  padding: 16px;
+  overflow-y: auto;
+  background-color: #fff;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #374151;
+}
+
+.create-course-modal .markdown-preview-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #9ca3af;
+  font-style: italic;
+}
+
+/* Markdown Preview Styles */
+.create-course-modal .markdown-preview h1,
+.create-course-modal .markdown-preview h2,
+.create-course-modal .markdown-preview h3,
+.create-course-modal .markdown-preview h4 {
+  margin-top: 24px;
+  margin-bottom: 12px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.create-course-modal .markdown-preview h1 {
+  font-size: 24px;
+  border-bottom: 2px solid #e5e7eb;
+  padding-bottom: 8px;
+}
+
+.create-course-modal .markdown-preview h2 {
+  font-size: 20px;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 6px;
+}
+
+.create-course-modal .markdown-preview h3 {
+  font-size: 18px;
+}
+
+.create-course-modal .markdown-preview h4 {
+  font-size: 16px;
+}
+
+.create-course-modal .markdown-preview p {
+  margin-bottom: 12px;
+}
+
+.create-course-modal .markdown-preview ul,
+.create-course-modal .markdown-preview ol {
+  margin-bottom: 12px;
+  padding-left: 24px;
+}
+
+.create-course-modal .markdown-preview li {
+  margin-bottom: 6px;
+}
+
+.create-course-modal .markdown-preview code {
+  background-color: #f3f4f6;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Courier New', Consolas, 'Liberation Mono', Menlo, monospace;
+  font-size: 13px;
+  color: #dc2626;
+}
+
+.create-course-modal .markdown-preview pre {
+  background-color: #1f2937;
+  color: #f9fafb;
+  padding: 16px;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin-bottom: 12px;
+}
+
+.create-course-modal .markdown-preview pre code {
+  background-color: transparent;
+  color: inherit;
+  padding: 0;
+}
+
+.create-course-modal .markdown-preview blockquote {
+  border-left: 4px solid #3b82f6;
+  padding-left: 16px;
+  margin-left: 0;
+  margin-bottom: 12px;
+  color: #6b7280;
+  font-style: italic;
+}
+
+.create-course-modal .markdown-preview table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 12px;
+}
+
+.create-course-modal .markdown-preview th,
+.create-course-modal .markdown-preview td {
+  border: 1px solid #e5e7eb;
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.create-course-modal .markdown-preview th {
+  background-color: #f9fafb;
+  font-weight: 600;
+}
+
+.create-course-modal .markdown-preview a {
+  color: #3b82f6;
+  text-decoration: none;
+}
+
+.create-course-modal .markdown-preview a:hover {
+  text-decoration: underline;
+}
+
+.create-course-modal .markdown-preview img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+.create-course-modal .markdown-preview hr {
+  border: none;
+  border-top: 1px solid #e5e7eb;
+  margin: 24px 0;
+}
+
+.create-course-modal .markdown-preview strong {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.create-course-modal .markdown-preview em {
+  font-style: italic;
+}
+
+/* Responsive for smaller screens */
+@media (max-width: 768px) {
+  .create-course-modal .markdown-editor-container {
+    flex-direction: column;
+    min-height: 600px;
+  }
+
+  .create-course-modal .markdown-editor-left {
+    border-right: none;
+    border-bottom: 1px solid #e5e7eb;
+    min-height: 300px;
+  }
+
+  .create-course-modal .markdown-editor-right {
+    min-height: 300px;
+  }
+}
+

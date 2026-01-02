@@ -40,11 +40,11 @@ export const API_ENDPOINTS = {
             DELETE: (id) => `/admin/courses/${id}`,
         },
         USERS: {
-            GET_ALL: "/admin/users", 
+            GET_ALL: "/admin/users",
             GET_TEACHERS: "/admin/users/teachers",
             GET_BLOCKED: "/admin/users/blocked",
             USER_STATS: "/admin/statistics/users", // Thêm endpoint thống kê user
-            BLOCK: (id) => `/admin/users/block/${id}`, 
+            BLOCK: (id) => `/admin/users/block/${id}`,
             UNBLOCK: (id) => `/admin/users/unblock/${id}`,
             UPGRADE_TEACHER: "/admin/users/upgrade-to-teacher"
         }
@@ -98,7 +98,7 @@ export const API_ENDPOINTS = {
     QUIZZES: {
         GET_BY_LESSON: (lessonId) => `/user/quizzes/lesson/${lessonId}`,
         GET_BY_ID: (quizId) => `/user/quizzes/quiz/${quizId}`, // Fixed: backend uses /quiz/{quizId}
-        GET_BY_ASSESSMENT: (assessmentId) => `/user/quizzes/Quizz/${assessmentId}`,
+        GET_BY_ASSESSMENT: (assessmentId) => `/user/quizzes/assessment/${assessmentId}`,
     },
     // Quiz Attempts
     QUIZ_ATTEMPTS: {
@@ -167,6 +167,90 @@ export const API_ENDPOINTS = {
     STREAKS: {
         GET_MY_STREAK: "/user/streaks",
         CHECKIN: "/user/streaks/checkin",
+    },
+    // Teacher endpoints
+    TEACHER: {
+        // Course endpoints
+        GET_MY_COURSES: "/teacher/courses/my-courses",
+        GET_COURSE_DETAIL: (courseId) => `/teacher/courses/${courseId}`,
+        CREATE_COURSE: "/teacher/courses",
+        UPDATE_COURSE: (courseId) => `/teacher/courses/${courseId}`,
+        // Student management endpoints
+        GET_COURSE_STUDENTS: (courseId) => `/teacher/courses/${courseId}/students`,
+        GET_STUDENT_DETAIL: (courseId, studentId) => `/teacher/courses/${courseId}/students/${studentId}`,
+        ADD_STUDENT: (courseId) => `/teacher/courses/${courseId}/students`,
+        REMOVE_STUDENT: (courseId, studentId) => `/teacher/courses/${courseId}/students/${studentId}`,
+        // Lesson endpoints
+        CREATE_LESSON: "/teacher/lessons",
+        GET_LESSONS_BY_COURSE: (courseId) => `/teacher/lessons/course/${courseId}`,
+        GET_LESSON_BY_ID: (lessonId) => `/teacher/lessons/${lessonId}`,
+        UPDATE_LESSON: (lessonId) => `/teacher/lessons/${lessonId}`,
+        // Module endpoints
+        CREATE_MODULE: "/teacher/modules",
+        GET_MODULES_BY_LESSON: (lessonId) => `/teacher/modules/lesson/${lessonId}`,
+        GET_MODULE_BY_ID: (moduleId) => `/teacher/modules/${moduleId}`,
+        UPDATE_MODULE: (moduleId) => `/teacher/modules/${moduleId}`,
+        // Lecture endpoints
+        CREATE_LECTURE: "/teacher/lectures",
+        BULK_CREATE_LECTURES: "/teacher/lectures/bulk",
+        GET_LECTURE_BY_ID: (lectureId) => `/teacher/lectures/${lectureId}`,
+        GET_LECTURES_BY_MODULE: (moduleId) => `/teacher/lectures/module/${moduleId}`,
+        GET_LECTURE_TREE: (moduleId) => `/teacher/lectures/module/${moduleId}/tree`,
+        UPDATE_LECTURE: (lectureId) => `/teacher/lectures/${lectureId}`,
+        DELETE_LECTURE: (lectureId) => `/teacher/lectures/${lectureId}`,
+        REORDER_LECTURES: "/teacher/lectures/reorder",
+        // FlashCard endpoints
+        CREATE_FLASHCARD: "/teacher/flashcards",
+        BULK_CREATE_FLASHCARDS: "/teacher/flashcards/bulk",
+        GET_FLASHCARD_BY_ID: (flashcardId) => `/teacher/flashcards/${flashcardId}`,
+        GET_FLASHCARDS_BY_MODULE: (moduleId) => `/teacher/flashcards/module/${moduleId}`,
+        UPDATE_FLASHCARD: (flashcardId) => `/teacher/flashcards/${flashcardId}`,
+        DELETE_FLASHCARD: (flashcardId) => `/teacher/flashcards/${flashcardId}`,
+        // Assessment endpoints
+        CREATE_ASSESSMENT: "/teacher/assessments",
+        GET_ASSESSMENT_BY_ID: (assessmentId) => `/teacher/assessments/${assessmentId}`,
+        GET_ASSESSMENTS_BY_MODULE: (moduleId) => `/teacher/assessments/module/${moduleId}`,
+        UPDATE_ASSESSMENT: (assessmentId) => `/teacher/assessments/${assessmentId}`,
+        DELETE_ASSESSMENT: (assessmentId) => `/teacher/assessments/${assessmentId}`,
+        // Quiz endpoints
+        CREATE_QUIZ: "/teacher/quizzes",
+        GET_QUIZ_BY_ID: (quizId) => `/teacher/quizzes/${quizId}`,
+        GET_QUIZZES_BY_ASSESSMENT: (assessmentId) => `/teacher/quizzes/assessment/${assessmentId}`,
+        UPDATE_QUIZ: (quizId) => `/teacher/quizzes/${quizId}`,
+        DELETE_QUIZ: (quizId) => `/teacher/quizzes/${quizId}`,
+        // Quiz Section endpoints
+        CREATE_QUIZ_SECTION: "/teacher/quiz-sections",
+        GET_QUIZ_SECTION_BY_ID: (sectionId) => `/teacher/quiz-sections/${sectionId}`,
+        GET_QUIZ_SECTIONS_BY_QUIZ: (quizId) => `/teacher/quiz-sections/by-quiz/${quizId}`,
+        UPDATE_QUIZ_SECTION: (sectionId) => `/teacher/quiz-sections/${sectionId}`,
+        DELETE_QUIZ_SECTION: (sectionId) => `/teacher/quiz-sections/${sectionId}`,
+        // Quiz Group endpoints
+        CREATE_QUIZ_GROUP: "/teacher/quiz-groups",
+        GET_QUIZ_GROUP_BY_ID: (groupId) => `/teacher/quiz-groups/${groupId}`,
+        GET_QUIZ_GROUPS_BY_SECTION: (sectionId) => `/teacher/quiz-groups/by-quiz-section/${sectionId}`,
+        UPDATE_QUIZ_GROUP: (groupId) => `/teacher/quiz-groups/${groupId}`,
+        DELETE_QUIZ_GROUP: (groupId) => `/teacher/quiz-groups/${groupId}`,
+        // Question endpoints
+        GET_QUESTION_BY_ID: (questionId) => `/teacher/questions/${questionId}`,
+        GET_QUESTIONS_BY_GROUP: (groupId) => `/teacher/questions/quiz-group/${groupId}`,
+        GET_QUESTIONS_BY_SECTION: (sectionId) => `/teacher/questions/quiz-section/${sectionId}`,
+        CREATE_QUESTION: "/teacher/questions",
+        UPDATE_QUESTION: (questionId) => `/teacher/questions/${questionId}`,
+        DELETE_QUESTION: (questionId) => `/teacher/questions/${questionId}`,
+        BULK_CREATE_QUESTIONS: "/teacher/questions/bulk",
+        // Essay endpoints
+        CREATE_ESSAY: "/teacher/essays",
+        GET_ESSAY_BY_ID: (essayId) => `/teacher/essays/${essayId}`,
+        GET_ESSAYS_BY_ASSESSMENT: (assessmentId) => `/teacher/essays/assessment/${assessmentId}`,
+        UPDATE_ESSAY: (essayId) => `/teacher/essays/${essayId}`,
+        DELETE_ESSAY: (essayId) => `/teacher/essays/${essayId}`,
+    },
+    // Public Dictionary endpoints
+    PUBLIC: {
+        DICTIONARY: {
+            GENERATE_FLASHCARD: "/public/dictionary/generate-flashcard",
+            LOOKUP: (word, targetLanguage = "vi") => `/public/dictionary/lookup/${word}?targetLanguage=${targetLanguage}`,
+        },
     },
 };
 

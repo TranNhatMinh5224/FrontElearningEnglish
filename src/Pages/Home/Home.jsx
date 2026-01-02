@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "./Home.css";
 import MainHeader from "../../Components/Header/MainHeader";
 import { useAuth } from "../../Context/AuthContext";
+import SEO from "../../Components/SEO/SEO";
 import {
   WelcomeSection,
   MyCoursesSection,
@@ -43,6 +44,11 @@ export default function Home() {
 
   return (
     <>
+      <SEO
+        title="Catalunya English - Trang Chủ | Học Tiếng Anh Online"
+        description="Khám phá các khóa học tiếng Anh chất lượng tại Catalunya English. Nền tảng học tiếng Anh online với bài học tương tác, từ vựng, phát âm và nhiều hơn nữa."
+        keywords="học tiếng anh online, khóa học tiếng anh, luyện thi IELTS, từ vựng tiếng anh, phát âm tiếng anh"
+      />
       <MainHeader />
 
       <div className="home-container">

@@ -1,57 +1,49 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import "./PaymentSuccess.css"; // Reuse same styles
 import { FaTimesCircle } from "react-icons/fa";
-import "./Payment.css";
 
 export default function PaymentFailed() {
-    const navigate = useNavigate();
-    const [searchParams] = useSearchParams();
-    const reason = searchParams.get("reason");
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const reason = searchParams.get("reason");
 
-    const [countdown, setCountdown] = useState(5);
+  const handleGoHome = () => {
+    navigate("/home");
+  };
 
-    useEffect(() => {
-        const timer = setInterval(() => {
-            setCountdown((prev) => {
-                if (prev <= 1) {
-                    clearInterval(timer);
-                    return 0;
-                }
-                return prev - 1;
-            });
-        }, 1000);
+  const handleRetry = () => {
+    navigate("/home"); // Navigate to home to select package again
+  };
 
-        return () => clearInterval(timer);
-    }, []);
-
-    useEffect(() => {
-        if (countdown === 0) {
-            navigate("/home");
-        }
-    }, [countdown, navigate]);
-
-    return (
-        <div className="payment-container">
-            <div className="payment-card" style={{ textAlign: "center", padding: "60px 40px" }}>
-                <FaTimesCircle style={{ fontSize: "80px", color: "#ef4444", marginBottom: "20px" }} />
-                <h1 className="payment-title" style={{ color: "#ef4444" }}>
-                    Thanh toán thất bại
-                </h1>
-                {reason && (
-                    <p style={{ fontSize: "16px", color: "#6b7280", marginBottom: "20px" }}>
-                        {reason}
-                    </p>
-                )}
-                <p style={{ fontSize: "14px", color: "#9ca3af" }}>
-                    Đang chuyển về trang chủ trong {countdown} giây...
-                </p>
-            </div>
+  return (
+    <div className="payment-result-container">
+      <div className="payment-result-card error">
+        <div className="success-icon-wrapper">
+          <FaTimesCircle className="error-icon" />
         </div>
-    );
+        
+        <h1 className="result-title">Thanh toán thất bại</h1>
+        <p className="result-message">
+          Rất tiếc, giao dịch của bạn không thể hoàn tất. Vui lòng thử lại.
+        </p>
+
+        {reason && (
+          <div className="error-reason">
+            <strong>Lý do:</strong> {decodeURIComponent(reason)}
+          </div>
+        )}
+
+        <div className="action-buttons">
+          <button className="btn-primary" onClick={handleRetry}>
+            Thử lại
+          </button>
+          <button className="btn-secondary" onClick={handleGoHome}>
+            Về trang chủ
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 }
-
-
-
-
-
 

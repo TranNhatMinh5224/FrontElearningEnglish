@@ -1,0 +1,380 @@
+.teacher-module-lecture-detail-container {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  padding: 20px;
+  padding-top: calc(20px + 70px);
+}
+
+.breadcrumb-section {
+  margin-bottom: 20px;
+  padding: 0 20px;
+}
+
+.breadcrumb-text {
+  font-size: 16px;
+  color: #666;
+}
+
+.breadcrumb-link {
+  color: #41d6e3;
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.breadcrumb-link:hover {
+  color: #6fd5e0;
+  text-decoration: underline;
+}
+
+.breadcrumb-current {
+  color: #666;
+}
+
+.create-lecture-content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.create-lecture-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 32px;
+}
+
+.page-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 32px;
+}
+
+.form-group {
+  margin-bottom: 24px;
+}
+
+.form-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 8px;
+}
+
+.form-label.required {
+  color: #3b82f6;
+}
+
+.form-control {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 15px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-control.is-invalid {
+  border-color: #ef4444;
+}
+
+textarea.form-control {
+  resize: vertical;
+  min-height: 300px;
+}
+
+/* Markdown Editor */
+.markdown-editor-container {
+  display: flex;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  overflow: hidden;
+  height: 400px;
+  background-color: #fff;
+}
+
+.markdown-editor-left,
+.markdown-editor-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.markdown-editor-left {
+  border-right: 1px solid #e5e7eb;
+}
+
+.markdown-textarea {
+  width: 100%;
+  flex: 1;
+  padding: 16px;
+  font-size: 14px;
+  font-family: 'Courier New', Consolas, 'Liberation Mono', Menlo, monospace;
+  border: none;
+  outline: none;
+  resize: none;
+  background-color: #fafafa;
+  color: #1f2937;
+  line-height: 1.6;
+}
+
+.markdown-textarea:focus {
+  background-color: #fff;
+}
+
+.markdown-textarea.is-invalid {
+  background-color: #fef2f2;
+}
+
+.markdown-preview {
+  flex: 1;
+  padding: 16px;
+  overflow-y: auto;
+  background-color: #fff;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #374151;
+}
+
+.markdown-preview-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #9ca3af;
+  font-style: italic;
+}
+
+/* Markdown Preview Styles */
+.markdown-preview h1,
+.markdown-preview h2,
+.markdown-preview h3,
+.markdown-preview h4 {
+  margin-top: 24px;
+  margin-bottom: 12px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.markdown-preview h1 {
+  font-size: 24px;
+  border-bottom: 2px solid #e5e7eb;
+  padding-bottom: 8px;
+}
+
+.markdown-preview h2 {
+  font-size: 20px;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 6px;
+}
+
+.markdown-preview h3 {
+  font-size: 18px;
+}
+
+.markdown-preview h4 {
+  font-size: 16px;
+}
+
+.markdown-preview p {
+  margin-bottom: 12px;
+}
+
+.markdown-preview ul,
+.markdown-preview ol {
+  margin-bottom: 12px;
+  padding-left: 24px;
+}
+
+.markdown-preview li {
+  margin-bottom: 6px;
+}
+
+.markdown-preview code {
+  background-color: #f3f4f6;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Courier New', Consolas, 'Liberation Mono', Menlo, monospace;
+  font-size: 13px;
+  color: #dc2626;
+}
+
+.markdown-preview pre {
+  background-color: #1f2937;
+  color: #f9fafb;
+  padding: 16px;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin-bottom: 12px;
+}
+
+.markdown-preview pre code {
+  background-color: transparent;
+  color: inherit;
+  padding: 0;
+}
+
+.markdown-preview blockquote {
+  border-left: 4px solid #3b82f6;
+  padding-left: 16px;
+  margin-left: 0;
+  margin-bottom: 12px;
+  color: #6b7280;
+  font-style: italic;
+}
+
+.markdown-preview table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 12px;
+}
+
+.markdown-preview th,
+.markdown-preview td {
+  border: 1px solid #e5e7eb;
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.markdown-preview th {
+  background-color: #f9fafb;
+  font-weight: 600;
+}
+
+.markdown-preview a {
+  color: #3b82f6;
+  text-decoration: none;
+}
+
+.markdown-preview a:hover {
+  text-decoration: underline;
+}
+
+.markdown-preview img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+.markdown-preview hr {
+  border: none;
+  border-top: 1px solid #e5e7eb;
+  margin: 24px 0;
+}
+
+.markdown-preview strong {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.markdown-preview em {
+  font-style: italic;
+}
+
+/* Responsive for smaller screens */
+@media (max-width: 768px) {
+  .markdown-editor-container {
+    flex-direction: column;
+    min-height: 600px;
+  }
+
+  .markdown-editor-left {
+    border-right: none;
+    border-bottom: 1px solid #e5e7eb;
+    min-height: 300px;
+  }
+
+  .markdown-editor-right {
+    min-height: 300px;
+  }
+}
+
+.form-hint {
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 6px;
+}
+
+.invalid-feedback {
+  display: block;
+  font-size: 12px;
+  color: #ef4444;
+  margin-top: 4px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.form-actions .btn {
+  padding: 10px 24px;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 8px;
+  border: none;
+  min-width: 100px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.form-actions .btn-secondary {
+  background-color: #f3f4f6;
+  color: #374151;
+}
+
+.form-actions .btn-secondary:hover:not(:disabled) {
+  background-color: #e5e7eb;
+}
+
+.form-actions .btn-primary {
+  background: linear-gradient(135deg, #41d6e3 0%, #0097A7 100%);
+  color: white;
+}
+
+.form-actions .btn-primary:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(65, 214, 227, 0.3);
+}
+
+.form-actions .btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.alert {
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.alert-danger {
+  background-color: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+.loading-message,
+.error-message {
+  text-align: center;
+  padding: 40px;
+  font-size: 18px;
+}
+
+.error-message {
+  color: #d32f2f;
+}

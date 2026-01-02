@@ -1,0 +1,90 @@
+/* Override Bootstrap modal styles - make it wider and centered */
+.create-quiz-section-modal-dialog,
+.modal .create-quiz-section-modal-dialog,
+.modal.show .create-quiz-section-modal-dialog,
+.create-quiz-section-modal .modal-dialog.create-quiz-section-modal-dialog,
+.modal.create-quiz-section-modal .modal-dialog.create-quiz-section-modal-dialog,
+.modal.show.create-quiz-section-modal .modal-dialog.create-quiz-section-modal-dialog,
+body .modal .create-quiz-section-modal-dialog,
+body .modal.show .create-quiz-section-modal-dialog,
+body .create-quiz-section-modal .modal-dialog.create-quiz-section-modal-dialog,
+html body .modal .create-quiz-section-modal-dialog,
+html body .modal.show .create-quiz-section-modal-dialog,
+html body .create-quiz-section-modal .modal-dialog.create-quiz-section-modal-dialog {
+  max-width: 900px !important;
+  width: 90% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+body .modal.show .create-quiz-section-modal .modal-dialog.create-quiz-section-modal-dialog,
+body .modal.show.create-quiz-section-modal .modal-dialog.create-quiz-section-modal-dialog,
+html body .modal.show .create-quiz-section-modal-dialog,
+html body .modal.show .create-quiz-section-modal .modal-dialog.create-quiz-section-modal-dialog {
+  max-width: 900px !important;
+  width: 90% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  display: flex !important;
+  align-items: center !important;
+  min-height: calc(100% - 1rem) !important;
+}
+
+.create-quiz-section-modal-dialog.modal-dialog-centered,
+.modal.create-quiz-section-modal .modal-dialog.create-quiz-section-modal-dialog.modal-dialog-centered,
+body .create-quiz-section-modal .modal-dialog.create-quiz-section-modal-dialog.modal-dialog-centered,
+html body .create-quiz-section-modal-dialog.modal-dialog-centered,
+html body .modal.create-quiz-section-modal .modal-dialog.create-quiz-section-modal-dialog.modal-dialog-centered {
+  max-width: 900px !important;
+  width: 90% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  display: flex !important;
+  align-items: center !important;
+  min-height: calc(100% - 1rem) !important;
+}
+
+.create-quiz-section-modal .modal-content,
+.modal.create-quiz-section-modal .modal-content,
+body .create-quiz-section-modal .modal-content,
+html body .create-quiz-section-modal .modal-content {
+  border-radius: 16px !important;
+  border: none !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15) !important;
+  max-width: none !important;
+  width: 100% !important;
+  max-height: 90vh !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.create-quiz-section-modal .modal-header {
+  border-bottom: 1px solid #e5e7eb;
+  padding: 24px 28px;
+}
+
+.create-quiz-section-modal .modal-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.create-quiz-section-modal .modal-body {
+  padding: 28px;
+  overflow-y: auto;
+  flex: 1;
+  max-height: calc(90vh - 140px);
+}
+
+.create-quiz-section-modal .modal-footer {
+  border-top: 1px solid #e5e7eb;
+  padding: 20px 28px;
+  gap: 12px;
+}
+
+/* Custom form label required indicator */
+.create-quiz-section-modal .form-label.required::after {
+  content: " *";
+  color: #3b82f6;
+}
+

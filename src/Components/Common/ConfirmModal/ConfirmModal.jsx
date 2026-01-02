@@ -10,7 +10,8 @@ export default function ConfirmModal({
     message,
     confirmText = "Xác nhận",
     cancelText = "Hủy",
-    type = "warning" // "warning", "danger"
+    type = "warning", // "warning", "danger"
+    disabled = false
 }) {
     if (!isOpen) return null;
 
@@ -31,6 +32,7 @@ export default function ConfirmModal({
                         type="button"
                         className="modal-btn modal-btn-cancel"
                         onClick={onClose}
+                        disabled={disabled}
                     >
                         {cancelText}
                     </button>
@@ -38,6 +40,7 @@ export default function ConfirmModal({
                         type="button"
                         className={`modal-btn confirm-btn confirm-btn-${type}`}
                         onClick={onConfirm}
+                        disabled={disabled}
                     >
                         {confirmText}
                     </button>

@@ -101,12 +101,12 @@ export default function LessonDetail() {
             if (!isNaN(parsed)) {
                 contentType = parsed;
             } else {
-                // If it's an enum string like "Assignment", "Quiz", etc.
+                // If it's an enum string like "Assessment", "FlashCard", etc.
                 const typeLower = contentType.toLowerCase();
-                if (typeLower.includes("assignment") || typeLower.includes("quiz") || typeLower.includes("essay") || typeLower.includes("test")) {
-                    contentType = 3; // Assignment
+                if (typeLower.includes("assessment") || typeLower.includes("assignment")) {
+                    contentType = 3; // Assessment
                 } else if (typeLower.includes("flashcard") || typeLower.includes("flash")) {
-                    contentType = 4; // FlashCard
+                    contentType = 2; // FlashCard
                 } else {
                     contentType = 1; // Default to Lecture
                 }
@@ -116,17 +116,17 @@ export default function LessonDetail() {
         // If contentType is still undefined or null, check contentTypeName or module name
         if (contentType === undefined || contentType === null) {
             // Check module name or contentTypeName for hints
-            if (contentTypeName.includes("assignment") || contentTypeName.includes("quiz") || contentTypeName.includes("essay") || contentTypeName.includes("test")) {
-                contentType = 3; // Assignment
+            if (contentTypeName.includes("assessment") || contentTypeName.includes("assignment")) {
+                contentType = 3; // Assessment
             } else if (contentTypeName.includes("flashcard") || contentTypeName.includes("flash")) {
-                contentType = 4; // FlashCard
+                contentType = 2; // FlashCard
             } else {
                 contentType = 1; // Default to Lecture
             }
         }
 
         // Gọi API start module ngay khi click vào module
-        // Backend sẽ tự động complete cho Lecture/FlashCard/Video/Reading
+        // Backend sẽ tự động complete cho Lecture/FlashCard
         try {
             console.log(`Starting module ${moduleId}...`);
             await moduleService.startModule(moduleId);
@@ -154,17 +154,18 @@ export default function LessonDetail() {
             // Vẫn tiếp tục navigate dù có lỗi API
         }
 
-        // Navigate based on ContentType: 1=Lecture, 2=Quiz, 3=Assignment, 4=FlashCard
-        if (contentType === 4 || contentTypeName.includes("flashcard") || contentTypeName.includes("flash")) {
+        // Navigate based on ContentType: 1=Lecture, 2=FlashCard, 3=Assessment
+        if (contentType === 2 || contentTypeName.includes("flashcard") || contentTypeName.includes("flash")) {
             // Navigate to flashcard detail page
             console.log("Navigating to FlashCard page");
             navigate(`/course/${courseId}/lesson/${lessonId}/module/${moduleId}/flashcards`);
-        } else if (contentType === 2 || contentType === 3 ||
-            contentTypeName.includes("quiz") ||
+        } else if (contentType === 3 ||
+            contentTypeName.includes("assessment") ||
             contentTypeName.includes("assignment") ||
             contentTypeName.includes("essay") ||
+            contentTypeName.includes("quiz") ||
             contentTypeName.includes("test")) {
-            // Navigate to assignment detail page (Quiz=2, Assignment=3)
+            // Navigate to assignment detail page (Assessment=3)
             console.log("Navigating to Assignment page");
             navigate(`/course/${courseId}/lesson/${lessonId}/module/${moduleId}/assignment`);
         } else if (contentType === 1 || contentTypeName.includes("lecture")) {
@@ -172,9 +173,9 @@ export default function LessonDetail() {
             console.log("Navigating to Lecture page");
             navigate(`/course/${courseId}/lesson/${lessonId}/module/${moduleId}`);
         } else {
-            // Default: navigate to assignment page (for safety)
-            console.log("Default: Navigating to Assignment page");
-            navigate(`/course/${courseId}/lesson/${lessonId}/module/${moduleId}/assignment`);
+            // Default: navigate to lecture page
+            console.log("Default: Navigating to Lecture page");
+            navigate(`/course/${courseId}/lesson/${lessonId}/module/${moduleId}`);
         }
     };
 

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Outlet, NavLink, useNavigate } from "react-router-dom";
 import { ROUTE_PATHS } from "../../Routes/Paths";
 import "./AdminLayout.css";
@@ -17,13 +17,49 @@ import {
 import { useAuth } from "../../Context/AuthContext";
 
 export default function AdminLayout() {
-  const { user, logout } = useAuth();
+  const { user, roles, isAuthenticated, loading, logout } = useAuth();
   const navigate = useNavigate();
 
+  // Check if user is admin
+  const isAdmin = roles.some((role) => {
+    const roleName = typeof role === 'string' ? role : role?.name || role;
+    return roleName === "SuperAdmin" || 
+           roleName === "ContentAdmin" || 
+           roleName === "FinanceAdmin" ||
+           roleName === "Admin";
+  });
+
+  useEffect(() => {
+    // Debug: Log roles to check
+    console.log("=== AdminLayout DEBUG ===");
+    console.log("Roles:", roles);
+    console.log("Is Authenticated:", isAuthenticated);
+    console.log("Is Admin:", isAdmin);
+    console.log("Loading:", loading);
+
+    if (!loading) {
+      if (!isAuthenticated) {
+        console.log("Not authenticated, redirecting to login");
+        navigate(ROUTE_PATHS.LOGIN);
+        return;
+      }
+      
+      if (!isAdmin) {
+        console.log("Not admin, redirecting to home");
+        navigate(ROUTE_PATHS.HOME);
+        return;
+      }
+    }
+  }, [isAuthenticated, isAdmin, loading, navigate, roles]);
+
   const handleLogout = () => {
-    logout();
-    navigate(ROUTE_PATHS.LOGIN);
+    logout(navigate);
   };
+
+  // Show loading or nothing while checking auth
+  if (loading || !isAuthenticated || !isAdmin) {
+    return null;
+  }
 
   return (
     <div className="admin-layout">

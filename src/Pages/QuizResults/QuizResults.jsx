@@ -2,13 +2,15 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Container, Row, Col, Button, Card, Badge } from "react-bootstrap";
 import MainHeader from "../../Components/Header/MainHeader";
+import { useSubmissionStatus } from "../../hooks/useSubmissionStatus";
 import { quizAttemptService } from "../../Services/quizAttemptService";
 import { FaCheckCircle, FaTimesCircle, FaClock, FaTrophy } from "react-icons/fa";
 import "./QuizResults.css";
 
 export default function QuizResults() {
-    const { courseId, lessonId, moduleId, quizId, attemptId } = useParams();
+    const { courseId, lessonId, moduleId, attemptId } = useParams();
     const navigate = useNavigate();
+    const { isSubmitted } = useSubmissionStatus();
     
     const [result, setResult] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -27,8 +29,9 @@ export default function QuizResults() {
                     // If already submitted, get result
                     // Otherwise, try to get from submit endpoint
                     const attemptData = response.data.data;
+                    const status = attemptData.Status || attemptData.status;
                     
-                    if (attemptData.Status === 2 || attemptData.status === 2) {
+                    if (isSubmitted(status)) {
                         // Attempt is submitted, fetch result
                         // The result should be in the submit response, but we can also parse from attempt
                         // For now, we'll need to call submit again or get result differently
