@@ -44,6 +44,7 @@ import TeacherModuleFlashCardDetail from "../Pages/Teacher/TeacherModuleFlashCar
 import TeacherQuizEssayManagement from "../Pages/Teacher/TeacherQuizEssayManagement/TeacherQuizEssayManagement";
 import TeacherQuizSectionManagement from "../Pages/Teacher/TeacherQuizSectionManagement/TeacherQuizSectionManagement";
 import TeacherQuestionManagement from "../Pages/Teacher/TeacherQuestionManagement/TeacherQuestionManagement";
+import TeacherSubmissionManagement from "../Pages/Teacher/TeacherSubmissionManagement/TeacherSubmissionManagement";
 
 // Admin Imports
 import AdminLayout from "../Layouts/AdminLayout/AdminLayout";
@@ -105,6 +106,7 @@ export default function AppRoutes() {
       {/* Teacher routes */}
       <Route path="/teacher" element={<CourseManagement />} />
       <Route path="/teacher/account-management" element={<CourseManagement />} />
+      <Route path="/teacher/submission-management" element={<TeacherSubmissionManagement />} />
       <Route path="/teacher/course-management" element={<CourseManagement />} />
       <Route path="/teacher/course/:courseId/students" element={<TeacherStudentManagement />} />
       <Route path="/teacher/course/:courseId/lesson/:lessonId" element={<TeacherLessonDetail />} />

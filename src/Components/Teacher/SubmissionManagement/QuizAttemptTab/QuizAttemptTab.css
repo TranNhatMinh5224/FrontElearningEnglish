@@ -1,0 +1,8 @@
+.quiz-attempt-tab {
+  background: white;
+  border-radius: 0 0 12px 12px;
+  padding: 24px;
+  min-height: 500px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+

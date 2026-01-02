@@ -244,6 +244,24 @@ export const API_ENDPOINTS = {
         GET_ESSAYS_BY_ASSESSMENT: (assessmentId) => `/teacher/essays/assessment/${assessmentId}`,
         UPDATE_ESSAY: (essayId) => `/teacher/essays/${essayId}`,
         DELETE_ESSAY: (essayId) => `/teacher/essays/${essayId}`,
+        // Essay Submission endpoints
+        GET_ESSAY_SUBMISSIONS_BY_ESSAY: (essayId) => `/teacher/essay-submissions/essay/${essayId}`,
+        GET_ESSAY_SUBMISSION_DETAIL: (submissionId) => `/teacher/essay-submissions/${submissionId}`,
+        DOWNLOAD_ESSAY_SUBMISSION: (submissionId) => `/teacher/essay-submissions/${submissionId}/download`,
+        GRADE_ESSAY_WITH_AI: (submissionId) => `/teacher/essay-submissions/${submissionId}/grade-ai`,
+        GRADE_ESSAY_MANUALLY: (submissionId) => `/teacher/essay-submissions/${submissionId}/grade`,
+        UPDATE_ESSAY_GRADE: (submissionId) => `/teacher/essay-submissions/${submissionId}/grade`,
+        BATCH_GRADE_ESSAY_AI: (essayId) => `/teacher/essay-submissions/essay/${essayId}/batch-grade-ai`,
+        GET_ESSAY_STATISTICS: (essayId) => `/teacher/essay-submissions/essay/${essayId}/statistics`,
+        // Quiz Attempt endpoints
+        GET_QUIZ_ATTEMPTS_PAGED: (quizId) => `/teacher/quiz-attempts/quiz/${quizId}/paged`,
+        GET_QUIZ_ATTEMPTS: (quizId) => `/teacher/quiz-attempts/quiz/${quizId}`,
+        GET_QUIZ_ATTEMPT_STATS: (quizId) => `/teacher/quiz-attempts/stats/${quizId}`,
+        GET_QUIZ_SCORES_PAGED: (quizId) => `/teacher/quiz-attempts/scores/${quizId}/paged`,
+        GET_QUIZ_SCORES: (quizId) => `/teacher/quiz-attempts/scores/${quizId}`,
+        GET_USER_QUIZ_ATTEMPTS: (userId, quizId) => `/teacher/quiz-attempts/user/${userId}/quiz/${quizId}`,
+        GET_QUIZ_ATTEMPT_DETAIL: (attemptId) => `/teacher/quiz-attempts/${attemptId}/review`,
+        FORCE_SUBMIT_QUIZ_ATTEMPT: (attemptId) => `/teacher/quiz-attempts/force-submit/${attemptId}`,
     },
     // Public Dictionary endpoints
     PUBLIC: {

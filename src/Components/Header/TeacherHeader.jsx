@@ -61,11 +61,11 @@ export default function TeacherHeader() {
             </Nav.Item>
 
             <Nav.Item
-              onClick={() => handleNavigation("/teacher/account-management", true)}
-              className={`nav-item ${isActive("/teacher/account-management") ? "active" : ""}`}
+              onClick={() => handleNavigation("/teacher/submission-management", true)}
+              className={`nav-item ${isActive("/teacher/submission-management") ? "active" : ""}`}
             >
               <FaUserCog className="nav-icon" style={{ width: "18px", height: "18px" }} />
-              <span className="nav-text">Quản lí tài khoản</span>
+              <span className="nav-text">Quản lí bài nộp</span>
             </Nav.Item>
           </Nav>
 

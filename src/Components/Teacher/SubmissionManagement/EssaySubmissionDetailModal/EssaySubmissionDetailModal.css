@@ -1,0 +1,117 @@
+/* Override Bootstrap modal styles - make it wider and centered */
+.essay-submission-detail-modal-dialog,
+.modal .essay-submission-detail-modal-dialog,
+.modal.show .essay-submission-detail-modal-dialog,
+.essay-submission-detail-modal .modal-dialog.essay-submission-detail-modal-dialog,
+.modal.essay-submission-detail-modal .modal-dialog.essay-submission-detail-modal-dialog,
+.modal.show.essay-submission-detail-modal .modal-dialog.essay-submission-detail-modal-dialog,
+body .modal .essay-submission-detail-modal-dialog,
+body .modal.show .essay-submission-detail-modal-dialog,
+body .essay-submission-detail-modal .modal-dialog.essay-submission-detail-modal-dialog,
+html body .modal .essay-submission-detail-modal-dialog,
+html body .modal.show .essay-submission-detail-modal-dialog,
+html body .essay-submission-detail-modal .modal-dialog.essay-submission-detail-modal-dialog {
+  max-width: 900px !important;
+  width: 90% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+body .modal.show .essay-submission-detail-modal .modal-dialog.essay-submission-detail-modal-dialog,
+body .modal.show.essay-submission-detail-modal .modal-dialog.essay-submission-detail-modal-dialog,
+html body .modal.show .essay-submission-detail-modal-dialog,
+html body .modal.show .essay-submission-detail-modal .modal-dialog.essay-submission-detail-modal-dialog {
+  max-width: 900px !important;
+  width: 90% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  display: flex !important;
+  align-items: center !important;
+  min-height: calc(100% - 1rem) !important;
+}
+
+.essay-submission-detail-modal-dialog.modal-dialog-centered,
+.modal.essay-submission-detail-modal .modal-dialog.essay-submission-detail-modal-dialog.modal-dialog-centered,
+body .essay-submission-detail-modal .modal-dialog.essay-submission-detail-modal-dialog.modal-dialog-centered,
+html body .essay-submission-detail-modal-dialog.modal-dialog-centered,
+html body .modal.essay-submission-detail-modal .modal-dialog.essay-submission-detail-modal-dialog.modal-dialog-centered {
+  max-width: 900px !important;
+  width: 90% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  display: flex !important;
+  align-items: center !important;
+  min-height: calc(100% - 1rem) !important;
+}
+
+.essay-submission-detail-modal .modal-content,
+.modal.essay-submission-detail-modal .modal-content,
+body .essay-submission-detail-modal .modal-content,
+html body .essay-submission-detail-modal .modal-content {
+  border-radius: 16px !important;
+  border: none !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15) !important;
+  max-width: none !important;
+  width: 100% !important;
+  max-height: 90vh !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.essay-submission-detail-modal .modal-header {
+  border-bottom: 1px solid #e5e7eb;
+  padding: 24px 28px;
+}
+
+.essay-submission-detail-modal .modal-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.essay-submission-detail-modal .modal-body {
+  padding: 28px;
+  overflow-y: auto;
+  flex: 1;
+  max-height: calc(90vh - 140px);
+}
+
+.essay-submission-detail-modal .modal-footer {
+  border-top: 1px solid #e5e7eb;
+  padding: 20px 28px;
+  gap: 12px;
+}
+
+.essay-submission-detail-modal .form-group {
+  margin-bottom: 24px;
+}
+
+.essay-submission-detail-modal .form-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 8px;
+}
+
+.essay-submission-detail-modal .form-control {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 15px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  background-color: #fff;
+}
+
+.essay-submission-detail-modal .form-control:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.submission-content {
+  background-color: #f9fafb;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}

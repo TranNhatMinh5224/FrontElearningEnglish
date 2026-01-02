@@ -61,6 +61,7 @@ export const ROUTE_PATHS = {
   // Teacher routes
   TEACHER: "/teacher",
   TEACHER_ACCOUNT_MANAGEMENT: "/teacher/account-management",
+  TEACHER_SUBMISSION_MANAGEMENT: "/teacher/submission-management",
   TEACHER_COURSE_MANAGEMENT: "/teacher/course-management",
   TEACHER_STUDENT_MANAGEMENT: (courseId) => `/teacher/course/${courseId}/students`,
   TEACHER_LESSON_DETAIL: (courseId, lessonId) => `/teacher/course/${courseId}/lesson/${lessonId}`,

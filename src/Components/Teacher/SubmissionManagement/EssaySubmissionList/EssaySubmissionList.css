@@ -1,0 +1,29 @@
+.essay-submission-list {
+  padding: 0;
+}
+
+.essay-submission-list .table {
+  margin-bottom: 0;
+}
+
+.essay-submission-list .table thead th {
+  background-color: #f8f9fa;
+  border-bottom: 2px solid #dee2e6;
+  font-weight: 600;
+  color: #495057;
+}
+
+.essay-submission-list .table tbody tr {
+  transition: background-color 0.15s ease;
+}
+
+.essay-submission-list .table tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+.essay-submission-list .view-btn {
+  font-size: 13px !important;
+  padding: 6px 30px !important;
+  min-width: auto !important;
+}
+

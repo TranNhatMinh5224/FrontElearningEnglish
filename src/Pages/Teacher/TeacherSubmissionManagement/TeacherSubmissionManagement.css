@@ -1,0 +1,34 @@
+.teacher-submission-management-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%);
+  padding: 40px 20px;
+  padding-top: calc(40px + 70px);
+}
+
+.teacher-submission-management-container .nav-tabs {
+  background: white;
+  border-radius: 12px 12px 0 0;
+  padding: 0 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.teacher-submission-management-container .nav-tabs .nav-link {
+  border: none;
+  color: #6c757d;
+  padding: 16px 24px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.teacher-submission-management-container .nav-tabs .nav-link:hover {
+  color: #0d6efd;
+  background: transparent;
+}
+
+.teacher-submission-management-container .nav-tabs .nav-link.active {
+  color: #0d6efd;
+  background: transparent;
+  border-bottom: 3px solid #0d6efd;
+  font-weight: 600;
+}
+
