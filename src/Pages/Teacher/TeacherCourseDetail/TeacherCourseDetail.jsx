@@ -10,8 +10,9 @@ import { mochiCourseTeacher, mochiLessonTeacher } from "../../../Assets/Logo";
 import CreateCourseModal from "../../../Components/Teacher/CreateCourseModal/CreateCourseModal";
 import CreateLessonModal from "../../../Components/Teacher/CreateLessonModal/CreateLessonModal";
 import SuccessModal from "../../../Components/Common/SuccessModal/SuccessModal";
+import ConfirmModal from "../../../Components/Common/ConfirmModal/ConfirmModal";
 import LessonLimitModal from "../../../Components/Common/LessonLimitModal/LessonLimitModal";
-import { FaPlus } from "react-icons/fa";
+import { FaPlus, FaTrash } from "react-icons/fa";
 import { ROUTE_PATHS } from "../../../Routes/Paths";
 
 export default function TeacherCourseDetail() {
@@ -28,6 +29,10 @@ export default function TeacherCourseDetail() {
   const [showLessonSuccessModal, setShowLessonSuccessModal] = useState(false);
   const [showLessonLimitModal, setShowLessonLimitModal] = useState(false);
   const [maxLessonsLimit, setMaxLessonsLimit] = useState(0);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [lessonToDelete, setLessonToDelete] = useState(null);
+  const [deletingLesson, setDeletingLesson] = useState(false);
+  const [showDeleteSuccessModal, setShowDeleteSuccessModal] = useState(false);
 
   const isTeacher = roles.includes("Teacher") || user?.teacherSubscription?.isTeacher === true;
 
@@ -141,6 +146,35 @@ export default function TeacherCourseDetail() {
     fetchCourseDetail(); // Refresh course data to update totalLessons
   };
 
+  const handleDeleteClick = (lesson) => {
+    setLessonToDelete(lesson);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDeleteLesson = async () => {
+    if (!lessonToDelete) return;
+
+    try {
+      setDeletingLesson(true);
+      const lessonId = lessonToDelete.lessonId || lessonToDelete.LessonId;
+      const response = await teacherService.deleteLesson(lessonId);
+
+      if (response.status === 204 || response.data?.success) {
+        setShowDeleteModal(false);
+        setShowDeleteSuccessModal(true);
+        setLessonToDelete(null);
+        fetchLessons();
+        fetchCourseDetail();
+      }
+    } catch (error) {
+      console.error("Error deleting lesson:", error);
+      const errorMessage = error.response?.data?.message || error.message || "Có lỗi xảy ra khi xóa bài học";
+      alert(errorMessage);
+    } finally {
+      setDeletingLesson(false);
+    }
+  };
+
   if (!isAuthenticated || !isTeacher) {
     return null;
   }
@@ -225,15 +259,7 @@ export default function TeacherCourseDetail() {
 
                     <div className="course-detail-item">
                       <label>Tổng số học sinh:</label>
-                      <div className="course-stat-with-action">
-                        <span className="course-stat-value">{totalStudents}</span>
-                        <button
-                          className="manage-students-btn"
-                          onClick={() => navigate(`/teacher/course/${courseId}/students`)}
-                        >
-                          Quản lý học viên
-                        </button>
-                      </div>
+                      <span className="course-stat-value">{totalStudents}</span>
                     </div>
                   </div>
 
@@ -242,6 +268,13 @@ export default function TeacherCourseDetail() {
                     onClick={() => setShowUpdateModal(true)}
                   >
                     Cập nhật
+                  </button>
+                  
+                  <button
+                    className="manage-students-btn"
+                    onClick={() => navigate(`/teacher/course/${courseId}/students`)}
+                  >
+                    Quản lý học viên
                   </button>
                 </div>
               </div>
@@ -256,7 +289,12 @@ export default function TeacherCourseDetail() {
                     const lessonTitle = lesson.title || lesson.Title || `Lesson ${index + 1}`;
                     const lessonImage = lesson.imageUrl || lesson.ImageUrl || mochiLessonTeacher;
                     return (
-                      <div key={lessonId || index} className="lesson-item">
+                      <div 
+                        key={lessonId || index} 
+                        className="lesson-item"
+                        onClick={() => navigate(`/teacher/course/${courseId}/lesson/${lessonId}`)}
+                        style={{ cursor: 'pointer' }}
+                      >
                         <div className="lesson-item-content">
                           <img
                             src={lessonImage}
@@ -265,13 +303,22 @@ export default function TeacherCourseDetail() {
                           />
                           <span className="lesson-title">{lessonTitle}</span>
                         </div>
-                        <button
-                          className="add-module-btn"
-                          onClick={() => navigate(`/teacher/course/${courseId}/lesson/${lessonId}`)}
-                        >
-                          <FaPlus className="add-icon" />
-                          Thêm Module
-                        </button>
+                        <div className="lesson-actions" onClick={(e) => e.stopPropagation()}>
+                          <button
+                            className="add-module-btn"
+                            onClick={() => navigate(`/teacher/course/${courseId}/lesson/${lessonId}`)}
+                          >
+                            <FaPlus className="add-icon" />
+                            Thêm Module
+                          </button>
+                          <button
+                            className="delete-lesson-btn"
+                            onClick={() => handleDeleteClick(lesson)}
+                            title="Xóa bài học"
+                          >
+                            <FaTrash />
+                          </button>
+                        </div>
                       </div>
                     );
                   })
@@ -341,6 +388,32 @@ export default function TeacherCourseDetail() {
           setShowLessonLimitModal(false);
           navigate("/home");
         }}
+      />
+
+      {/* Confirm Delete Lesson Modal */}
+      <ConfirmModal
+        isOpen={showDeleteModal}
+        onClose={() => {
+          setShowDeleteModal(false);
+          setLessonToDelete(null);
+        }}
+        onConfirm={confirmDeleteLesson}
+        title="Xác nhận xóa bài học"
+        message="Bạn có chắc chắn muốn xóa bài học này không?"
+        itemName={lessonToDelete ? (lessonToDelete.title || lessonToDelete.Title) : ""}
+        type="delete"
+        confirmText="Xác nhận xóa"
+        loading={deletingLesson}
+      />
+
+      {/* Success Modal for Delete Lesson */}
+      <SuccessModal
+        isOpen={showDeleteSuccessModal}
+        onClose={() => setShowDeleteSuccessModal(false)}
+        title="Xóa bài học thành công"
+        message="Bài học đã được xóa thành công!"
+        autoClose={true}
+        autoCloseDelay={1500}
       />
     </>
   );

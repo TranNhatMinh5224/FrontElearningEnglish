@@ -3,7 +3,7 @@ import { Modal, Button } from "react-bootstrap";
 import { quizService } from "../../../Services/quizService";
 import "./CreateQuizSectionModal.css";
 
-export default function CreateQuizSectionModal({ show, onClose, onSuccess, quizId, sectionToUpdate = null }) {
+export default function CreateQuizSectionModal({ show, onClose, onSuccess, quizId, sectionToUpdate = null, isAdmin = false }) {
   const isUpdateMode = !!sectionToUpdate;
   
   // Form state
@@ -88,9 +88,13 @@ export default function CreateQuizSectionModal({ show, onClose, onSuccess, quizI
           title: submitData.title,
           description: submitData.description,
         };
-        response = await quizService.updateQuizSection(sectionId, updateData);
+        response = isAdmin
+          ? await quizService.updateAdminQuizSection(sectionId, updateData)
+          : await quizService.updateQuizSection(sectionId, updateData);
       } else {
-        response = await quizService.createQuizSection(submitData);
+        response = isAdmin
+          ? await quizService.createAdminQuizSection(submitData)
+          : await quizService.createQuizSection(submitData);
       }
 
       if (response.data?.success) {

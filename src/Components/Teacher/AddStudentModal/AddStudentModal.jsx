@@ -2,9 +2,10 @@ import React, { useState } from "react";
 import { Modal } from "react-bootstrap";
 import "./AddStudentModal.css";
 import { teacherService } from "../../../Services/teacherService";
+import { adminService } from "../../../Services/adminService";
 import { FaEnvelope, FaSpinner } from "react-icons/fa";
 
-export default function AddStudentModal({ show, onClose, onSuccess, courseId }) {
+export default function AddStudentModal({ show, onClose, onSuccess, courseId, isAdmin = false }) {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -28,7 +29,9 @@ export default function AddStudentModal({ show, onClose, onSuccess, courseId }) 
       setLoading(true);
       setError("");
 
-      const response = await teacherService.addStudentToCourse(courseId, email.trim());
+      const response = isAdmin 
+        ? await adminService.addStudentToCourse(courseId, email.trim())
+        : await teacherService.addStudentToCourse(courseId, email.trim());
 
       if (response.data?.success || response.data?.Success) {
         setEmail("");

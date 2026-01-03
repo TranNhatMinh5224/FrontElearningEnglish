@@ -38,6 +38,9 @@ export const teacherService = {
     // Update lesson
     updateLesson: (lessonId, data) => axiosClient.put(API_ENDPOINTS.TEACHER.UPDATE_LESSON(lessonId), data),
     
+    // Delete lesson
+    deleteLesson: (lessonId) => axiosClient.delete(API_ENDPOINTS.TEACHER.DELETE_LESSON(lessonId)),
+    
     // Create new module
     createModule: (data) => axiosClient.post(API_ENDPOINTS.TEACHER.CREATE_MODULE, data),
     
@@ -49,5 +52,8 @@ export const teacherService = {
     
     // Update module
     updateModule: (moduleId, data) => axiosClient.put(API_ENDPOINTS.TEACHER.UPDATE_MODULE(moduleId), data),
+    
+    // Delete module
+    deleteModule: (moduleId) => axiosClient.delete(API_ENDPOINTS.TEACHER.DELETE_MODULE(moduleId)),
 };
 

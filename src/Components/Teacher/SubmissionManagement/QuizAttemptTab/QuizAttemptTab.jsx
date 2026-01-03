@@ -9,7 +9,7 @@ import QuizList from "../QuizList/QuizList";
 import QuizAttemptList from "../QuizAttemptList/QuizAttemptList";
 import "./QuizAttemptTab.css";
 
-export default function QuizAttemptTab({ courses }) {
+export default function QuizAttemptTab({ courses, isAdmin = false }) {
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [selectedLesson, setSelectedLesson] = useState(null);
   const [selectedModule, setSelectedModule] = useState(null);
@@ -132,6 +132,7 @@ export default function QuizAttemptTab({ courses }) {
         <LessonList
           courseId={selectedCourse.courseId || selectedCourse.CourseId}
           onSelect={handleLessonSelect}
+          isAdmin={isAdmin}
         />
       )}
 
@@ -139,6 +140,7 @@ export default function QuizAttemptTab({ courses }) {
         <ModuleList
           lessonId={selectedLesson.lessonId || selectedLesson.LessonId}
           onSelect={handleModuleSelect}
+          isAdmin={isAdmin}
         />
       )}
 
@@ -146,6 +148,7 @@ export default function QuizAttemptTab({ courses }) {
         <AssessmentList
           moduleId={selectedModule.moduleId || selectedModule.ModuleId}
           onSelect={handleAssessmentSelect}
+          isAdmin={isAdmin}
         />
       )}
 
@@ -153,6 +156,7 @@ export default function QuizAttemptTab({ courses }) {
         <QuizList
           assessmentId={selectedAssessment.assessmentId || selectedAssessment.AssessmentId}
           onSelect={handleQuizSelect}
+          isAdmin={isAdmin}
         />
       )}
 
@@ -161,6 +165,7 @@ export default function QuizAttemptTab({ courses }) {
           quizId={selectedQuiz.quizId || selectedQuiz.QuizId}
           quizTitle={selectedQuiz.title || selectedQuiz.Title}
           onBack={() => setSelectedQuiz(null)}
+          isAdmin={isAdmin}
         />
       )}
     </div>

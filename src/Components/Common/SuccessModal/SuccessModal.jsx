@@ -8,7 +8,7 @@ export default function SuccessModal({
     title = "Thành công",
     message,
     autoClose = true,
-    autoCloseDelay = 3000
+    autoCloseDelay = 1500
 }) {
     useEffect(() => {
         if (isOpen && autoClose) {

@@ -25,5 +25,22 @@ export const lectureService = {
     deleteLecture: (lectureId) => axiosClient.delete(API_ENDPOINTS.TEACHER.DELETE_LECTURE(lectureId)),
     
     reorderLectures: (data) => axiosClient.post(API_ENDPOINTS.TEACHER.REORDER_LECTURES, data),
+
+    // Admin endpoints
+    createAdminLecture: (data) => axiosClient.post(API_ENDPOINTS.ADMIN.LECTURES.CREATE, data),
+    
+    bulkCreateAdminLectures: (data) => axiosClient.post(API_ENDPOINTS.ADMIN.LECTURES.BULK_CREATE, data),
+    
+    getAdminLectureById: (lectureId) => axiosClient.get(API_ENDPOINTS.ADMIN.LECTURES.GET_BY_ID(lectureId)),
+    
+    getAdminLecturesByModule: (moduleId) => axiosClient.get(API_ENDPOINTS.ADMIN.LECTURES.GET_BY_MODULE(moduleId)),
+    
+    getAdminLectureTree: (moduleId) => axiosClient.get(API_ENDPOINTS.ADMIN.LECTURES.GET_TREE(moduleId)),
+    
+    updateAdminLecture: (lectureId, data) => axiosClient.put(API_ENDPOINTS.ADMIN.LECTURES.UPDATE(lectureId), data),
+    
+    deleteAdminLecture: (lectureId) => axiosClient.delete(API_ENDPOINTS.ADMIN.LECTURES.DELETE(lectureId)),
+    
+    reorderAdminLectures: (data) => axiosClient.post(API_ENDPOINTS.ADMIN.LECTURES.REORDER, data),
 };
 

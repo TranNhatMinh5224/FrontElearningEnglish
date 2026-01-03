@@ -1,0 +1,33 @@
+.admin-module-flashcard-detail-container {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  padding: 20px;
+}
+
+.flashcard-item {
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.flashcard-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15) !important;
+}
+
+.flashcard-item .card-img-top {
+  transition: transform 0.2s;
+}
+
+.flashcard-item:hover .card-img-top {
+  transform: scale(1.05);
+}
+
+.flashcard-item .position-relative {
+  overflow: hidden;
+}
+
+@media (max-width: 768px) {
+  .admin-module-flashcard-detail-container {
+    padding: 10px;
+  }
+}

@@ -22,5 +22,14 @@ export const questionService = {
     
     // Bulk create questions
     bulkCreateQuestions: (data) => axiosClient.post(API_ENDPOINTS.TEACHER.BULK_CREATE_QUESTIONS, data),
+    
+    // Admin Question endpoints
+    createAdminQuestion: (data) => axiosClient.post(API_ENDPOINTS.ADMIN.QUESTIONS.CREATE, data),
+    bulkCreateAdminQuestions: (data) => axiosClient.post(API_ENDPOINTS.ADMIN.QUESTIONS.BULK_CREATE, data),
+    getAdminQuestionById: (questionId) => axiosClient.get(API_ENDPOINTS.ADMIN.QUESTIONS.GET_BY_ID(questionId)),
+    getAdminQuestionsByGroup: (groupId) => axiosClient.get(API_ENDPOINTS.ADMIN.QUESTIONS.GET_BY_GROUP(groupId)),
+    getAdminQuestionsBySection: (sectionId) => axiosClient.get(API_ENDPOINTS.ADMIN.QUESTIONS.GET_BY_SECTION(sectionId)),
+    updateAdminQuestion: (questionId, data) => axiosClient.put(API_ENDPOINTS.ADMIN.QUESTIONS.UPDATE(questionId), data),
+    deleteAdminQuestion: (questionId) => axiosClient.delete(API_ENDPOINTS.ADMIN.QUESTIONS.DELETE(questionId)),
 };
 

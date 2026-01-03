@@ -94,8 +94,14 @@ export default function AdminCourseList() {
     navigate(`/admin/courses/${courseId}`);
   };
 
+  const handlePageChange = (page) => {
+    setPagination({ ...pagination, pageNumber: page });
+  };
+
+  const totalPages = Math.ceil(pagination.totalCount / pagination.pageSize);
+
   return (
-    <div className="course-management-container">
+    <div className="admin-course-management-container">
       {/* HEADER */}
       <div className="page-header">
         <div className="header-content">
@@ -123,6 +129,11 @@ export default function AdminCourseList() {
         onView={handleViewCourse}
         onEdit={handleEditClick}
         onDelete={handleDeleteCourse}
+        currentPage={pagination.pageNumber}
+        totalPages={totalPages}
+        totalCount={pagination.totalCount}
+        pageSize={pagination.pageSize}
+        onPageChange={handlePageChange}
       />
 
       {/* MODAL */}
@@ -140,7 +151,7 @@ export default function AdminCourseList() {
         title="Thành công"
         message={successMessage}
         autoClose={true}
-        autoCloseDelay={3000}
+        autoCloseDelay={1500}
       />
     </div>
   );

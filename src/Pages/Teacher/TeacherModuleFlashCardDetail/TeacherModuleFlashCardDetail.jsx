@@ -77,7 +77,15 @@ export default function TeacherModuleFlashCardDetail() {
   const confirmDelete = async () => {
     if (!flashcardToDelete) return;
     try {
-      const cardId = flashcardToDelete.flashcardId || flashcardToDelete.FlashcardId;
+      // Backend returns FlashCardId (capital C)
+      const cardId = flashcardToDelete.flashCardId || flashcardToDelete.FlashCardId || flashcardToDelete.flashcardId;
+      
+      if (!cardId) {
+        console.error("Flashcard ID not found. Available keys:", Object.keys(flashcardToDelete));
+        alert("Không tìm thấy ID của flashcard. Vui lòng thử lại.");
+        return;
+      }
+      
       const res = await flashcardService.deleteFlashcard(cardId);
       if (res.data?.success) {
         setSuccessMessage("Xóa flashcard thành công!");
@@ -88,8 +96,8 @@ export default function TeacherModuleFlashCardDetail() {
         alert("Xóa thất bại: " + res.data?.message);
       }
     } catch (err) {
-      console.error(err);
-      alert("Lỗi khi xóa flashcard");
+      console.error("Error deleting flashcard:", err);
+      alert("Lỗi khi xóa flashcard: " + (err.response?.data?.message || err.message));
     }
   };
 

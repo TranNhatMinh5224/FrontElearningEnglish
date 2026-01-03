@@ -1,4 +1,5 @@
 import React from "react";
+import { Pagination } from "react-bootstrap";
 import { MdEdit, MdDelete, MdVisibility, MdMenuBook } from "react-icons/md";
 import "./CourseTable.css";
 
@@ -7,7 +8,12 @@ export default function CourseTable({
   loading, 
   onView, 
   onEdit, 
-  onDelete 
+  onDelete,
+  currentPage = 1,
+  totalPages = 1,
+  totalCount = 0,
+  pageSize = 10,
+  onPageChange
 }) {
   const formatPrice = (price) => {
     if (price === 0 || !price) {
@@ -53,7 +59,12 @@ export default function CourseTable({
               </tr>
             ) : (
               courses.map((course) => (
-                <tr key={course.courseId}>
+                <tr 
+                  key={course.courseId}
+                  onClick={() => onView(course.courseId)}
+                  style={{ cursor: 'pointer' }}
+                  className="course-row-clickable"
+                >
                   <td>
                     <div className="course-info">
                       {course.imageUrl ? (
@@ -68,8 +79,7 @@ export default function CourseTable({
                         </div>
                       )}
                       <div className="course-details">
-                        <div className="course-title">{course.title}</div>
-                        <div className="course-id">ID: #CRS-{course.courseId}</div>
+                        <div className="table-course-title">{course.title}</div>
                       </div>
                     </div>
                   </td>
@@ -82,14 +92,20 @@ export default function CourseTable({
                       <button 
                         className="action-btn action-view" 
                         title="View Details"
-                        onClick={() => onView(course.courseId)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onView(course.courseId);
+                        }}
                       >
                         <MdVisibility />
                       </button>
                       <button 
                         className="action-btn action-edit" 
                         title="Edit"
-                        onClick={() => onEdit(course)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onEdit(course);
+                        }}
                       >
                         <MdEdit />
                       </button>
@@ -108,6 +124,58 @@ export default function CourseTable({
           </tbody>
         </table>
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="pagination-wrapper">
+          <Pagination>
+            <Pagination.First 
+              onClick={() => onPageChange(1)} 
+              disabled={currentPage === 1}
+            />
+            <Pagination.Prev 
+              onClick={() => onPageChange(currentPage - 1)} 
+              disabled={currentPage === 1}
+            />
+            
+            {[...Array(totalPages)].map((_, index) => {
+              const page = index + 1;
+              // Show first page, last page, current page, and pages around current
+              if (
+                page === 1 ||
+                page === totalPages ||
+                (page >= currentPage - 1 && page <= currentPage + 1)
+              ) {
+                return (
+                  <Pagination.Item
+                    key={page}
+                    active={page === currentPage}
+                    onClick={() => onPageChange(page)}
+                  >
+                    {page}
+                  </Pagination.Item>
+                );
+              } else if (page === currentPage - 2 || page === currentPage + 2) {
+                return <Pagination.Ellipsis key={page} />;
+              }
+              return null;
+            })}
+            
+            <Pagination.Next 
+              onClick={() => onPageChange(currentPage + 1)} 
+              disabled={currentPage === totalPages}
+            />
+            <Pagination.Last 
+              onClick={() => onPageChange(totalPages)} 
+              disabled={currentPage === totalPages}
+            />
+          </Pagination>
+          
+          <div className="pagination-info">
+            Showing {((currentPage - 1) * pageSize) + 1} - {Math.min(currentPage * pageSize, totalCount)} / {totalCount} courses
+          </div>
+        </div>
+      )}
     </div>
   );
 }

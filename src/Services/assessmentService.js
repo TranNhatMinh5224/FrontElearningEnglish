@@ -19,5 +19,16 @@ export const assessmentService = {
     updateAssessment: (assessmentId, data) => axiosClient.put(API_ENDPOINTS.TEACHER.UPDATE_ASSESSMENT(assessmentId), data),
     
     deleteAssessment: (assessmentId) => axiosClient.delete(API_ENDPOINTS.TEACHER.DELETE_ASSESSMENT(assessmentId)),
+
+    // Admin endpoints
+    createAdminAssessment: (data) => axiosClient.post(API_ENDPOINTS.ADMIN.ASSESSMENTS.CREATE, data),
+    
+    getAdminAssessmentById: (assessmentId) => axiosClient.get(API_ENDPOINTS.ADMIN.ASSESSMENTS.GET_BY_ID(assessmentId)),
+    
+    getAdminAssessmentsByModule: (moduleId) => axiosClient.get(API_ENDPOINTS.ADMIN.ASSESSMENTS.GET_BY_MODULE(moduleId)),
+    
+    updateAdminAssessment: (assessmentId, data) => axiosClient.put(API_ENDPOINTS.ADMIN.ASSESSMENTS.UPDATE(assessmentId), data),
+    
+    deleteAdminAssessment: (assessmentId) => axiosClient.delete(API_ENDPOINTS.ADMIN.ASSESSMENTS.DELETE(assessmentId)),
 };
 

@@ -2,11 +2,12 @@ import React, { useState, useEffect } from "react";
 import { Card, Spinner } from "react-bootstrap";
 import { FaClipboardList } from "react-icons/fa";
 import { teacherService } from "../../../../Services/teacherService";
+import { adminService } from "../../../../Services/adminService";
 import "./ModuleList.css";
 
 const MODULE_TYPE_ASSESSMENT = 3; // Assessment module type
 
-export default function ModuleList({ lessonId, onSelect }) {
+export default function ModuleList({ lessonId, onSelect, isAdmin = false }) {
   const [modules, setModules] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -19,7 +20,8 @@ export default function ModuleList({ lessonId, onSelect }) {
     try {
       setLoading(true);
       setError("");
-      const response = await teacherService.getModulesByLesson(lessonId);
+      const service = isAdmin ? adminService : teacherService;
+      const response = await service.getModulesByLesson(lessonId);
       if (response.data?.success) {
         const data = response.data.data || [];
         // Filter only Assessment modules (type = 3)

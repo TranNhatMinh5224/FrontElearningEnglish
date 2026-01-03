@@ -18,5 +18,18 @@ export const flashcardService = {
     updateFlashcard: (flashcardId, data) => axiosClient.put(API_ENDPOINTS.TEACHER.UPDATE_FLASHCARD(flashcardId), data),
     
     deleteFlashcard: (flashcardId) => axiosClient.delete(API_ENDPOINTS.TEACHER.DELETE_FLASHCARD(flashcardId)),
+
+    // Admin endpoints
+    createAdminFlashcard: (data) => axiosClient.post(API_ENDPOINTS.ADMIN.FLASHCARDS.CREATE, data),
+    
+    bulkCreateAdminFlashcards: (data) => axiosClient.post(API_ENDPOINTS.ADMIN.FLASHCARDS.BULK_CREATE, data),
+    
+    getAdminFlashcardById: (flashcardId) => axiosClient.get(API_ENDPOINTS.ADMIN.FLASHCARDS.GET_BY_ID(flashcardId)),
+    
+    getAdminFlashcardsByModule: (moduleId) => axiosClient.get(API_ENDPOINTS.ADMIN.FLASHCARDS.GET_BY_MODULE(moduleId)),
+    
+    updateAdminFlashcard: (flashcardId, data) => axiosClient.put(API_ENDPOINTS.ADMIN.FLASHCARDS.UPDATE(flashcardId), data),
+    
+    deleteAdminFlashcard: (flashcardId) => axiosClient.delete(API_ENDPOINTS.ADMIN.FLASHCARDS.DELETE(flashcardId)),
 };
 

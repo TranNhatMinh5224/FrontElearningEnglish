@@ -238,6 +238,26 @@
   cursor: not-allowed;
 }
 
+.module-delete-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  color: white;
+  background-color: #dc3545;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.module-delete-btn:hover {
+  background-color: #c82333;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+}
+
 .add-module-btn-main {
   display: flex;
   align-items: center;

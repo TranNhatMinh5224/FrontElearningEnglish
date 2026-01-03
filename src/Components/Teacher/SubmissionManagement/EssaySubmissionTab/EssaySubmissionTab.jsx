@@ -9,7 +9,7 @@ import EssayList from "../EssayList/EssayList";
 import EssaySubmissionList from "../EssaySubmissionList/EssaySubmissionList";
 import "./EssaySubmissionTab.css";
 
-export default function EssaySubmissionTab({ courses }) {
+export default function EssaySubmissionTab({ courses, isAdmin = false }) {
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [selectedLesson, setSelectedLesson] = useState(null);
   const [selectedModule, setSelectedModule] = useState(null);
@@ -132,6 +132,7 @@ export default function EssaySubmissionTab({ courses }) {
         <LessonList
           courseId={selectedCourse.courseId || selectedCourse.CourseId}
           onSelect={handleLessonSelect}
+          isAdmin={isAdmin}
         />
       )}
 
@@ -139,6 +140,7 @@ export default function EssaySubmissionTab({ courses }) {
         <ModuleList
           lessonId={selectedLesson.lessonId || selectedLesson.LessonId}
           onSelect={handleModuleSelect}
+          isAdmin={isAdmin}
         />
       )}
 
@@ -146,6 +148,7 @@ export default function EssaySubmissionTab({ courses }) {
         <AssessmentList
           moduleId={selectedModule.moduleId || selectedModule.ModuleId}
           onSelect={handleAssessmentSelect}
+          isAdmin={isAdmin}
         />
       )}
 
@@ -153,6 +156,7 @@ export default function EssaySubmissionTab({ courses }) {
         <EssayList
           assessmentId={selectedAssessment.assessmentId || selectedAssessment.AssessmentId}
           onSelect={handleEssaySelect}
+          isAdmin={isAdmin}
         />
       )}
 
@@ -161,6 +165,7 @@ export default function EssaySubmissionTab({ courses }) {
           essayId={selectedEssay.essayId || selectedEssay.EssayId}
           essayTitle={selectedEssay.title || selectedEssay.Title}
           onBack={() => setSelectedEssay(null)}
+          isAdmin={isAdmin}
         />
       )}
     </div>

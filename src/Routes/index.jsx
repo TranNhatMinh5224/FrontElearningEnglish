@@ -51,8 +51,16 @@ import TeacherSubmissionManagement from "../Pages/Teacher/TeacherSubmissionManag
 import AdminLayout from "../Layouts/AdminLayout/AdminLayout";
 import AdminDashboard from "../Pages/Admin/Dashboard/AdminDashboard";
 import AdminCourseList from "../Pages/Admin/CourseManagement/AdminCourseList";
-import AdminCourseDetail from "../Pages/Admin/CourseManagement/Detail/AdminCourseDetail";
+import AdminCourseDetail from "../Pages/Admin/CourseManagement/AdminCourseDetail";
+import AdminStudentManagement from "../Pages/Admin/CourseManagement/AdminStudentManagement";
+import AdminLessonDetail from "../Pages/Admin/AdminLessonDetail/AdminLessonDetail";
+import AdminModuleLectureDetail from "../Pages/Admin/AdminModuleLectureDetail/AdminModuleLectureDetail";
+import AdminModuleFlashCardDetail from "../Pages/Admin/AdminModuleFlashCardDetail/AdminModuleFlashCardDetail";
 import AdminUserList from "../Pages/Admin/UserManagement/AdminUserList";
+import AdminQuizEssayManagement from "../Pages/Admin/AdminQuizEssayManagement/AdminQuizEssayManagement";
+import AdminQuizSectionManagement from "../Pages/Admin/AdminQuizSectionManagement/AdminQuizSectionManagement";
+import AdminQuestionManagement from "../Pages/Admin/AdminQuestionManagement/AdminQuestionManagement";
+import AdminSubmissionManagement from "../Pages/Admin/AdminSubmissionManagement/AdminSubmissionManagement";
 
 /**
  * Application Routes
@@ -127,8 +135,16 @@ export default function AppRoutes() {
         <Route index element={<AdminDashboard />} />
         <Route path="courses" element={<AdminCourseList />} />
         <Route path="courses/:courseId" element={<AdminCourseDetail />} />
+        <Route path="courses/:courseId/students" element={<AdminStudentManagement />} />
+        <Route path="courses/:courseId/lesson/:lessonId" element={<AdminLessonDetail />} />
+        <Route path="courses/:courseId/lesson/:lessonId/module/:moduleId/lecture/create" element={<AdminModuleLectureDetail />} />
+        <Route path="courses/:courseId/lesson/:lessonId/module/:moduleId/flashcard/create" element={<AdminModuleFlashCardDetail />} />
+        <Route path="courses/:courseId/lesson/:lessonId/module/:moduleId/assessment/:assessmentId" element={<AdminQuizEssayManagement />} />
+        <Route path="courses/:courseId/lesson/:lessonId/module/:moduleId/assessment/:assessmentId/quiz/:quizId/sections" element={<AdminQuizSectionManagement />} />
+        <Route path="courses/:courseId/lesson/:lessonId/module/:moduleId/assessment/:assessmentId/quiz/:quizId/section/:sectionId/questions" element={<AdminQuestionManagement />} />
         <Route path="users" element={<AdminUserList />} />
         <Route path="finance" element={<AdminDashboard />} />
+        <Route path="submission-management" element={<AdminSubmissionManagement />} />
       </Route>
     </Routes>
   );

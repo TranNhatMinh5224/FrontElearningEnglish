@@ -16,7 +16,8 @@ import CreateLessonModal from "../../../Components/Teacher/CreateLessonModal/Cre
 import CreateModuleModal from "../../../Components/Teacher/CreateModuleModal/CreateModuleModal";
 import CreateAssessmentModal from "../../../Components/Teacher/CreateAssessmentModal/CreateAssessmentModal";
 import SuccessModal from "../../../Components/Common/SuccessModal/SuccessModal";
-import { FaPlus, FaArrowLeft, FaEdit } from "react-icons/fa";
+import ConfirmModal from "../../../Components/Common/ConfirmModal/ConfirmModal";
+import { FaPlus, FaArrowLeft, FaEdit, FaTrash } from "react-icons/fa";
 import { ROUTE_PATHS } from "../../../Routes/Paths";
 
 export default function TeacherLessonDetail() {
@@ -42,6 +43,10 @@ export default function TeacherLessonDetail() {
   const [showUpdateAssessmentModal, setShowUpdateAssessmentModal] = useState(false);
   const [showUpdateAssessmentSuccessModal, setShowUpdateAssessmentSuccessModal] = useState(false);
   const [assessmentToUpdate, setAssessmentToUpdate] = useState(null);
+  const [showDeleteModuleModal, setShowDeleteModuleModal] = useState(false);
+  const [moduleToDelete, setModuleToDelete] = useState(null);
+  const [deletingModule, setDeletingModule] = useState(false);
+  const [showDeleteModuleSuccessModal, setShowDeleteModuleSuccessModal] = useState(false);
 
   // Module content state
   const [selectedModule, setSelectedModule] = useState(null);
@@ -259,7 +264,34 @@ export default function TeacherLessonDetail() {
 
     navigate(ROUTE_PATHS.TEACHER_EDIT_FLASHCARD(courseId, lessonId, moduleId, flashcardId));
   };
+  const handleDeleteModuleClick = (module) => {
+    setModuleToDelete(module);
+    setShowDeleteModuleModal(true);
+  };
 
+  const confirmDeleteModule = async () => {
+    if (!moduleToDelete) return;
+
+    try {
+      setDeletingModule(true);
+      const moduleId = moduleToDelete.moduleId || moduleToDelete.ModuleId;
+      const response = await teacherService.deleteModule(moduleId);
+
+      if (response.status === 204 || response.data?.success) {
+        setShowDeleteModuleModal(false);
+        setShowDeleteModuleSuccessModal(true);
+        setModuleToDelete(null);
+        fetchModules();
+        fetchLessonDetail();
+      }
+    } catch (error) {
+      console.error("Error deleting module:", error);
+      const errorMessage = error.response?.data?.message || error.message || "Có lỗi xảy ra khi xóa module";
+      alert(errorMessage);
+    } finally {
+      setDeletingModule(false);
+    }
+  };
 
   if (!isAuthenticated || !isTeacher) {
     return null;
@@ -712,6 +744,16 @@ export default function TeacherLessonDetail() {
                             >
                               {loadingModuleDetail ? "Đang tải..." : "Cập nhật"}
                             </button>
+                            <button
+                              className="module-delete-btn"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteModuleClick(module);
+                              }}
+                              title="Xóa module"
+                            >
+                              <FaTrash />
+                            </button>
                             {getCreateButton()}
                           </div>
                         </div>
@@ -860,6 +902,32 @@ export default function TeacherLessonDetail() {
         onClose={() => setShowModuleSuccessModal(false)}
         title="Thêm module thành công"
         message="Module của bạn đã được thêm thành công!"
+        autoClose={true}
+        autoCloseDelay={1500}
+      />
+
+      {/* Confirm Delete Module Modal */}
+      <ConfirmModal
+        isOpen={showDeleteModuleModal}
+        onClose={() => {
+          setShowDeleteModuleModal(false);
+          setModuleToDelete(null);
+        }}
+        onConfirm={confirmDeleteModule}
+        title="Xác nhận xóa module"
+        message="Bạn có chắc chắn muốn xóa module này không?"
+        itemName={moduleToDelete ? (moduleToDelete.name || moduleToDelete.Name) : ""}
+        type="delete"
+        confirmText="Xác nhận xóa"
+        loading={deletingModule}
+      />
+
+      {/* Success Modal for Delete Module */}
+      <SuccessModal
+        isOpen={showDeleteModuleSuccessModal}
+        onClose={() => setShowDeleteModuleSuccessModal(false)}
+        title="Xóa module thành công"
+        message="Module đã được xóa thành công!"
         autoClose={true}
         autoCloseDelay={1500}
       />

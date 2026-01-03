@@ -67,4 +67,35 @@ export const quizAttemptService = {
     forceSubmitAttempt: (attemptId) => {
         return axiosClient.post(API_ENDPOINTS.TEACHER.FORCE_SUBMIT_QUIZ_ATTEMPT(attemptId));
     },
+
+    // Admin methods
+    getAdminQuizAttemptsPaged: (quizId, page = 1, pageSize = 10) => {
+        return axiosClient.get(API_ENDPOINTS.ADMIN.QUIZ_ATTEMPTS.GET_BY_QUIZ_PAGED(quizId), {
+            params: { 
+                pageNumber: page,
+                pageSize: pageSize
+            }
+        });
+    },
+
+    getAdminQuizAttempts: (quizId) => {
+        return axiosClient.get(API_ENDPOINTS.ADMIN.QUIZ_ATTEMPTS.GET_BY_QUIZ(quizId));
+    },
+
+    getAdminAttemptDetailForReview: (attemptId) => {
+        return axiosClient.get(API_ENDPOINTS.ADMIN.QUIZ_ATTEMPTS.GET_REVIEW(attemptId));
+    },
+
+    forceSubmitAdminAttempt: (attemptId) => {
+        return axiosClient.post(API_ENDPOINTS.ADMIN.QUIZ_ATTEMPTS.FORCE_SUBMIT(attemptId));
+    },
+
+    getAdminQuizScoresPaged: (quizId, page = 1, pageSize = 10) => {
+        return axiosClient.get(API_ENDPOINTS.ADMIN.QUIZ_ATTEMPTS.GET_SCORES_PAGED(quizId), {
+            params: { 
+                pageNumber: page,
+                pageSize: pageSize
+            }
+        });
+    },
 };

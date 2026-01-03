@@ -28,6 +28,10 @@
     color: var(--color-status-error, #ef4444);
 }
 
+.confirm-icon-delete {
+    color: #ff6b6b;
+}
+
 .confirm-modal-title {
     font-size: 24px;
     font-weight: 700;
@@ -43,7 +47,18 @@
     font-size: 16px;
     color: var(--color-text-secondary, #6b7280);
     line-height: 1.6;
+    margin: 0 0 12px 0;
+}
+
+.item-name {
+    font-size: 18px;
+    font-weight: 600;
+    color: #ff6b6b;
+    padding: 12px 16px;
+    background: #fff5f5;
+    border-radius: 8px;
     margin: 0;
+    word-break: break-word;
 }
 
 .confirm-modal-footer {
@@ -72,6 +87,16 @@
 }
 
 .confirm-btn-danger:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+.confirm-btn-delete {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+    color: white;
+}
+
+.confirm-btn-delete:hover {
     opacity: 0.9;
     transform: translateY(-1px);
 }

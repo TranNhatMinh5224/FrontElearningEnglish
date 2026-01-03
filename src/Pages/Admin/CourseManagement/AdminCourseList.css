@@ -1,5 +1,4 @@
-.course-management-container {
-  padding: 2rem;
+.admin-course-management-container {
   max-width: 1400px;
   margin: 0 auto;
 }
@@ -54,8 +53,7 @@
 }
 
 @media (max-width: 768px) {
-  .course-management-container {
-    padding: 1rem;
+  .admin-course-management-container {
   }
   
   .page-header {

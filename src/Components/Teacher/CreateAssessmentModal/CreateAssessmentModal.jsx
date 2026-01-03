@@ -10,7 +10,8 @@ export default function CreateAssessmentModal({
   onSuccess, 
   moduleId, 
   assessmentData = null, 
-  isUpdateMode = false 
+  isUpdateMode = false,
+  isAdmin = false 
 }) {
   // Form state
   const [title, setTitle] = useState("");
@@ -182,9 +183,13 @@ export default function CreateAssessmentModal({
         if (!assessmentId) {
           throw new Error("Không tìm thấy ID của Assessment");
         }
-        response = await assessmentService.updateAssessment(assessmentId, submitData);
+        response = isAdmin
+          ? await assessmentService.updateAdminAssessment(assessmentId, submitData)
+          : await assessmentService.updateAssessment(assessmentId, submitData);
       } else {
-        response = await assessmentService.createAssessment(submitData);
+        response = isAdmin
+          ? await assessmentService.createAdminAssessment(submitData)
+          : await assessmentService.createAssessment(submitData);
       }
 
       if (response.data?.success) {

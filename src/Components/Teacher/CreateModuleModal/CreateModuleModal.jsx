@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Modal, Button } from "react-bootstrap";
 import { fileService } from "../../../Services/fileService";
 import { teacherService } from "../../../Services/teacherService";
+import { adminService } from "../../../Services/adminService";
 import { useAuth } from "../../../Context/AuthContext";
 import { FaFileUpload, FaTimes } from "react-icons/fa";
 import "./CreateModuleModal.css";
@@ -16,7 +17,7 @@ const MODULE_TYPES = [
   { value: 3, label: "Assessment" },
 ];
 
-export default function CreateModuleModal({ show, onClose, onSuccess, lessonId, moduleData, isUpdateMode = false }) {
+export default function CreateModuleModal({ show, onClose, onSuccess, lessonId, moduleData, isUpdateMode = false, isAdmin = false }) {
   const { user } = useAuth();
   const fileInputRef = useRef(null);
 
@@ -213,7 +214,9 @@ export default function CreateModuleModal({ show, onClose, onSuccess, lessonId, 
           updateData.imageType = imageType;
         }
 
-        response = await teacherService.updateModule(moduleId, updateData);
+        response = isAdmin
+          ? await adminService.updateModule(moduleId, updateData)
+          : await teacherService.updateModule(moduleId, updateData);
       } else {
         const createData = {
           lessonId: parseInt(lessonId),
@@ -229,7 +232,9 @@ export default function CreateModuleModal({ show, onClose, onSuccess, lessonId, 
           createData.imageType = imageType;
         }
 
-        response = await teacherService.createModule(createData);
+        response = isAdmin
+          ? await adminService.createModule(createData)
+          : await teacherService.createModule(createData);
       }
 
       if (response.data?.success) {

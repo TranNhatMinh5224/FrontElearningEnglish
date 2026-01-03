@@ -1,25 +1,24 @@
 /* UserDetailModal Styles */
 
-.user-detail-modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.6);
-  z-index: 1050;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/* Modal dialog sizing - override Bootstrap defaults with highest specificity */
+.modal-dialog.modal-dialog-centered.user-detail-modal-dialog,
+div.modal-dialog.modal-dialog-centered.user-detail-modal-dialog,
+.modal .modal-dialog.modal-dialog-centered.user-detail-modal-dialog,
+body .modal .modal-dialog.modal-dialog-centered.user-detail-modal-dialog,
+html body .modal .modal-dialog.modal-dialog-centered.user-detail-modal-dialog {
+  max-width: 900px !important;
+  width: 90% !important;
+  margin: 1.75rem auto !important;
 }
 
-.user-detail-modal {
-  max-width: 800px;
-  width: 90%;
-  border: none;
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+.user-detail-modal-dialog .modal-content,
+.modal-dialog.user-detail-modal-dialog .modal-content,
+div.modal-dialog.user-detail-modal-dialog .modal-content {
+  max-height: 90vh !important;
+  overflow-y: auto !important;
+  border-radius: 16px !important;
+  width: 100% !important;
+  max-width: none !important;
 }
 
 .user-detail-header {

@@ -5,7 +5,7 @@ import DateTimePicker from "../DateTimePicker/DateTimePicker";
 import { useEnums } from "../../../Context/EnumContext";
 import "./CreateQuizModal.css";
 
-export default function CreateQuizModal({ show, onClose, onSuccess, assessmentId, quizToUpdate = null }) {
+export default function CreateQuizModal({ show, onClose, onSuccess, assessmentId, quizToUpdate = null, isAdmin = false }) {
   const { getEnumOptions, loading: enumsLoading } = useEnums();
   const isUpdateMode = !!quizToUpdate;
   
@@ -46,7 +46,9 @@ export default function CreateQuizModal({ show, onClose, onSuccess, assessmentId
     setLoadingQuiz(true);
     try {
       const quizId = quizToUpdate.quizId || quizToUpdate.QuizId;
-      const response = await quizService.getTeacherQuizById(quizId);
+      const response = isAdmin
+        ? await quizService.getAdminQuizById(quizId)
+        : await quizService.getTeacherQuizById(quizId);
       
       if (response.data?.success && response.data?.data) {
         const quiz = response.data.data;
@@ -162,9 +164,13 @@ export default function CreateQuizModal({ show, onClose, onSuccess, assessmentId
       let response;
       if (isUpdateMode && quizToUpdate) {
         const quizId = quizToUpdate.quizId || quizToUpdate.QuizId;
-        response = await quizService.updateQuiz(quizId, submitData);
+        response = isAdmin 
+          ? await quizService.updateAdminQuiz(quizId, submitData)
+          : await quizService.updateQuiz(quizId, submitData);
       } else {
-        response = await quizService.createQuiz(submitData);
+        response = isAdmin
+          ? await quizService.createAdminQuiz(submitData)
+          : await quizService.createQuiz(submitData);
       }
 
       if (response.data?.success) {

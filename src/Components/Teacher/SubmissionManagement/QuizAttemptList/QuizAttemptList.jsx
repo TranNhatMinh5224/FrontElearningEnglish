@@ -4,7 +4,7 @@ import { quizAttemptService } from "../../../../Services/quizAttemptService";
 import QuizAttemptDetailModal from "../QuizAttemptDetailModal/QuizAttemptDetailModal";
 import "./QuizAttemptList.css";
 
-export default function QuizAttemptList({ quizId, quizTitle, onBack }) {
+export default function QuizAttemptList({ quizId, quizTitle, onBack, isAdmin = false }) {
   const [attempts, setAttempts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -22,7 +22,9 @@ export default function QuizAttemptList({ quizId, quizTitle, onBack }) {
     try {
       setLoading(true);
       setError("");
-      const response = await quizAttemptService.getQuizAttemptsPaged(quizId, currentPage, pageSize);
+      const response = isAdmin
+        ? await quizAttemptService.getAdminQuizAttemptsPaged(quizId, currentPage, pageSize)
+        : await quizAttemptService.getQuizAttemptsPaged(quizId, currentPage, pageSize);
       if (response.data?.success) {
         const data = response.data.data || {};
         const items = data.items || data.data || [];

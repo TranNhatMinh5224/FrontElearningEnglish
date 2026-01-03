@@ -1,0 +1,175 @@
+.admin-quiz-essay-management-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%);
+  padding: 40px 20px;
+}
+
+/* Custom button gradients */
+.create-quiz-button {
+  background: linear-gradient(135deg, #9333ea 0%, #7c3aed 100%) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.create-quiz-button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.create-quiz-button:hover::before {
+  left: 100%;
+}
+
+.create-quiz-button:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 8px 25px rgba(147, 51, 234, 0.4) !important;
+}
+
+.create-quiz-button:active {
+  transform: translateY(-1px) scale(1);
+}
+
+.create-essay-button {
+  background: linear-gradient(135deg, #41d6e3 0%, #6fd5e0 100%) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.create-essay-button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.create-essay-button:hover::before {
+  left: 100%;
+}
+
+.create-essay-button:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 8px 25px rgba(65, 214, 227, 0.4) !important;
+}
+
+.create-essay-button:active {
+  transform: translateY(-1px) scale(1);
+}
+
+/* Hover effect for cards */
+.hover-card {
+  transition: all 0.2s ease;
+}
+
+.hover-card:hover {
+  background-color: #f3f4f6 !important;
+  border-color: #d1d5db !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Edit and Delete buttons for quizzes */
+.btn-edit-quiz,
+.btn-delete-quiz {
+  border: none;
+  border-radius: 8px;
+  padding: 8px 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  cursor: pointer;
+  min-width: 36px;
+  height: 36px;
+}
+
+.btn-edit-quiz {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.btn-edit-quiz:hover {
+  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  color: white;
+}
+
+.btn-edit-quiz:active {
+  transform: translateY(0);
+}
+
+.btn-delete-quiz {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: white;
+}
+
+.btn-delete-quiz:hover {
+  background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(245, 87, 108, 0.4);
+  color: white;
+}
+
+.btn-delete-quiz:active {
+  transform: translateY(0);
+}
+
+/* Edit and Delete buttons for essays */
+.btn-edit-essay,
+.btn-delete-essay {
+  border: none;
+  border-radius: 8px;
+  padding: 8px 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  cursor: pointer;
+  min-width: 36px;
+  height: 36px;
+}
+
+.btn-edit-essay {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.btn-edit-essay:hover {
+  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  color: white;
+}
+
+.btn-edit-essay:active {
+  transform: translateY(0);
+}
+
+.btn-delete-essay {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: white;
+}
+
+.btn-delete-essay:hover {
+  background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(245, 87, 108, 0.4);
+  color: white;
+}
+
+.btn-delete-essay:active {
+  transform: translateY(0);
+}

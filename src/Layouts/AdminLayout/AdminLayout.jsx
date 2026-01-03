@@ -9,7 +9,7 @@ import {
   MdClass, 
   MdPeople, 
   MdAttachMoney, 
-  MdSettings, 
+  MdAssignment, 
   MdLogout,
   MdNotifications,
   MdSearch 
@@ -98,10 +98,14 @@ export default function AdminLayout() {
             <MdAttachMoney /> Finance
           </NavLink>
 
+          <NavLink 
+            to={ROUTE_PATHS.ADMIN.SUBMISSION_MANAGEMENT} 
+            className={({ isActive }) => isActive ? "menu-item active" : "menu-item"}
+          >
+            <MdAssignment /> Quản lý bài nộp
+          </NavLink>
+
           <div style={{ marginTop: 'auto', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
-            <NavLink to="/admin/settings" className="menu-item">
-              <MdSettings /> System Settings
-            </NavLink>
             <button onClick={handleLogout} className="menu-item" style={{ width: '100%', background: 'transparent', border: 'none', cursor: 'pointer' }}>
               <MdLogout /> Logout
             </button>

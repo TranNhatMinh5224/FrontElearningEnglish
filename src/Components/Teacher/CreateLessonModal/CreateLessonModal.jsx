@@ -2,13 +2,14 @@ import React, { useState, useEffect, useRef } from "react";
 import { Modal, Button } from "react-bootstrap";
 import { fileService } from "../../../Services/fileService";
 import { teacherService } from "../../../Services/teacherService";
+import { adminService } from "../../../Services/adminService";
 import { useAuth } from "../../../Context/AuthContext";
 import { FaFileUpload, FaTimes } from "react-icons/fa";
 import "./CreateLessonModal.css";
 
 const LESSON_IMAGE_BUCKET = "lessons"; // Bucket name for lesson images
 
-export default function CreateLessonModal({ show, onClose, onSuccess, courseId, lessonData, isUpdateMode = false }) {
+export default function CreateLessonModal({ show, onClose, onSuccess, courseId, lessonData, isUpdateMode = false, isAdmin = false }) {
   const { user } = useAuth();
   const fileInputRef = useRef(null);
 
@@ -195,10 +196,14 @@ export default function CreateLessonModal({ show, onClose, onSuccess, courseId, 
         if (!lessonId) {
           throw new Error("Không tìm thấy ID bài học");
         }
-        response = await teacherService.updateLesson(lessonId, submitData);
+        response = isAdmin 
+          ? await adminService.updateLesson(lessonId, submitData)
+          : await teacherService.updateLesson(lessonId, submitData);
       } else {
         submitData.courseId = parseInt(courseId);
-        response = await teacherService.createLesson(submitData);
+        response = isAdmin
+          ? await adminService.createLesson(submitData)
+          : await teacherService.createLesson(submitData);
       }
 
       if (response.data?.success) {

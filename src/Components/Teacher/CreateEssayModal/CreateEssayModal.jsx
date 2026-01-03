@@ -7,7 +7,7 @@ import "./CreateEssayModal.css";
 
 const ESSAY_BUCKET = "essays"; // Backend uses "essays" bucket for both images and audios
 
-export default function CreateEssayModal({ show, onClose, onSuccess, assessmentId, essayToUpdate = null }) {
+export default function CreateEssayModal({ show, onClose, onSuccess, assessmentId, essayToUpdate = null, isAdmin = false }) {
   const isUpdateMode = !!essayToUpdate;
   
   // Form state
@@ -51,7 +51,9 @@ export default function CreateEssayModal({ show, onClose, onSuccess, assessmentI
     setLoadingEssay(true);
     try {
       const essayId = essayToUpdate.essayId || essayToUpdate.EssayId;
-      const response = await essayService.getTeacherEssayById(essayId);
+      const response = isAdmin 
+        ? await essayService.getAdminEssayById(essayId)
+        : await essayService.getTeacherEssayById(essayId);
       
       if (response.data?.success && response.data?.data) {
         const essay = response.data.data;
@@ -325,9 +327,13 @@ export default function CreateEssayModal({ show, onClose, onSuccess, assessmentI
           audioTempKey: submitData.audioTempKey,
           audioType: submitData.audioType,
         };
-        response = await essayService.updateEssay(essayId, updateData);
+        response = isAdmin
+          ? await essayService.updateAdminEssay(essayId, updateData)
+          : await essayService.updateEssay(essayId, updateData);
       } else {
-        response = await essayService.createEssay(submitData);
+        response = isAdmin
+          ? await essayService.createAdminEssay(submitData)
+          : await essayService.createEssay(submitData);
       }
 
       if (response.data?.success) {

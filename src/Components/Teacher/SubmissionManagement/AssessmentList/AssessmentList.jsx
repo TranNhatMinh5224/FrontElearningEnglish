@@ -4,7 +4,7 @@ import { FaClipboardCheck } from "react-icons/fa";
 import { assessmentService } from "../../../../Services/assessmentService";
 import "./AssessmentList.css";
 
-export default function AssessmentList({ moduleId, onSelect }) {
+export default function AssessmentList({ moduleId, onSelect, isAdmin = false }) {
   const [assessments, setAssessments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -17,8 +17,10 @@ export default function AssessmentList({ moduleId, onSelect }) {
     try {
       setLoading(true);
       setError("");
-      // Use teacher API to get assessments by module
-      const response = await assessmentService.getTeacherAssessmentsByModule(moduleId);
+      // Use teacher or admin API based on isAdmin prop
+      const response = isAdmin 
+        ? await assessmentService.getAdminAssessmentsByModule(moduleId)
+        : await assessmentService.getTeacherAssessmentsByModule(moduleId);
       if (response.data?.success) {
         const data = response.data.data || [];
         setAssessments(data);

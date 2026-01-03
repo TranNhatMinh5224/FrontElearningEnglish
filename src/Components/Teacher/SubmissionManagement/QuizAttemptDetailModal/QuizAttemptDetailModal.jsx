@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Spinner } from "react-bootstrap";
 import { quizAttemptService } from "../../../../Services/quizAttemptService";
+import { useQuestionTypes } from "../../../../hooks/useQuestionTypes";
 import "./QuizAttemptDetailModal.css";
 
 export default function QuizAttemptDetailModal({ show, onClose, attempt, quizId }) {
+  const { getQuestionTypeLabel } = useQuestionTypes();
   const [attemptDetail, setAttemptDetail] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -95,6 +97,7 @@ export default function QuizAttemptDetailModal({ show, onClose, attempt, quizId 
   const maxScore = displayData.maxScore !== undefined ? displayData.maxScore : (displayData.MaxScore !== undefined ? displayData.MaxScore : null);
   const percentage = displayData.percentage !== undefined ? displayData.percentage : (displayData.Percentage !== undefined ? displayData.Percentage : null);
   const timeSpentSeconds = displayData.timeSpentSeconds !== undefined ? displayData.timeSpentSeconds : (displayData.TimeSpentSeconds !== undefined ? displayData.TimeSpentSeconds : 0);
+  const questions = displayData.questions || displayData.Questions || [];
 
   return (
     <Modal 
@@ -132,6 +135,85 @@ export default function QuizAttemptDetailModal({ show, onClose, attempt, quizId 
             <div className="mb-3">
               <strong>Thời gian làm bài:</strong> {timeSpentSeconds > 0 ? `${Math.floor(timeSpentSeconds / 60)} phút ${timeSpentSeconds % 60} giây` : "N/A"}
             </div>
+
+            {questions.length > 0 && (
+              <div className="questions-review-section">
+                <h5>Chi tiết câu hỏi</h5>
+                {questions.map((question, index) => {
+                  const questionId = question.questionId || question.QuestionId;
+                  const questionText = question.questionText || question.QuestionText || "";
+                  const questionType = question.type || question.Type;
+                  const points = question.points || question.Points || 0;
+                  const score = question.score || question.Score || 0;
+                  const isCorrect = question.isCorrect !== undefined ? question.isCorrect : (question.IsCorrect || false);
+                  const userAnswerText = question.userAnswerText || question.UserAnswerText || "Chưa trả lời";
+                  const correctAnswerText = question.correctAnswerText || question.CorrectAnswerText || "";
+                  const options = question.options || question.Options || [];
+
+                  return (
+                    <div key={questionId || index} className={`question-review-item ${isCorrect ? 'correct-answer' : 'incorrect-answer'}`}>
+                      <div className="question-header">
+                        <span className="question-badge number">Câu {index + 1}</span>
+                        <span className="question-badge type">{getQuestionTypeLabel(questionType)}</span>
+                        <span className={`question-badge ${isCorrect ? 'correct' : 'incorrect'}`}>
+                          {isCorrect ? '✓ Đúng' : '✗ Sai'}
+                        </span>
+                        <span className="question-score ms-auto">
+                          {score}/{points} điểm
+                        </span>
+                      </div>
+                      
+                      <div className="question-text">
+                        <strong>Câu hỏi:</strong> {questionText}
+                      </div>
+Label
+                      {options.length > 0 && (
+                        <div className="options-section">
+                          <strong>Các lựa chọn:</strong>
+                          <ul className="question-options">
+                            {options.map((option, optIdx) => {
+                              const optionId = option.optionId || option.OptionId;
+                              const optionText = option.optionText || option.OptionText || "";
+                              const isOptionCorrect = option.isCorrect !== undefined ? option.isCorrect : (option.IsCorrect || false);
+                              const isSelected = option.isSelected !== undefined ? option.isSelected : (option.IsSelected || false);
+                              
+                              let className = '';
+                              if (isSelected && isOptionCorrect) {
+                                className = 'selected correct-option';
+                              } else if (isSelected) {
+                                className = 'selected';
+                              } else if (isOptionCorrect) {
+                                className = 'correct-option';
+                              }
+                              
+                              return (
+                                <li key={optionId || optIdx} className={className}>
+                                  {isSelected && <span className="selected-indicator">[Đã chọn]</span>}
+                                  {isOptionCorrect && <span className="correct-indicator">✓</span>}
+                                  {optionText}
+                                </li>
+                              );
+                            })}
+                          </ul>
+                        </div>
+                      )}
+
+                      <div className="answer-section">
+                        <div className="user-answer">
+                          <strong>Câu trả lời:</strong> {userAnswerText}
+                        </div>
+
+                        {!isCorrect && correctAnswerText && (
+                          <div className="correct-answer-text">
+                            <strong>Đáp án đúng:</strong> {correctAnswerText}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </>
         )}
       </Modal.Body>
