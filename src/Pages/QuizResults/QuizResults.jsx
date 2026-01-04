@@ -4,6 +4,7 @@ import { Container, Row, Col, Button, Card, Badge } from "react-bootstrap";
 import MainHeader from "../../Components/Header/MainHeader";
 import { useSubmissionStatus } from "../../hooks/useSubmissionStatus";
 import { quizAttemptService } from "../../Services/quizAttemptService";
+import { quizService } from "../../Services/quizService";
 import { FaCheckCircle, FaTimesCircle, FaClock, FaTrophy } from "react-icons/fa";
 import "./QuizResults.css";
 
@@ -15,6 +16,8 @@ export default function QuizResults() {
     const [result, setResult] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [assessmentId, setAssessmentId] = useState(null);
+    const [quizId, setQuizId] = useState(null);
 
     useEffect(() => {
         const fetchResults = async () => {
@@ -22,28 +25,47 @@ export default function QuizResults() {
                 setLoading(true);
                 setError("");
 
+                let attemptData = null;
+
                 // ƯU TIÊN 1: Lấy từ localStorage (Dữ liệu này được QuizDetail lưu ngay khi nộp thành công)
                 const savedResult = localStorage.getItem(`quiz_result_${attemptId}`);
                 if (savedResult) {
                     console.log("✅ [QuizResults] Found result in localStorage");
-                    setResult(JSON.parse(savedResult));
-                    setLoading(false);
-                    return;
+                    attemptData = JSON.parse(savedResult);
+                } else {
+                    // ƯU TIÊN 2: Nếu F5 hoặc mất cache, thử gọi Resume API (Backend thường trả về kết quả nếu đã nộp)
+                    console.log("🔍 [QuizResults] Fetching via Resume API as fallback...");
+                    const response = await quizAttemptService.resume(attemptId);
+                    
+                    if (response.data?.success && response.data?.data) {
+                        attemptData = response.data.data;
+                        console.log("📥 [QuizResults] Data from Resume API:", attemptData);
+                    } else {
+                        setError("Không tìm thấy kết quả bài thi này.");
+                    }
                 }
 
-                // ƯU TIÊN 2: Nếu F5 hoặc mất cache, thử gọi Resume API (Backend thường trả về kết quả nếu đã nộp)
-                console.log("🔍 [QuizResults] Fetching via Resume API as fallback...");
-                const response = await quizAttemptService.resume(attemptId);
-                
-                if (response.data?.success && response.data?.data) {
-                    const attemptData = response.data.data;
-                    console.log("📥 [QuizResults] Data from Resume API:", attemptData);
-                    
-                    // Map attempt data to result format if needed
-                    // Nếu backend trả về kết quả chấm điểm trong attempt
+                if (attemptData) {
                     setResult(attemptData);
-                } else {
-                    setError("Không tìm thấy kết quả bài thi này.");
+                    // Extract quizId from result
+                    const qId = attemptData.quizId || attemptData.QuizId;
+                    if (qId) {
+                        setQuizId(qId);
+                        // Fetch quiz info to get assessmentId
+                        try {
+                            const quizRes = await quizService.getById(qId);
+                            if (quizRes.data?.success && quizRes.data?.data) {
+                                const quizData = Array.isArray(quizRes.data.data) ? quizRes.data.data[0] : quizRes.data.data;
+                                const aId = quizData.assessmentId || quizData.AssessmentId;
+                                if (aId) {
+                                    setAssessmentId(aId);
+                                    console.log("✅ [QuizResults] Found AssessmentId:", aId);
+                                }
+                            }
+                        } catch (qErr) {
+                            console.error("Error fetching quiz info:", qErr);
+                        }
+                    }
                 }
             } catch (err) {
                 console.error("Error fetching results:", err);
@@ -109,6 +131,14 @@ export default function QuizResults() {
         return [correctOption];
     };
 
+    const handleBack = () => {
+        if (assessmentId) {
+            navigate(`/course/${courseId}/lesson/${lessonId}/module/${moduleId}/assignment/${assessmentId}`);
+        } else {
+            navigate(`/course/${courseId}/lesson/${lessonId}/module/${moduleId}/assignment`);
+        }
+    };
+
     if (loading) {
         return (
             <>
@@ -128,7 +158,7 @@ export default function QuizResults() {
                     <div className="error-message">{error}</div>
                     <Button
                         variant="primary"
-                        onClick={() => navigate(`/course/${courseId}/lesson/${lessonId}/module/${moduleId}/assignment`)}
+                        onClick={handleBack}
                         style={{ marginTop: "20px" }}
                     >
                         Quay lại
@@ -282,7 +312,7 @@ export default function QuizResults() {
                                     <div className="results-actions">
                                         <Button
                                             variant="outline-secondary"
-                                            onClick={() => navigate(`/course/${courseId}/lesson/${lessonId}/module/${moduleId}/assignment`)}
+                                            onClick={handleBack}
                                         >
                                             Quay lại
                                         </Button>

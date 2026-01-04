@@ -44,10 +44,8 @@ html body .modal.student-detail-modal .modal-dialog.student-detail-modal-dialog.
   min-height: calc(100% - 1rem) !important;
 }
 
-.student-detail-modal .modal-content,
-.modal.student-detail-modal .modal-content,
-body .student-detail-modal .modal-content,
-html body .student-detail-modal .modal-content {
+.student-detail-modal > .modal-dialog > .modal-content,
+.modal.student-detail-modal > .modal-dialog > .modal-content {
   border-radius: 16px !important;
   border: none !important;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15) !important;
@@ -58,18 +56,18 @@ html body .student-detail-modal .modal-content {
   flex-direction: column !important;
 }
 
-.student-detail-modal .modal-header {
+.student-detail-modal > .modal-dialog > .modal-content > .modal-header {
   border-bottom: 1px solid #e5e7eb;
   padding: 24px 28px;
 }
 
-.student-detail-modal .modal-title {
+.student-detail-modal > .modal-dialog > .modal-content > .modal-header > .modal-title {
   font-size: 24px;
   font-weight: 700;
   color: #1f2937;
 }
 
-.student-detail-modal .modal-body {
+.student-detail-modal > .modal-dialog > .modal-content > .modal-body {
   padding: 28px;
   overflow-y: auto;
   flex: 1;
@@ -269,10 +267,40 @@ html body .student-detail-modal .modal-content {
   text-align: right;
 }
 
-.student-detail-modal .modal-footer {
+.student-detail-modal > .modal-dialog > .modal-content > .modal-footer {
   border-top: 1px solid #e5e7eb;
   padding: 20px 28px;
   gap: 12px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.delete-btn {
+  padding: 10px 24px;
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-right: auto;
+}
+
+.delete-btn:hover:not(:disabled) {
+  background-color: #dc2626;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.delete-btn:disabled {
+  background-color: #fca5a5;
+  cursor: not-allowed;
+  opacity: 0.6;
 }
 
 .close-btn {

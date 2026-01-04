@@ -13,7 +13,7 @@ const LECTURE_TYPES = [
   { value: 5, label: "Interactive" },
 ];
 
-export default function CreateLectureModal({ show, onClose, onSuccess, moduleId, lectureToUpdate }) {
+export default function CreateLectureModal({ show, onClose, onSuccess, moduleId, lectureToUpdate, isAdmin = false }) {
   const [title, setTitle] = useState("");
   const [markdownContent, setMarkdownContent] = useState("");
   const [lectureType, setLectureType] = useState(1);
@@ -65,9 +65,13 @@ export default function CreateLectureModal({ show, onClose, onSuccess, moduleId,
       let response;
       if (lectureToUpdate) {
         const lectureId = lectureToUpdate.lectureId || lectureToUpdate.LectureId;
-        response = await lectureService.updateLecture(lectureId, lectureData);
+        response = isAdmin
+          ? await lectureService.updateAdminLecture(lectureId, lectureData)
+          : await lectureService.updateLecture(lectureId, lectureData);
       } else {
-        response = await lectureService.createLecture(lectureData);
+        response = isAdmin
+          ? await lectureService.createAdminLecture(lectureData)
+          : await lectureService.createLecture(lectureData);
       }
 
       if (response.data?.success) {

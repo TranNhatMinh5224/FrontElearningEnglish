@@ -84,6 +84,7 @@ export const ROUTE_PATHS = {
     COURSES: "/admin/courses",
     USERS: "/admin/users",
     FINANCE: "/admin/finance",
+    SUBMISSION_MANAGEMENT: "/admin/submission-management",
   },
 };
 

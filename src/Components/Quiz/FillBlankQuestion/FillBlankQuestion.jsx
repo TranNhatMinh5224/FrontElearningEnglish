@@ -17,38 +17,46 @@ export default function FillBlankQuestion({ question, answer, onChange }) {
         );
     }, [question]);
 
-    // Parse nội dung để tìm các ô trống
-    const parts = useMemo(() => text.split(/(\[.*?\])/g), [text]);
+    // Parse nội dung để tìm các ô trống (hỗ trợ cả [...] và ___)
+    const parts = useMemo(() => text.split(/(_+|\[.*?\])/g), [text]);
     
     // Đếm số lượng ô trống thực tế
     const blanksCount = useMemo(() => {
-        return parts.filter(p => p.startsWith('[') && p.endsWith(']')).length;
+        return parts.filter(p => p.startsWith('_') || (p.startsWith('[') && p.endsWith(']'))).length;
     }, [parts]);
 
-    // Khởi tạo state inputs
-    const [inputs, setInputs] = useState(() => {
+    // Parse answer helper
+    const parseAnswer = (ans) => {
         try {
-            if (typeof answer === 'string' && answer.startsWith('[')) {
-                return JSON.parse(answer);
+            if (!ans) return new Array(blanksCount).fill("");
+            if (typeof ans === 'string' && ans.startsWith('[')) {
+                const parsed = JSON.parse(ans);
+                return Array.isArray(parsed) ? parsed : [ans];
             }
-            if (Array.isArray(answer)) return answer;
-            if (answer && typeof answer === 'string') return [answer];
+            if (Array.isArray(ans)) return ans;
+            // Handle comma separated string logic if needed, or just treat as single
+            if (typeof ans === 'string') {
+                 if (blanksCount > 1 && ans.includes(", ")) return ans.split(", ");
+                 return [ans];
+            }
         } catch (e) {
             console.error("FillBlank Error parsing answer:", e);
         }
         return new Array(blanksCount).fill("");
-    });
+    };
 
-    // Đồng bộ inputs khi blanksCount thay đổi (tránh lỗi lệch index)
+    // Khởi tạo state inputs
+    const [inputs, setInputs] = useState(() => parseAnswer(answer));
+
+    // Đồng bộ inputs khi answer hoặc blanksCount thay đổi (Fix bug chuyển câu hỏi không reset)
     useEffect(() => {
-        if (inputs.length < blanksCount) {
-            setInputs(prev => {
-                const next = [...prev];
-                while (next.length < blanksCount) next.push("");
-                return next;
-            });
+        const newInputs = parseAnswer(answer);
+        // Ensure length match
+        if (newInputs.length < blanksCount) {
+             while (newInputs.length < blanksCount) newInputs.push("");
         }
-    }, [blanksCount]);
+        setInputs(newInputs);
+    }, [answer, blanksCount]);
 
     const handleInputChange = (index, value) => {
         const newInputs = [...inputs];
@@ -58,7 +66,7 @@ export default function FillBlankQuestion({ question, answer, onChange }) {
         // Gửi kết quả về parent để nộp bài
         if (blanksCount === 1) {
             // Nếu chỉ có 1 ô, gửi chính xác giá trị text (đã trim) để backend so sánh chuỗi
-            onChange(value.trim()); 
+            onChange(value); 
         } else {
             // Nếu nhiều ô, gửi chuỗi nối (logic mặc định của backend cũ)
             onChange(newInputs.map(i => i.trim()).join(", "));
@@ -73,8 +81,8 @@ export default function FillBlankQuestion({ question, answer, onChange }) {
         <div className="fill-blank-question-container mt-3 p-4 bg-white rounded shadow-sm border">
             <div className="fill-blank-sentence" style={{ lineHeight: '3.5rem', fontSize: '1.25rem', color: '#333' }}>
                 {parts.map((part, i) => {
-                    // Nếu part là cụm [đáp án]
-                    if (part.startsWith('[') && part.endsWith(']')) {
+                    // Nếu part là cụm [đáp án] hoặc _ (bất kỳ độ dài nào)
+                    if (part.startsWith('_') || (part.startsWith('[') && part.endsWith(']'))) {
                         const index = currentBlankIdx++;
                         return (
                             <input

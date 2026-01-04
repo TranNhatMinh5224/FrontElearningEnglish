@@ -1,0 +1,65 @@
+/* DashboardHeader Component Styles */
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.page-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 0.25rem;
+}
+
+.header-subtitle {
+  color: #6b7280;
+  margin-bottom: 0;
+  font-size: 0.95rem;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.time-range-selector {
+  background: white;
+  padding: 0.25rem;
+  border-radius: 0.375rem;
+  border: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+}
+
+.time-range-selector .form-select {
+  width: auto;
+  font-weight: 500;
+  border: none;
+  box-shadow: none;
+  padding: 0.25rem 0.5rem;
+}
+
+.time-range-selector .form-select:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+@media (max-width: 768px) {
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .header-actions {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .time-range-selector {
+    width: 100%;
+  }
+}

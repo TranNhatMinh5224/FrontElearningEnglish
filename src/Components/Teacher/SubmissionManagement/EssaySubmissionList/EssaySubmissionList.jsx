@@ -5,7 +5,7 @@ import { essaySubmissionService } from "../../../../Services/essaySubmissionServ
 import EssaySubmissionDetailModal from "../EssaySubmissionDetailModal/EssaySubmissionDetailModal";
 import "./EssaySubmissionList.css";
 
-export default function EssaySubmissionList({ essayId, essayTitle, onBack }) {
+export default function EssaySubmissionList({ essayId, essayTitle, onBack, isAdmin = false }) {
   const [submissions, setSubmissions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -24,7 +24,9 @@ export default function EssaySubmissionList({ essayId, essayTitle, onBack }) {
     try {
       setLoading(true);
       setError("");
-      const response = await essaySubmissionService.getSubmissionsByEssay(essayId, currentPage, pageSize);
+      const response = isAdmin
+        ? await essaySubmissionService.getAdminSubmissionsByEssay(essayId, currentPage, pageSize)
+        : await essaySubmissionService.getSubmissionsByEssay(essayId, currentPage, pageSize);
       if (response.data?.success) {
         const data = response.data.data || {};
         const items = data.items || data.data || [];
@@ -42,7 +44,10 @@ export default function EssaySubmissionList({ essayId, essayTitle, onBack }) {
 
   const handleViewDetail = async (submission) => {
     try {
-      const response = await essaySubmissionService.getSubmissionDetail(submission.submissionId || submission.SubmissionId);
+      const submissionId = submission.submissionId || submission.SubmissionId;
+      const response = isAdmin
+        ? await essaySubmissionService.getAdminSubmissionDetail(submissionId)
+        : await essaySubmissionService.getSubmissionDetail(submissionId);
       if (response.data?.success) {
         setSelectedSubmission(response.data.data);
         setShowDetailModal(true);
@@ -60,7 +65,9 @@ export default function EssaySubmissionList({ essayId, essayTitle, onBack }) {
         (s) => (s.submissionId || s.SubmissionId) === submissionId
       );
       
-      const response = await essaySubmissionService.downloadSubmissionFile(submissionId);
+      const response = isAdmin
+        ? await essaySubmissionService.downloadAdminSubmissionFile(submissionId)
+        : await essaySubmissionService.downloadSubmissionFile(submissionId);
       
       // Get filename from Content-Disposition header or use attachmentType
       let fileName = `submission-${submissionId}`;
@@ -313,6 +320,7 @@ export default function EssaySubmissionList({ essayId, essayTitle, onBack }) {
             setSelectedSubmission(null);
           }}
           submission={selectedSubmission}
+          isAdmin={isAdmin}
           onGradeSuccess={() => {
             fetchSubmissions();
             setShowDetailModal(false);

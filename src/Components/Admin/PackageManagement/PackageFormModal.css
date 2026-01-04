@@ -1,0 +1,126 @@
+/* Override Bootstrap modal styles - make it wider and centered */
+/* Use highest specificity to override global modal rules */
+
+/* Base styles - target all possible selector combinations */
+.package-form-modal-dialog,
+.modal .package-form-modal-dialog,
+.modal.show .package-form-modal-dialog,
+.package-form-modal .modal-dialog.package-form-modal-dialog,
+.modal.package-form-modal .modal-dialog.package-form-modal-dialog,
+.modal.show.package-form-modal .modal-dialog.package-form-modal-dialog,
+body .modal .package-form-modal-dialog,
+body .modal.show .package-form-modal-dialog,
+body .package-form-modal .modal-dialog.package-form-modal-dialog,
+html body .modal .package-form-modal-dialog,
+html body .modal.show .package-form-modal-dialog {
+  max-width: 900px !important;
+  width: 90% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+/* Override global modal.show rule - highest specificity */
+body .modal.show .package-form-modal .modal-dialog.package-form-modal-dialog,
+body .modal.show.package-form-modal .modal-dialog.package-form-modal-dialog,
+html body .modal.show .package-form-modal-dialog,
+html body .modal.show .package-form-modal .modal-dialog.package-form-modal-dialog {
+  max-width: 900px !important;
+  width: 90% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  display: flex !important;
+  align-items: center !important;
+  min-height: calc(100% - 1rem) !important;
+}
+
+/* Ensure centered alignment works correctly with Bootstrap centered class */
+.package-form-modal-dialog.modal-dialog-centered,
+.modal.package-form-modal .modal-dialog.package-form-modal-dialog.modal-dialog-centered,
+body .package-form-modal .modal-dialog.package-form-modal-dialog.modal-dialog-centered,
+html body .package-form-modal-dialog.modal-dialog-centered,
+html body .modal.package-form-modal .modal-dialog.package-form-modal-dialog.modal-dialog-centered {
+  max-width: 900px !important;
+  width: 90% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  display: flex !important;
+  align-items: center !important;
+  min-height: calc(100% - 1rem) !important;
+}
+
+/* Override modal-content from other modals */
+.package-form-modal > .modal-dialog > .modal-content,
+.modal.package-form-modal > .modal-dialog > .modal-content {
+  border-radius: 16px !important;
+  border: none !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15) !important;
+  max-width: none !important;
+  width: 100% !important;
+  max-height: 90vh !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.package-form-modal > .modal-dialog > .modal-content > .modal-header {
+  border-bottom: 1px solid #e5e7eb;
+  padding: 24px 28px;
+}
+
+.package-form-modal > .modal-dialog > .modal-content > .modal-header > .modal-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.package-form-modal > .modal-dialog > .modal-content > .modal-body {
+  padding: 28px;
+  overflow-y: auto;
+  flex: 1;
+  max-height: calc(90vh - 140px); /* Subtract header + footer height */
+}
+
+.package-form-modal > .modal-dialog > .modal-content > .modal-footer {
+  border-top: 1px solid #e5e7eb;
+  padding: 20px 28px;
+  gap: 12px;
+}
+
+.package-form-modal .form-group {
+  margin-bottom: 20px;
+}
+
+.package-form-modal .form-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 8px;
+}
+
+.package-form-modal .form-control,
+.package-form-modal .form-select {
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  padding: 10px 14px;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.package-form-modal .form-control:focus,
+.package-form-modal .form-select:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  outline: none;
+}
+
+.package-form-modal .text-danger {
+  color: #ef4444;
+}
+
+.package-form-modal .text-primary {
+  color: #6366f1;
+}
+
+.package-form-modal .border-bottom {
+  border-bottom: 2px solid #e5e7eb;
+}

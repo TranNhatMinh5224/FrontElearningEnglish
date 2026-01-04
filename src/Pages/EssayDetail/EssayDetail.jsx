@@ -10,7 +10,7 @@ import { fileService } from "../../Services/fileService";
 import { moduleService } from "../../Services/moduleService";
 import { courseService } from "../../Services/courseService";
 import { lessonService } from "../../Services/lessonService";
-import { FaFileUpload, FaTimes, FaEdit, FaClock, FaCheckCircle, FaVolumeUp, FaPlay, FaPause, FaForward, FaBackward } from "react-icons/fa";
+import { FaFileUpload, FaTimes, FaEdit, FaClock, FaCheckCircle, FaTimesCircle, FaVolumeUp } from "react-icons/fa";
 import "./EssayDetail.css";
 
 export default function EssayDetail() {
@@ -20,6 +20,7 @@ export default function EssayDetail() {
     const [essay, setEssay] = useState(null);
     const [course, setCourse] = useState(null);
     const [lesson, setLesson] = useState(null);
+    const [module, setModule] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [submitting, setSubmitting] = useState(false);
@@ -45,7 +46,6 @@ export default function EssayDetail() {
     const fileInputRef = useRef(null);
     const moduleStartedRef = useRef(false);
     const audioRef = useRef(null);
-    const [isPlaying, setIsPlaying] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -75,6 +75,12 @@ export default function EssayDetail() {
                 const lessonResponse = await lessonService.getLessonById(lessonId);
                 if (lessonResponse.data?.success && lessonResponse.data?.data) {
                     setLesson(lessonResponse.data.data);
+                }
+
+                // Fetch module info
+                const moduleResponse = await moduleService.getModuleById(moduleId);
+                if (moduleResponse.data?.success && moduleResponse.data?.data) {
+                    setModule(moduleResponse.data.data);
                 }
 
                 // Fetch essay info
@@ -186,20 +192,6 @@ export default function EssayDetail() {
 
     const handleAudioClick = async (e) => {
         e.stopPropagation();
-        
-        // Toggle play/pause if audio already loaded
-        if (audioRef.current) {
-            if (isPlaying) {
-                audioRef.current.pause();
-                setIsPlaying(false);
-            } else {
-                audioRef.current.play();
-                setIsPlaying(true);
-            }
-            return;
-        }
-        
-        // Load and play audio for the first time
         const audioUrl = essay?.audioUrl || essay?.AudioUrl;
         if (!audioUrl) {
             console.warn("No audio URL provided");
@@ -207,6 +199,13 @@ export default function EssayDetail() {
         }
 
         try {
+            // Stop any currently playing audio
+            if (audioRef.current) {
+                audioRef.current.pause();
+                audioRef.current.src = "";
+                audioRef.current = null;
+            }
+            
             // Try fetching audio as blob first (to bypass CORS and handle 403)
             // Similar to FlashCardViewer approach
             try {
@@ -231,14 +230,12 @@ export default function EssayDetail() {
                     // Clean up blob URL when audio ends
                     URL.revokeObjectURL(blobUrl);
                     audioRef.current = null;
-                    setIsPlaying(false);
                 };
                 
                 audio.onerror = (err) => {
                     console.error("Error playing audio from blob:", err);
                     URL.revokeObjectURL(blobUrl);
                     audioRef.current = null;
-                    setIsPlaying(false);
                     setNotification({
                         isOpen: true,
                         type: "error",
@@ -248,7 +245,6 @@ export default function EssayDetail() {
                 
                 audioRef.current = audio;
                 await audio.play();
-                setIsPlaying(true);
                 console.log("Audio playing successfully via blob");
             } catch (fetchError) {
                 // If fetch fails (403, CORS, etc.), try direct audio URL as fallback
@@ -262,13 +258,11 @@ export default function EssayDetail() {
                     
                     audio.onended = () => {
                         audioRef.current = null;
-                        setIsPlaying(false);
                     };
                     
                     audio.onerror = (err) => {
                         console.error("Error playing audio from direct URL:", err);
                         audioRef.current = null;
-                        setIsPlaying(false);
                         setNotification({
                             isOpen: true,
                             type: "error",
@@ -277,7 +271,6 @@ export default function EssayDetail() {
                     };
                     
                     await audio.play();
-                    setIsPlaying(true);
                     console.log("Audio playing successfully via direct URL");
                 } catch (directError) {
                     console.error("Both blob fetch and direct URL failed:", directError);
@@ -298,21 +291,6 @@ export default function EssayDetail() {
                 type: "error",
                 message: "Không thể phát âm thanh. Vui lòng thử lại."
             });
-        }
-    };
-
-    const handleSeekBackward = () => {
-        if (audioRef.current) {
-            audioRef.current.currentTime = Math.max(0, audioRef.current.currentTime - 10);
-        }
-    };
-
-    const handleSeekForward = () => {
-        if (audioRef.current) {
-            audioRef.current.currentTime = Math.min(
-                audioRef.current.duration,
-                audioRef.current.currentTime + 10
-            );
         }
     };
 
@@ -700,6 +678,7 @@ export default function EssayDetail() {
     const essayTitle = essay?.title || essay?.Title || "Essay";
     const courseTitle = course?.title || course?.Title || "Khóa học";
     const lessonTitle = lesson?.title || lesson?.Title || "Bài học";
+    const moduleName = module?.name || module?.Name || "Module";
 
     // Safety check: ensure all required objects exist before rendering
     if (!essay) {
@@ -745,7 +724,18 @@ export default function EssayDetail() {
                     <Row>
                         <Col>
                             <div className="essay-header">
-                                <h1 className="essay-title">{essayTitle}</h1>
+                                <div className="essay-title-wrapper">
+                                    <h1 className="essay-title">{essayTitle}</h1>
+                                    {essay?.audioUrl && (
+                                        <button 
+                                            className="essay-audio-icon-btn"
+                                            onClick={handleAudioClick}
+                                            title="Nghe đề bài"
+                                        >
+                                            <FaVolumeUp />
+                                        </button>
+                                    )}
+                                </div>
                                 {essay?.description && (
                                     <p className="essay-description">{essay.description || essay.Description}</p>
                                 )}
@@ -768,38 +758,6 @@ export default function EssayDetail() {
                                 <h2 className="section-title">
                                     {currentSubmission ? "Cập nhật bài Essay" : "Nộp bài Essay"}
                                 </h2>
-                                <p className="essay-good-luck">Chúc các em thi tốt goodLuck!</p>
-
-                                {essay?.audioUrl && (
-                                    <div className="essay-audio-player">
-                                        <button 
-                                            className="audio-control-btn"
-                                            onClick={handleSeekBackward}
-                                            title="Lùi lại 10s"
-                                            disabled={!audioRef.current}
-                                        >
-                                            <FaBackward />
-                                        </button>
-                                        <button 
-                                            className="audio-control-btn play-pause-btn"
-                                            onClick={handleAudioClick}
-                                            title={isPlaying ? "Tạm dừng" : "Phát"}
-                                        >
-                                            {isPlaying ? <FaPause /> : <FaPlay />}
-                                        </button>
-                                        <button 
-                                            className="audio-control-btn"
-                                            onClick={handleSeekForward}
-                                            title="Tiến 10s"
-                                            disabled={!audioRef.current}
-                                        >
-                                            <FaForward />
-                                        </button>
-                                        <span className="audio-label">
-                                            <FaVolumeUp className="me-1" /> Nghe đề bài
-                                        </span>
-                                    </div>
-                                )}
 
                                 {currentSubmission && (
                                     <div className="alert alert-info mb-3" role="alert">

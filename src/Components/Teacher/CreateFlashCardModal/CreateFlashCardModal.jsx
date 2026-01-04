@@ -10,7 +10,7 @@ import "./CreateFlashCardModal.css";
 const FLASHCARD_IMAGE_BUCKET = "flashcards";
 const FLASHCARD_AUDIO_BUCKET = "flashcard-audio";
 
-export default function CreateFlashCardModal({ show, onClose, onSuccess, moduleId, flashcardToUpdate }) {
+export default function CreateFlashCardModal({ show, onClose, onSuccess, moduleId, flashcardToUpdate, isAdmin = false }) {
   const isEditMode = !!flashcardToUpdate;
 
   // Form state
@@ -190,10 +190,14 @@ export default function CreateFlashCardModal({ show, onClose, onSuccess, moduleI
         let res;
         if (isEditMode) {
             const flashcardId = flashcardToUpdate.flashcardId || flashcardToUpdate.FlashcardId;
-            res = await flashcardService.updateFlashcard(flashcardId, payload);
+            res = isAdmin
+                ? await flashcardService.updateAdminFlashcard(flashcardId, payload)
+                : await flashcardService.updateFlashcard(flashcardId, payload);
         } else {
             payload.moduleId = parseInt(moduleId);
-            res = await flashcardService.createFlashcard(payload);
+            res = isAdmin
+                ? await flashcardService.createAdminFlashcard(payload)
+                : await flashcardService.createFlashcard(payload);
         }
 
         if (res.data?.success) {
@@ -227,23 +231,23 @@ export default function CreateFlashCardModal({ show, onClose, onSuccess, moduleI
                 <Col md={6}>
                     <div className="mb-3">
                         <label className="form-label required">Từ vựng</label>
-                        <input type="text" className="form-control" value={word} onChange={e => setWord(e.target.value)} placeholder="Apple" />
+                        <input type="text" className="form-control" value={word} onChange={e => setWord(e.target.value)} placeholder="Nhập từ vựng tiếng Anh" />
                     </div>
                 </Col>
                 <Col md={6}>
                     <div className="mb-3">
                         <label className="form-label required">Phiên âm</label>
-                        <input type="text" className="form-control" value={pronunciation} onChange={e => setPronunciation(e.target.value)} placeholder="/ˈæp.l/" />
+                        <input type="text" className="form-control" value={pronunciation} onChange={e => setPronunciation(e.target.value)} placeholder="Nhập phiên âm IPA (VD: /ˈæp.l/)" />
                     </div>
                 </Col>
             </Row>
             <div className="mb-3">
                 <label className="form-label required">Nghĩa</label>
-                <input type="text" className="form-control" value={meaning} onChange={e => setMeaning(e.target.value)} placeholder="Quả táo" />
+                <input type="text" className="form-control" value={meaning} onChange={e => setMeaning(e.target.value)} placeholder="Nhập nghĩa tiếng Việt" />
             </div>
             <div className="mb-3">
                 <label className="form-label required">Từ loại</label>
-                <input type="text" className="form-control" value={partOfSpeech} onChange={e => setPartOfSpeech(e.target.value)} placeholder="Noun" />
+                <input type="text" className="form-control" value={partOfSpeech} onChange={e => setPartOfSpeech(e.target.value)} placeholder="Nhập từ loại (VD: Noun, Verb, Adjective)" />
             </div>
             
             <Row>
@@ -272,9 +276,9 @@ export default function CreateFlashCardModal({ show, onClose, onSuccess, moduleI
                         <label className="form-label required">Âm thanh</label>
                         <div className="border p-2 text-center rounded bg-light" style={{minHeight: '150px', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
                             {audioPreview ? (
-                                <div className="w-100 position-relative">
+                                <div className="w-100">
                                     <audio controls src={audioPreview} style={{width: '100%'}}/>
-                                    <Button variant="danger" size="sm" className="position-absolute top-0 end-0 m-1" onClick={() => {setAudioPreview(null); setAudioTempKey(null);}}><FaTimes/></Button>
+                                    <Button variant="danger" size="sm" className="mt-2 w-100" onClick={() => {setAudioPreview(null); setAudioTempKey(null);}}><FaTimes className="me-1"/> Xóa audio</Button>
                                 </div>
                             ) : (
                                 <div className="cursor-pointer" onClick={() => audioInputRef.current?.click()}>
@@ -293,13 +297,13 @@ export default function CreateFlashCardModal({ show, onClose, onSuccess, moduleI
                 <Col md={6}>
                     <div className="mb-3">
                         <label className="form-label">Ví dụ</label>
-                        <textarea className="form-control" rows={2} value={example} onChange={e => setExample(e.target.value)} placeholder="I eat an apple." />
+                        <textarea className="form-control" rows={2} value={example} onChange={e => setExample(e.target.value)} placeholder="Nhập câu ví dụ tiếng Anh" />
                     </div>
                 </Col>
                 <Col md={6}>
                     <div className="mb-3">
                         <label className="form-label">Dịch ví dụ</label>
-                        <textarea className="form-control" rows={2} value={exampleTranslation} onChange={e => setExampleTranslation(e.target.value)} placeholder="Tôi ăn một quả táo." />
+                        <textarea className="form-control" rows={2} value={exampleTranslation} onChange={e => setExampleTranslation(e.target.value)} placeholder="Nhập bản dịch tiếng Việt" />
                     </div>
                 </Col>
             </Row>

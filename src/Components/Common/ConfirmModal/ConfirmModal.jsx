@@ -1,6 +1,6 @@
 import React from "react";
 import "./ConfirmModal.css";
-import { FaQuestionCircle } from "react-icons/fa";
+import { FaQuestionCircle, FaExclamationTriangle } from "react-icons/fa";
 
 export default function ConfirmModal({ 
     isOpen, 
@@ -8,23 +8,34 @@ export default function ConfirmModal({
     onConfirm,
     title = "Xác nhận",
     message,
+    itemName = "", // Tên item cần xác nhận (dùng cho delete)
     confirmText = "Xác nhận",
     cancelText = "Hủy",
-    type = "warning", // "warning", "danger"
-    disabled = false
+    type = "warning", // "warning", "danger", "delete"
+    disabled = false,
+    loading = false // Thêm loading state
 }) {
     if (!isOpen) return null;
+
+    // Icon theo type
+    const getIcon = () => {
+        if (type === "delete" || type === "danger") {
+            return <FaExclamationTriangle className={`confirm-icon confirm-icon-${type}`} />;
+        }
+        return <FaQuestionCircle className={`confirm-icon confirm-icon-${type}`} />;
+    };
 
     return (
         <div className="modal-overlay confirm-modal-overlay" onClick={onClose}>
             <div className="modal-content confirm-modal-content" onClick={(e) => e.stopPropagation()}>
                 <div className="confirm-modal-header">
-                    <FaQuestionCircle className={`confirm-icon confirm-icon-${type}`} />
+                    {getIcon()}
                     <h2 className="confirm-modal-title">{title}</h2>
                 </div>
                 
                 <div className="confirm-modal-body">
                     <p className="confirm-message">{message}</p>
+                    {itemName && <p className="item-name">"{itemName}"</p>}
                 </div>
 
                 <div className="confirm-modal-footer">
@@ -32,7 +43,7 @@ export default function ConfirmModal({
                         type="button"
                         className="modal-btn modal-btn-cancel"
                         onClick={onClose}
-                        disabled={disabled}
+                        disabled={disabled || loading}
                     >
                         {cancelText}
                     </button>
@@ -40,9 +51,9 @@ export default function ConfirmModal({
                         type="button"
                         className={`modal-btn confirm-btn confirm-btn-${type}`}
                         onClick={onConfirm}
-                        disabled={disabled}
+                        disabled={disabled || loading}
                     >
-                        {confirmText}
+                        {loading ? "Đang xử lý..." : confirmText}
                     </button>
                 </div>
             </div>

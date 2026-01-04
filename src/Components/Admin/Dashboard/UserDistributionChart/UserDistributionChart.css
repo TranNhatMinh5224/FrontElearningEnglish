@@ -1,0 +1,30 @@
+/* UserDistributionChart Component Styles */
+.user-distribution-container {
+  height: 350px;
+}
+
+.user-chart-wrapper {
+  width: 100%;
+  height: 220px;
+}
+
+.user-stats-badges {
+  text-align: center;
+  margin-top: 0.5rem;
+}
+
+.user-stats-badges .badge {
+  margin-right: 0.5rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+}
+
+.badge.bg-success.bg-opacity-10 {
+  background-color: rgba(16, 185, 129, 0.1) !important;
+  color: #059669 !important;
+}
+
+.badge.bg-warning.bg-opacity-10 {
+  background-color: rgba(245, 158, 11, 0.1) !important;
+  color: #d97706 !important;
+}

@@ -2,9 +2,10 @@ import React, { useState, useEffect } from "react";
 import { Card, Spinner } from "react-bootstrap";
 import { FaBookOpen } from "react-icons/fa";
 import { teacherService } from "../../../../Services/teacherService";
+import { adminService } from "../../../../Services/adminService";
 import "./LessonList.css";
 
-export default function LessonList({ courseId, onSelect }) {
+export default function LessonList({ courseId, onSelect, isAdmin = false }) {
   const [lessons, setLessons] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -17,7 +18,8 @@ export default function LessonList({ courseId, onSelect }) {
     try {
       setLoading(true);
       setError("");
-      const response = await teacherService.getLessonsByCourse(courseId);
+      const service = isAdmin ? adminService : teacherService;
+      const response = await service.getLessonsByCourse(courseId);
       if (response.data?.success) {
         const data = response.data.data || [];
         setLessons(data);

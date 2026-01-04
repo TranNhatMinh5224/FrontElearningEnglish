@@ -5,7 +5,7 @@ import { essaySubmissionService } from "../../../../Services/essaySubmissionServ
 import SuccessModal from "../../../Common/SuccessModal/SuccessModal";
 import "./EssaySubmissionDetailModal.css";
 
-export default function EssaySubmissionDetailModal({ show, onClose, submission, onGradeSuccess }) {
+export default function EssaySubmissionDetailModal({ show, onClose, submission, onGradeSuccess, isAdmin = false }) {
   const [score, setScore] = useState("");
   const [feedback, setFeedback] = useState("");
   const [grading, setGrading] = useState(false);
@@ -47,9 +47,15 @@ export default function EssaySubmissionDetailModal({ show, onClose, submission, 
       };
 
       const hasGrade = submission.teacherScore !== null && submission.teacherScore !== undefined;
-      const response = hasGrade
-        ? await essaySubmissionService.updateGrade(submissionId, gradeData)
-        : await essaySubmissionService.gradeManually(submissionId, gradeData);
+      
+      let response;
+      if (isAdmin) {
+        response = await essaySubmissionService.gradeAdminManually(submissionId, gradeData);
+      } else {
+        response = hasGrade
+          ? await essaySubmissionService.updateGrade(submissionId, gradeData)
+          : await essaySubmissionService.gradeManually(submissionId, gradeData);
+      }
 
       if (response.data?.success) {
         setShowSuccessModal(true);
@@ -69,7 +75,9 @@ export default function EssaySubmissionDetailModal({ show, onClose, submission, 
     if (!submission) return;
     try {
       const submissionId = submission.submissionId || submission.SubmissionId;
-      const response = await essaySubmissionService.downloadSubmissionFile(submissionId);
+      const response = isAdmin
+        ? await essaySubmissionService.downloadAdminSubmissionFile(submissionId)
+        : await essaySubmissionService.downloadSubmissionFile(submissionId);
       
       // Get filename from Content-Disposition header or use attachmentType
       let fileName = `submission-${submissionId}`;

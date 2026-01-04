@@ -12,12 +12,14 @@ import CreateEssayModal from "../../../Components/Teacher/CreateEssayModal/Creat
 import SuccessModal from "../../../Components/Common/SuccessModal/SuccessModal";
 import ConfirmModal from "../../../Components/Common/ConfirmModal/ConfirmModal";
 import { ROUTE_PATHS } from "../../../Routes/Paths";
+import { useQuizStatus } from "../../../hooks/useQuizStatus";
 import "./TeacherQuizEssayManagement.css";
 
 export default function TeacherQuizEssayManagement() {
   const { courseId, lessonId, moduleId, assessmentId } = useParams();
   const navigate = useNavigate();
   const { user, roles, isAuthenticated } = useAuth();
+  const { getStatusLabel } = useQuizStatus();
   const [assessment, setAssessment] = useState(null);
   const [quizzes, setQuizzes] = useState([]);
   const [essays, setEssays] = useState([]);
@@ -182,16 +184,6 @@ export default function TeacherQuizEssayManagement() {
     } finally {
       setDeletingEssay(false);
     }
-  };
-
-  const getStatusLabel = (status) => {
-    const statusMap = {
-      0: { label: "Draft", color: "#f59e0b", bg: "#fef3c7" },
-      1: { label: "Published", color: "#10b981", bg: "#d1fae5" },
-      2: { label: "Closed", color: "#6b7280", bg: "#f3f4f6" },
-      3: { label: "Archived", color: "#6b7280", bg: "#f3f4f6" },
-    };
-    return statusMap[status] || statusMap[0];
   };
 
   if (!isAuthenticated || !isTeacher) {

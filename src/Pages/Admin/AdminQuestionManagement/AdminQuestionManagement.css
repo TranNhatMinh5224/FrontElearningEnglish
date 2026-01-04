@@ -1,0 +1,45 @@
+.admin-question-management-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%);
+  padding: 20px 0;
+}
+
+.question-card {
+  transition: all 0.2s ease;
+}
+
+.question-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+}
+
+.question-index .badge {
+  font-size: 0.85rem;
+  padding: 6px 10px;
+}
+
+.question-stem {
+  font-size: 1rem;
+  color: #1f2937;
+}
+
+.options-preview li {
+  padding: 4px 0;
+}
+
+.group-header-bar {
+  transition: all 0.2s ease;
+}
+
+.group-header-bar:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+}
+
+.action-buttons button {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+}

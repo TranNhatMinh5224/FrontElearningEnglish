@@ -19,5 +19,12 @@ export const essayService = {
     updateEssay: (essayId, data) => axiosClient.put(API_ENDPOINTS.TEACHER.UPDATE_ESSAY(essayId), data),
     
     deleteEssay: (essayId) => axiosClient.delete(API_ENDPOINTS.TEACHER.DELETE_ESSAY(essayId)),
+    
+    // Admin Essay endpoints
+    createAdminEssay: (data) => axiosClient.post(API_ENDPOINTS.ADMIN.ESSAYS.CREATE, data),
+    getAdminEssayById: (essayId) => axiosClient.get(API_ENDPOINTS.ADMIN.ESSAYS.GET_BY_ID(essayId)),
+    getAdminEssaysByAssessment: (assessmentId) => axiosClient.get(API_ENDPOINTS.ADMIN.ESSAYS.GET_BY_ASSESSMENT(assessmentId)),
+    updateAdminEssay: (essayId, data) => axiosClient.put(API_ENDPOINTS.ADMIN.ESSAYS.UPDATE(essayId), data),
+    deleteAdminEssay: (essayId) => axiosClient.delete(API_ENDPOINTS.ADMIN.ESSAYS.DELETE(essayId)),
 };
 

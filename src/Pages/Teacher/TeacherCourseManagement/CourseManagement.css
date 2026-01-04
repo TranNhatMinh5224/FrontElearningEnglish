@@ -1,6 +1,6 @@
 .course-management-container {
   padding: 40px 80px 20px 80px;
-  padding-top: calc(40px + 70px);
+  padding-top: 120px !important;
   background: var(--color-bg-secondary, #f6f8fb);
   min-height: calc(100vh - 70px);
   max-width: 1400px;
@@ -289,7 +289,7 @@
 @media (max-width: 1024px) {
   .course-management-container {
     padding: 30px 50px;
-    padding-top: calc(30px + 70px);
+    padding-top: 120px;
   }
 
   .courses-grid {
@@ -301,7 +301,7 @@
 @media (max-width: 768px) {
   .course-management-container {
     padding: 24px 24px;
-    padding-top: calc(24px + 70px);
+    padding-top: 120px;
   }
 
   .course-management-header {

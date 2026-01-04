@@ -5,7 +5,7 @@
     display: flex;
     align-items: center;
     gap: 20px;
-    box-shadow: 
+    box-shadow:
         0 4px 6px rgba(0, 0, 0, 0.1),
         0 2px 4px rgba(0, 0, 0, 0.06);
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -32,7 +32,7 @@
 
 .lesson-card:hover {
     transform: translateY(-8px) rotateX(2deg) rotateY(-2deg);
-    box-shadow: 
+    box-shadow:
         0 20px 40px rgba(65, 214, 227, 0.25),
         0 10px 20px rgba(217, 70, 239, 0.15),
         0 4px 8px rgba(0, 0, 0, 0.1);
@@ -144,4 +144,3 @@
     color: var(--color-text-secondary, #6b7280);
     font-weight: 500;
 }
-

@@ -9,18 +9,11 @@ import ConfirmModal from "../../../Components/Common/ConfirmModal/ConfirmModal";
 import SuccessModal from "../../../Components/Common/SuccessModal/SuccessModal";
 import { questionService } from "../../../Services/questionService";
 import { quizService } from "../../../Services/quizService";
+import { useQuestionTypes } from "../../../hooks/useQuestionTypes";
 import "./TeacherQuestionManagement.css";
 
-const QUESTION_TYPES_LABEL = {
-  1: "Trắc nghiệm (1 đáp án)",
-  2: "Trắc nghiệm (Nhiều đáp án)",
-  3: "Đúng / Sai",
-  4: "Điền từ",
-  5: "Nối từ",
-  6: "Sắp xếp",
-};
-
 export default function TeacherQuestionManagement() {
+  const { getQuestionTypeLabel } = useQuestionTypes();
   const { courseId, lessonId, moduleId, assessmentId, quizId, sectionId, groupId } = useParams();
   const navigate = useNavigate();
   
@@ -284,7 +277,7 @@ export default function TeacherQuestionManagement() {
                     </div>
                     <div className="flex-grow-1">
                         <div className="d-flex align-items-center gap-2 mb-2">
-                            <Badge bg="info">{QUESTION_TYPES_LABEL[q.type] || "Unknown"}</Badge>
+                            <Badge bg="info">{getQuestionTypeLabel(q.type)}</Badge>
                             <span className="text-muted small">Points: {q.points}</span>
                             {isBulkMode && <Badge bg="warning" className="text-dark">Draft</Badge>}
                         </div>

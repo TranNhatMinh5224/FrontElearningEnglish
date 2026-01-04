@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { 
-  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell, Legend 
-} from 'recharts';
-import { MdTrendingUp, MdTrendingDown, MdPeople, MdAttachMoney, MdSchool, MdPersonAdd, MdCalendarToday } from "react-icons/md";
+import { MdTrendingUp, MdPeople, MdAttachMoney, MdSchool, MdPersonAdd } from "react-icons/md";
 import { adminService } from "../../../Services/adminService";
+import DashboardHeader from "../../../Components/Admin/Dashboard/DashboardHeader/DashboardHeader";
+import KPICard from "../../../Components/Admin/Dashboard/KPICard/KPICard";
+import RevenueChart from "../../../Components/Admin/Dashboard/RevenueChart/RevenueChart";
+import UserDistributionChart from "../../../Components/Admin/Dashboard/UserDistributionChart/UserDistributionChart";
+import RevenueBreakdown from "../../../Components/Admin/Dashboard/RevenueBreakdown/RevenueBreakdown";
+import "./AdminDashboard.css";
 
 export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
@@ -105,222 +107,76 @@ export default function AdminDashboard() {
   const formatCurrency = (val) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(val || 0);
   const formatNumber = (val) => new Intl.NumberFormat('en-US').format(val || 0);
 
-  // Data for User Pie Chart
-  const userPieData = [
-    { name: 'Students', value: userStats.studentCount },
-    { name: 'Teachers', value: userStats.teacherCount },
-  ];
-
-  const pieTotal = userStats.studentCount + userStats.teacherCount;
-
-  // Prevent PieChart error if all values are 0
-  const isPieDataEmpty = pieTotal === 0;
-
   return (
     <div className="dashboard-container">
       {/* HEADER & FILTER */}
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <div>
-           <h1 className="page-title mb-1">Dashboard Overview</h1>
-           <p className="text-muted mb-0">Real-time system analytics</p>
-        </div>
-        
-        <div className="d-flex align-items-center gap-2">
-           <div className="bg-white p-1 rounded border d-flex align-items-center">
-              <MdCalendarToday className="text-muted ms-2 me-1"/>
-              <select 
-                className="form-select border-0 shadow-none py-1" 
-                style={{width: 'auto', fontWeight: 500}}
-                value={timeRange}
-                onChange={(e) => setTimeRange(parseInt(e.target.value))}
-              >
-                <option value={7}>Last 7 Days</option>
-                <option value={30}>Last 30 Days</option>
-                <option value={90}>Last 3 Months</option>
-              </select>
-           </div>
-           <button className="btn btn-primary" onClick={fetchAllData}>Refresh Data</button>
-        </div>
-      </div>
+      <DashboardHeader
+        timeRange={timeRange}
+        onTimeRangeChange={setTimeRange}
+        onRefresh={fetchAllData}
+      />
 
       {/* KPI CARDS */}
       <div className="row g-4 mb-4">
-        {/* Revenue Card */}
-        <div className="col-md-3">
-          <div className="admin-card d-flex justify-content-between align-items-start h-100">
-            <div>
-              <p className="text-muted mb-1 text-uppercase fw-bold small">Total Revenue</p>
-              <h3 className="fw-bold mb-0 text-primary">{formatCurrency(overview.totalRevenue)}</h3>
-            </div>
-            <div className="p-3 bg-indigo-100 rounded text-primary" style={{backgroundColor: '#e0e7ff'}}>
-              <MdAttachMoney size={28} color="#4f46e5"/>
-            </div>
-          </div>
-        </div>
+        <KPICard
+          title="Total Revenue"
+          value={overview.totalRevenue}
+          formatValue={formatCurrency}
+          icon={MdAttachMoney}
+          iconColor="#4f46e5"
+          iconBgColor="#e0e7ff"
+        />
 
-        {/* Students Card */}
-        <div className="col-md-3">
-          <div className="admin-card d-flex justify-content-between align-items-start h-100">
-            <div>
-              <p className="text-muted mb-1 text-uppercase fw-bold small">Total Students</p>
-              <h3 className="fw-bold mb-0">{formatNumber(overview.totalStudents)}</h3>
-              <small className="text-muted d-flex align-items-center mt-2">
-                 Active learners
-              </small>
-            </div>
-            <div className="p-3 rounded" style={{backgroundColor: '#dcfce7'}}>
-              <MdPeople size={28} color="#166534"/>
-            </div>
-          </div>
-        </div>
+        <KPICard
+          title="Total Students"
+          value={overview.totalStudents}
+          formatValue={formatNumber}
+          icon={MdPeople}
+          iconColor="#166534"
+          iconBgColor="#dcfce7"
+          subtitle="Active learners"
+        />
 
-        {/* Teachers Card */}
-        <div className="col-md-3">
-          <div className="admin-card d-flex justify-content-between align-items-start h-100">
-            <div>
-              <p className="text-muted mb-1 text-uppercase fw-bold small">Total Teachers</p>
-              <h3 className="fw-bold mb-0">{formatNumber(overview.totalTeachers)}</h3>
-              <small className="text-muted d-flex align-items-center mt-2">
-                 Content creators
-              </small>
-            </div>
-            <div className="p-3 rounded" style={{backgroundColor: '#fef3c7'}}>
-              <MdSchool size={28} color="#b45309"/>
-            </div>
-          </div>
-        </div>
+        <KPICard
+          title="Total Teachers"
+          value={overview.totalTeachers}
+          formatValue={formatNumber}
+          icon={MdSchool}
+          iconColor="#b45309"
+          iconBgColor="#fef3c7"
+          subtitle="Content creators"
+        />
 
-        {/* New Users Card */}
-        <div className="col-md-3">
-          <div className="admin-card d-flex justify-content-between align-items-start h-100">
-            <div>
-              <p className="text-muted mb-1 text-uppercase fw-bold small">New Users (30d)</p>
-              <h3 className="fw-bold mb-0">{formatNumber(overview.newUsersLast30Days)}</h3>
-              <small className="text-success d-flex align-items-center mt-2">
-                 <MdPersonAdd className="me-1"/> Latest Growth
-              </small>
-            </div>
-            <div className="p-3 rounded" style={{backgroundColor: '#fee2e2'}}>
-              <MdTrendingUp size={28} color="#991b1b"/>
-            </div>
-          </div>
-        </div>
+        <KPICard
+          title="New Users (30d)"
+          value={overview.newUsersLast30Days}
+          formatValue={formatNumber}
+          icon={MdTrendingUp}
+          iconColor="#991b1b"
+          iconBgColor="#fee2e2"
+          subtitle={
+            <>
+              <MdPersonAdd className="me-1" /> Latest Growth
+            </>
+          }
+        />
       </div>
 
       {/* CHARTS SECTION */}
       <div className="row g-4 mb-4">
-        {/* LEFT: Revenue Growth Area Chart */}
-        <div className="col-lg-8">
-          <div className="admin-card">
-            <h5 className="fw-bold mb-4">Revenue Growth Trend</h5>
-            <div style={{ width: '100%', height: 350 }}>
-              {loading ? (
-                  <div className="d-flex align-items-center justify-content-center h-100 text-muted">Loading chart...</div>
-              ) : revenueChartData.length === 0 ? (
-                  <div className="d-flex align-items-center justify-content-center h-100 text-muted">No revenue data available for this period.</div>
-              ) : (
-                <ResponsiveContainer>
-                    <AreaChart data={revenueChartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-                    <defs>
-                        <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#6366f1" stopOpacity={0.8}/>
-                        <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
-                        </linearGradient>
-                    </defs>
-                    <XAxis dataKey="name" />
-                    <YAxis tickFormatter={(val) => val >= 1000000 ? `${val/1000000}M` : val} />
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb"/>
-                    <Tooltip formatter={(value) => formatCurrency(value)}/>
-                    <Area 
-                        type="monotone" 
-                        dataKey="revenue" 
-                        stroke="#6366f1" 
-                        strokeWidth={3}
-                        fill="url(#colorRevenue)" 
-                        name="Total Revenue" 
-                        animationDuration={1000}
-                    />
-                    </AreaChart>
-                </ResponsiveContainer>
-              )}
-            </div>
-          </div>
-        </div>
+        <RevenueChart
+          data={revenueChartData}
+          loading={loading}
+          formatCurrency={formatCurrency}
+        />
 
-        {/* RIGHT: User Distribution & Revenue Breakdown */}
         <div className="col-lg-4">
-          {/* User Pie Chart */}
-          <div className="admin-card mb-4" style={{height: '350px'}}>
-            <h5 className="fw-bold mb-0">User Distribution</h5>
-            <div style={{ width: '100%', height: '220px' }}>
-               {isPieDataEmpty ? (
-                   <div className="d-flex align-items-center justify-content-center h-100 text-muted">No user data available.</div>
-               ) : (
-                   <ResponsiveContainer>
-                    <PieChart>
-                    <Pie
-                        data={userPieData}
-                        innerRadius={60}
-                        outerRadius={80}
-                        paddingAngle={5}
-                        dataKey="value"
-                    >
-                        {userPieData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={index === 0 ? '#10b981' : '#f59e0b'} />
-                        ))}
-                    </Pie>
-                    <Tooltip />
-                    <Legend verticalAlign="bottom" height={36}/>
-                    </PieChart>
-                </ResponsiveContainer>
-               )}
-            </div>
-            
-            {!isPieDataEmpty && (
-                <div className="text-center mt-2">
-                <span className="badge bg-success bg-opacity-10 text-success me-2">
-                    {((userStats.studentCount / (pieTotal || 1)) * 100).toFixed(1)}% Students
-                </span>
-                <span className="badge bg-warning bg-opacity-10 text-warning">
-                    {((userStats.teacherCount / (pieTotal || 1)) * 100).toFixed(1)}% Teachers
-                </span>
-                </div>
-            )}
-          </div>
-
-          {/* Revenue Breakdown Mini Widget */}
-          <div className="admin-card">
-              <h6 className="fw-bold mb-3">Revenue Source Breakdown</h6>
-              
-              <div className="mb-3">
-                  <div className="d-flex justify-content-between small mb-1">
-                      <span>Course Sales</span>
-                      <span className="fw-bold">{formatCurrency(revenueBreakdown.fromCourses)}</span>
-                  </div>
-                  {/* Progress bar calculated based on total */}
-                  <div className="progress" style={{height: '6px'}}>
-                      <div 
-                        className="progress-bar bg-primary" 
-                        role="progressbar" 
-                        style={{width: `${overview.totalRevenue > 0 ? (revenueBreakdown.fromCourses / overview.totalRevenue) * 100 : 0}%`}}
-                      ></div>
-                  </div>
-              </div>
-
-              <div>
-                  <div className="d-flex justify-content-between small mb-1">
-                      <span>Teacher Packages</span>
-                      <span className="fw-bold">{formatCurrency(revenueBreakdown.fromPackages)}</span>
-                  </div>
-                  <div className="progress" style={{height: '6px'}}>
-                      <div 
-                        className="progress-bar bg-info" 
-                        role="progressbar" 
-                        style={{width: `${overview.totalRevenue > 0 ? (revenueBreakdown.fromPackages / overview.totalRevenue) * 100 : 0}%`}}
-                      ></div>
-                  </div>
-              </div>
-          </div>
+          <UserDistributionChart userStats={userStats} />
+          <RevenueBreakdown
+            breakdown={revenueBreakdown}
+            totalRevenue={overview.totalRevenue}
+            formatCurrency={formatCurrency}
+          />
         </div>
       </div>
     </div>

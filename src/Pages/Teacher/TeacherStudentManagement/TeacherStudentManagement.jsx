@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Container, Row, Col, Pagination } from "react-bootstrap";
+import { Container, Pagination } from "react-bootstrap";
 import "./TeacherStudentManagement.css";
 import TeacherHeader from "../../../Components/Header/TeacherHeader";
 import { useAuth } from "../../../Context/AuthContext";
@@ -36,17 +36,7 @@ export default function TeacherStudentManagement() {
 
   const isTeacher = roles.includes("Teacher") || user?.teacherSubscription?.isTeacher === true;
 
-  useEffect(() => {
-    if (!isAuthenticated || !isTeacher) {
-      navigate("/home");
-      return;
-    }
-
-    fetchCourseDetail();
-    fetchStudents();
-  }, [isAuthenticated, isTeacher, navigate, courseId, currentPage, searchTerm]);
-
-  const fetchCourseDetail = async () => {
+  const fetchCourseDetail = useCallback(async () => {
     try {
       const response = await teacherService.getCourseDetail(courseId);
       if (response.data?.success && response.data?.data) {
@@ -55,9 +45,9 @@ export default function TeacherStudentManagement() {
     } catch (err) {
       console.error("Error fetching course detail:", err);
     }
-  };
+  }, [courseId]);
 
-  const fetchStudents = async () => {
+  const fetchStudents = useCallback(async () => {
     try {
       setLoading(true);
       setError("");
@@ -88,7 +78,17 @@ export default function TeacherStudentManagement() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [courseId, currentPage, pageSize, searchTerm]);
+
+  useEffect(() => {
+    if (!isAuthenticated || !isTeacher) {
+      navigate("/home");
+      return;
+    }
+
+    fetchCourseDetail();
+    fetchStudents();
+  }, [isAuthenticated, isTeacher, navigate, fetchCourseDetail, fetchStudents]);
 
   const handleStudentClick = async (studentId) => {
     try {
@@ -286,6 +286,7 @@ export default function TeacherStudentManagement() {
         onClose={() => setShowStudentDetailModal(false)}
         student={selectedStudent}
         courseId={courseId}
+        onStudentRemoved={fetchStudents}
       />
 
       {/* Add Student Modal */}

@@ -85,4 +85,32 @@ export const essaySubmissionService = {
     getEssayStatistics: (essayId) => {
         return axiosClient.get(API_ENDPOINTS.TEACHER.GET_ESSAY_STATISTICS(essayId));
     },
+
+    // Admin methods
+    getAdminSubmissionsByEssay: (essayId, page = 1, pageSize = 10) => {
+        return axiosClient.get(API_ENDPOINTS.ADMIN.ESSAY_SUBMISSIONS.GET_BY_ESSAY(essayId), {
+            params: { page, pageSize }
+        });
+    },
+
+    getAdminSubmissionDetail: (submissionId) => {
+        return axiosClient.get(API_ENDPOINTS.ADMIN.ESSAY_SUBMISSIONS.GET_BY_ID(submissionId));
+    },
+
+    downloadAdminSubmissionFile: (submissionId) => {
+        return axiosClient.get(API_ENDPOINTS.ADMIN.ESSAY_SUBMISSIONS.DOWNLOAD(submissionId), {
+            responseType: 'blob',
+            headers: {
+                'Accept': '*/*'
+            }
+        });
+    },
+
+    gradeAdminWithAI: (submissionId) => {
+        return axiosClient.post(API_ENDPOINTS.ADMIN.ESSAY_SUBMISSIONS.GRADE_AI(submissionId));
+    },
+
+    gradeAdminManually: (submissionId, data) => {
+        return axiosClient.post(API_ENDPOINTS.ADMIN.ESSAY_SUBMISSIONS.GRADE(submissionId), data);
+    },
 };

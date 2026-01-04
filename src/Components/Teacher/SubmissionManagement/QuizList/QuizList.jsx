@@ -4,7 +4,7 @@ import { FaClipboardList } from "react-icons/fa";
 import { quizService } from "../../../../Services/quizService";
 import "./QuizList.css";
 
-export default function QuizList({ assessmentId, onSelect }) {
+export default function QuizList({ assessmentId, onSelect, isAdmin = false }) {
   const [quizzes, setQuizzes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -17,7 +17,9 @@ export default function QuizList({ assessmentId, onSelect }) {
     try {
       setLoading(true);
       setError("");
-      const response = await quizService.getTeacherQuizzesByAssessment(assessmentId);
+      const response = isAdmin
+        ? await quizService.getAdminQuizzesByAssessment(assessmentId)
+        : await quizService.getTeacherQuizzesByAssessment(assessmentId);
       if (response.data?.success) {
         const data = response.data.data || [];
         setQuizzes(data);

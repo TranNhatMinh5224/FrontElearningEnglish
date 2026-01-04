@@ -4,19 +4,11 @@ import { FaPlus, FaTrash, FaArrowUp, FaArrowDown, FaImage, FaVideo, FaTimes, FaL
 import { questionService } from "../../../Services/questionService";
 import { fileService } from "../../../Services/fileService";
 import { quizService } from "../../../Services/quizService";
+import { useQuestionTypes } from "../../../hooks/useQuestionTypes";
 import "./CreateQuestionModal.css";
 
 const QUESTION_BUCKET = "questions";
 const QUIZ_GROUP_BUCKET = "quizgroups";
-
-const QUESTION_TYPES = {
-  MultipleChoice: 1,
-  MultipleAnswers: 2,
-  TrueFalse: 3,
-  FillBlank: 4,
-  Matching: 5,
-  Ordering: 6,
-};
 
 export default function CreateQuestionModal({
   show,
@@ -26,9 +18,9 @@ export default function CreateQuestionModal({
   groupId,
   questionToUpdate,
   isBulkMode = false,
-  onSaveDraft
-}) {
-  const [activeTab, setActiveTab] = useState("question");
+  onSaveDraft,
+  isAdmin = false
+}) {  const { QUESTION_TYPES } = useQuestionTypes();  const [activeTab, setActiveTab] = useState("question");
   const [internalGroupId, setInternalGroupId] = useState(groupId); 
   const [groupInfo, setGroupInfo] = useState(null);
   const [sectionInfo, setSectionInfo] = useState(null);
@@ -240,7 +232,9 @@ export default function CreateQuestionModal({
         }));
       }
 
-      let response = questionToUpdate ? await questionService.updateQuestion(questionToUpdate.questionId, payload) : await questionService.createQuestion(payload);
+      let response = questionToUpdate 
+        ? (isAdmin ? await questionService.updateAdminQuestion(questionToUpdate.questionId, payload) : await questionService.updateQuestion(questionToUpdate.questionId, payload))
+        : (isAdmin ? await questionService.createAdminQuestion(payload) : await questionService.createQuestion(payload));
       if (response.data?.success) {
         onSuccess(response.data.data);
         if (isAddMore) { resetQuestionForm(qFormData.type); setQError(""); } else onClose();

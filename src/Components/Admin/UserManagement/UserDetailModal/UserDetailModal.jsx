@@ -1,5 +1,6 @@
 import React from "react";
 import { MdClose, MdLocalFireDepartment, MdCardMembership, MdPerson, MdEmail, MdPhone, MdWc, MdCake, MdVerifiedUser } from "react-icons/md";
+import "./UserDetailModal.css";
 
 export default function UserDetailModal({ show, onClose, user }) {
   if (!show || !user) return null;
@@ -11,7 +12,7 @@ export default function UserDetailModal({ show, onClose, user }) {
 
   return (
     <div className="modal d-block" style={{ backgroundColor: "rgba(0,0,0,0.6)", zIndex: 1050 }}>
-      <div className="modal-dialog modal-lg modal-dialog-centered">
+      <div className="modal-dialog modal-dialog-centered user-detail-modal-dialog">
         <div className="modal-content border-0 shadow-lg" style={{ borderRadius: '16px', overflow: 'hidden' }}>
           
           {/* Header Gradient */}

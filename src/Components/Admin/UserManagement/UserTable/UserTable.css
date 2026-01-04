@@ -1,0 +1,13 @@
+/* UserTable component styles - minimal overrides only */
+
+/* Status badges specific to user table */
+.status-badge.status-active {
+  background-color: #d1e7dd;
+  color: #0f5132;
+}
+
+.status-badge.status-blocked {
+  background-color: #f8d7da;
+  color: #842029;
+}
+

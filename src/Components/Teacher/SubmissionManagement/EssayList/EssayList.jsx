@@ -4,7 +4,7 @@ import { FaFileAlt } from "react-icons/fa";
 import { essayService } from "../../../../Services/essayService";
 import "./EssayList.css";
 
-export default function EssayList({ assessmentId, onSelect }) {
+export default function EssayList({ assessmentId, onSelect, isAdmin = false }) {
   const [essays, setEssays] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -17,7 +17,9 @@ export default function EssayList({ assessmentId, onSelect }) {
     try {
       setLoading(true);
       setError("");
-      const response = await essayService.getTeacherEssaysByAssessment(assessmentId);
+      const response = isAdmin
+        ? await essayService.getAdminEssaysByAssessment(assessmentId)
+        : await essayService.getTeacherEssaysByAssessment(assessmentId);
       if (response.data?.success) {
         const data = response.data.data || [];
         setEssays(data);

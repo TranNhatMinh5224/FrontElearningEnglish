@@ -34,8 +34,8 @@
   background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%);
 }
 
-.course-title {
-  font-size: 16px;
+.course-card .course-title {
+  font-size: 18px !important;
   font-weight: 600;
   color: #1f2937;
   margin-bottom: 0;

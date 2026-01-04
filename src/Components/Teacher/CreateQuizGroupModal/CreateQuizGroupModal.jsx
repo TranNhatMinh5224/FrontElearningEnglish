@@ -7,7 +7,7 @@ import "./CreateQuizGroupModal.css";
 
 const QUIZ_GROUP_BUCKET = "quizgroups";
 
-export default function CreateQuizGroupModal({ show, onClose, onSuccess, quizSectionId, groupToUpdate = null }) {
+export default function CreateQuizGroupModal({ show, onClose, onSuccess, quizSectionId, groupToUpdate = null, isAdmin = false }) {
   const isUpdateMode = !!groupToUpdate;
   
   // Form state
@@ -356,9 +356,13 @@ export default function CreateQuizGroupModal({ show, onClose, onSuccess, quizSec
           videoType: submitData.videoType,
           videoDuration: submitData.videoDuration,
         };
-        response = await quizService.updateQuizGroup(groupId, updateData);
+        response = isAdmin
+          ? await quizService.updateAdminQuizGroup(groupId, updateData)
+          : await quizService.updateQuizGroup(groupId, updateData);
       } else {
-        response = await quizService.createQuizGroup(submitData);
+        response = isAdmin
+          ? await quizService.createAdminQuizGroup(submitData)
+          : await quizService.createQuizGroup(submitData);
       }
 
       if (response.data?.success) {

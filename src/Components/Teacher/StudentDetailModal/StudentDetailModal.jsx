@@ -1,9 +1,18 @@
-import React from "react";
+import React, { useState } from "react";
 import { Modal } from "react-bootstrap";
 import "./StudentDetailModal.css";
-import { FaUser, FaEnvelope, FaCalendarAlt, FaVenusMars, FaGraduationCap, FaCheckCircle } from "react-icons/fa";
+import { FaUser, FaEnvelope, FaCalendarAlt, FaVenusMars, FaGraduationCap, FaCheckCircle, FaTrash } from "react-icons/fa";
+import ConfirmModal from "../../Common/ConfirmModal/ConfirmModal";
+import SuccessModal from "../../Common/SuccessModal/SuccessModal";
+import { teacherService } from "../../../Services/teacherService";
+import { adminService } from "../../../Services/adminService";
+import { useAuth } from "../../../Context/AuthContext";
 
-export default function StudentDetailModal({ show, onClose, student, courseId }) {
+export default function StudentDetailModal({ show, onClose, student, courseId, onStudentRemoved }) {
+  const { roles } = useAuth();
+  const [showConfirmDelete, setShowConfirmDelete] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   if (!student) return null;
 
   const displayName = student.displayName || student.DisplayName || 
@@ -69,6 +78,43 @@ export default function StudentDetailModal({ show, onClose, student, courseId })
   const isCompleted = progress?.isCompleted || progress?.IsCompleted || false;
   const completedAt = progress?.completedAt || progress?.CompletedAt;
   const lastUpdated = progress?.lastUpdated || progress?.LastUpdated;
+
+  const handleRemoveStudent = async () => {
+    setIsDeleting(true);
+    try {
+      const studentId = student.studentId || student.StudentId || student.userId || student.UserId;
+      
+      // Check if user is admin or teacher
+      const isAdmin = roles?.some(role => 
+        role === "SuperAdmin" || role === "ContentAdmin" || role === "FinanceAdmin"
+      );
+      
+      if (isAdmin) {
+        await adminService.removeStudentFromCourse(courseId, studentId);
+      } else {
+        await teacherService.removeStudentFromCourse(courseId, studentId);
+      }
+      
+      setShowConfirmDelete(false);
+      setShowSuccessModal(true);
+      
+      // Call callback to refresh the student list
+      if (onStudentRemoved) {
+        onStudentRemoved();
+      }
+      
+      // Close the detail modal after success modal closes
+      setTimeout(() => {
+        onClose();
+      }, 1500);
+      
+    } catch (error) {
+      console.error("Error removing student:", error);
+      alert(error.response?.data?.message || "Không thể xóa học sinh khỏi khóa học");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   return (
     <Modal 
@@ -203,10 +249,39 @@ export default function StudentDetailModal({ show, onClose, student, courseId })
         </div>
       </Modal.Body>
       <Modal.Footer>
+        <button 
+          className="delete-btn" 
+          onClick={() => setShowConfirmDelete(true)}
+          disabled={isDeleting}
+        >
+          <FaTrash /> Xóa học sinh
+        </button>
         <button className="close-btn" onClick={onClose}>
           Đóng
         </button>
       </Modal.Footer>
+
+      {/* Confirm Delete Modal */}
+      <ConfirmModal
+        isOpen={showConfirmDelete}
+        onClose={() => setShowConfirmDelete(false)}
+        onConfirm={handleRemoveStudent}
+        title="Xác nhận xóa học sinh"
+        message="Bạn có chắc chắn muốn xóa học sinh này khỏi khóa học?"
+        itemName={displayName}
+        confirmText="Xóa"
+        cancelText="Hủy"
+        type="delete"
+        loading={isDeleting}
+      />
+
+      {/* Success Modal */}
+      <SuccessModal
+        isOpen={showSuccessModal}
+        onClose={() => setShowSuccessModal(false)}
+        title="Thành công"
+        message="Đã xóa học sinh khỏi khóa học thành công"
+      />
     </Modal>
   );
 }

@@ -196,6 +196,12 @@
   font-weight: 500;
 }
 
+.lesson-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .add-module-btn {
   display: flex;
   align-items: center;
@@ -216,6 +222,24 @@
 
 .add-icon {
   font-size: 12px;
+}
+
+.delete-lesson-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-size: 14px;
+}
+
+.delete-lesson-btn:hover {
+  background-color: #c82333;
 }
 
 .add-lesson-btn {
