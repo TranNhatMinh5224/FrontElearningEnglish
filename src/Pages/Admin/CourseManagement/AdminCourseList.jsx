@@ -81,8 +81,9 @@ export default function AdminCourseList() {
         try {
             const response = await adminService.deleteCourse(courseId);
             if (response.data.success) {
-                alert("Course deleted successfully");
-                fetchCourses();
+              setSuccessMessage("Course deleted successfully");
+              setShowSuccessModal(true);
+              fetchCourses();
             }
         } catch (error) {
             console.error(error);

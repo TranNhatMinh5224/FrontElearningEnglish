@@ -4,6 +4,7 @@ import { authService } from "../../Services/authService";
 import { useNavigate, useLocation } from "react-router-dom";
 import { InputField } from "../../Components/Auth";
 import { iconLock } from "../../Assets";
+import SuccessModal from "../../Components/Common/SuccessModal/SuccessModal";
 
 export default function ResetPassword() {
   const navigate = useNavigate();
@@ -29,6 +30,8 @@ export default function ResetPassword() {
 
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -154,10 +157,10 @@ export default function ResetPassword() {
       });
 
       if (res.data?.success) {
-        setSuccess("Đặt lại mật khẩu thành công!");
-        setTimeout(() => {
-          navigate("/login");
-        }, 1500);
+        const msg = "Đặt lại mật khẩu thành công! Bạn sẽ được chuyển tới trang đăng nhập.";
+        setSuccess(msg);
+        setSuccessMessage(msg);
+        setShowSuccessModal(true);
       } else {
         setError(res.data?.message || "Đặt lại mật khẩu thất bại. Vui lòng thử lại.");
       }
@@ -173,6 +176,7 @@ export default function ResetPassword() {
   }
 
   return (
+    <>
     <div className="reset-password-container">
       <div className="reset-password-background">
         <div className="reset-password-shape shape-cyan"></div>
@@ -237,14 +241,26 @@ export default function ResetPassword() {
           </button>
         </form>
 
-        <button
-          className="reset-password-back-link"
-          onClick={() => navigate("/login")}
-          disabled={loading}
-        >
-          Quay lại Đăng nhập
-        </button>
+          <button
+            className="reset-password-back-link"
+            onClick={() => navigate("/login")}
+            disabled={loading}
+          >
+            Quay lại Đăng nhập
+          </button>
       </div>
     </div>
+      <SuccessModal
+        isOpen={showSuccessModal}
+        onClose={() => {
+          setShowSuccessModal(false);
+          navigate("/login");
+        }}
+        title="Thành công"
+        message={successMessage || "Đặt lại mật khẩu thành công."}
+        autoClose={true}
+        autoCloseDelay={1500}
+      />
+    </>
   );
 }

@@ -68,23 +68,36 @@
     display: inline-block;
 }
 
+.avatar-inner {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+}
+
 .avatar-image,
 .avatar-placeholder {
-    width: 120px;
-    height: 120px;
+    width: 140px;
+    height: 140px;
     border-radius: 50%;
-    border: 3px solid var(--color-secondary-cyan, #41d6e3);
     object-fit: cover;
+    box-shadow: 0 8px 20px rgba(15,23,42,0.08);
+    display: block;
+}
+
+.avatar-inner[aria-disabled="true"] {
+    cursor: default;
+    opacity: 0.9;
 }
 
 .avatar-placeholder {
-    background: var(--color-primary-main, #7a3df0);
+    background: linear-gradient(135deg, #7a3df0 0%, #41d6e3 100%);
     color: white;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 48px;
+    font-size: 42px;
     font-weight: 700;
+    letter-spacing: 0.5px;
 }
 
 .avatar-loading {
@@ -111,26 +124,40 @@
     cursor: not-allowed;
 }
 
-.avatar-edit-btn {
+.avatar-edit-overlay {
     position: absolute;
-    bottom: 0;
-    right: 0;
-    width: 36px;
-    height: 36px;
+    inset: 0;
     border-radius: 50%;
-    background: var(--color-secondary-cyan, #41d6e3);
-    color: white;
-    border: 3px solid white;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: opacity 0.2s ease, transform 0.2s ease;
+    border: none;
+    background: rgba(0,0,0,0.04);
+    transition: background 0.12s ease, transform 0.08s ease;
 }
 
-.avatar-edit-btn:hover {
-    opacity: 0.9;
-    transform: scale(1.05);
+.avatar-edit-overlay:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.avatar-edit-overlay:hover {
+    background: rgba(0,0,0,0.08);
+    transform: scale(1.02);
+}
+
+.pencil-circle {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: white;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-secondary-cyan, #41d6e3);
+    box-shadow: 0 6px 16px rgba(15,23,42,0.12);
+    font-size: 18px;
 }
 
 /* Profile Info */

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import "./SuccessModal.css";
 import { FaCheckCircle } from "react-icons/fa";
 
@@ -10,14 +10,22 @@ export default function SuccessModal({
     autoClose = true,
     autoCloseDelay = 1500
 }) {
+    const onCloseRef = useRef(onClose);
+
+    // keep latest onClose in a ref so the auto-close timer doesn't get
+    // cancelled by parent re-renders that recreate the onClose function.
+    useEffect(() => {
+        onCloseRef.current = onClose;
+    }, [onClose]);
+
     useEffect(() => {
         if (isOpen && autoClose) {
             const timer = setTimeout(() => {
-                onClose();
+                if (onCloseRef.current) onCloseRef.current();
             }, autoCloseDelay);
             return () => clearTimeout(timer);
         }
-    }, [isOpen, autoClose, autoCloseDelay, onClose]);
+    }, [isOpen, autoClose, autoCloseDelay]);
 
     if (!isOpen) return null;
 

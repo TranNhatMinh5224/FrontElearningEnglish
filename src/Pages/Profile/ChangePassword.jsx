@@ -3,13 +3,16 @@ import { useNavigate } from "react-router-dom";
 import "./ChangePassword.css";
 import MainHeader from "../../Components/Header/MainHeader";
 import { authService } from "../../Services/authService";
-import { FaArrowLeft, FaEye, FaEyeSlash } from "react-icons/fa";
+import { FaEye, FaEyeSlash, FaTimes, FaExclamationCircle, FaCheckCircle } from "react-icons/fa";
+import SuccessModal from "../../Components/Common/SuccessModal/SuccessModal";
 
 export default function ChangePassword() {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [success, setSuccess] = useState(false);
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [successMessage, setSuccessMessage] = useState("");
 
     const [formData, setFormData] = useState({
         currentPassword: "",
@@ -193,6 +196,8 @@ export default function ChangePassword() {
             });
 
             setSuccess(true);
+            setSuccessMessage("Đổi mật khẩu thành công!");
+            setShowSuccessModal(true);
             // Clear form
             setFormData({
                 currentPassword: "",
@@ -200,10 +205,7 @@ export default function ChangePassword() {
                 confirmPassword: "",
             });
 
-            // Navigate back to home after 2 seconds
-            setTimeout(() => {
-                navigate("/home");
-            }, 2000);
+            // showSuccessModal will handle navigation on close
         } catch (error) {
             setError(
                 error.response?.data?.message || "Có lỗi xảy ra khi đổi mật khẩu"
@@ -214,7 +216,7 @@ export default function ChangePassword() {
     };
 
     const handleCancel = () => {
-        navigate("/home");
+        navigate("/profile");
     };
 
     return (
@@ -222,20 +224,44 @@ export default function ChangePassword() {
             <MainHeader />
             <div className="change-password-container">
                 <div className="change-password-header">
-                    <button className="back-button" onClick={() => navigate("/profile")}>
-                        <FaArrowLeft /> Quay lại profile
-                    </button>
-                </div>
+                        {/* Back button removed — streamlined header */}
+                    </div>
 
                 <div className="change-password-card">
                     <h1>Thay đổi mật khẩu</h1>
 
-                    {error && <div className="error-message">{error}</div>}
-                    {success && (
-                        <div className="success-message">
-                            Đổi mật khẩu thành công! Đang chuyển về trang profile...
+                    {error && (
+                        <div className="alert-banner error" role="alert">
+                            <div className="alert-left">
+                                <FaExclamationCircle className="alert-icon" />
+                                <div className="alert-text">{error}</div>
+                            </div>
+                            <button className="alert-close" onClick={() => setError("")} aria-label="Đóng thông báo">
+                                <FaTimes />
+                            </button>
                         </div>
                     )}
+
+                    {success && !showSuccessModal && (
+                        <div className="alert-banner success" role="status">
+                            <div className="alert-left">
+                                <FaCheckCircle className="alert-icon" />
+                                <div className="alert-text">Đổi mật khẩu thành công!</div>
+                            </div>
+                        </div>
+                    )}
+
+                    <SuccessModal
+                        isOpen={showSuccessModal}
+                        onClose={() => {
+                            setShowSuccessModal(false);
+                            navigate("/profile");
+                        }}
+                        title="Chúc mừng"
+                        message={successMessage}
+                        autoClose={true}
+                        autoCloseDelay={1500}
+                    />
 
                     <form onSubmit={handleSubmit}>
                         <div className="form-group">

@@ -206,11 +206,7 @@ export default function Payment() {
         <>
             <MainHeader />
             <div className="payment-container">
-                <div className="payment-header">
-                    <button className="back-button" onClick={handleBack}>
-                        <FaArrowLeft /> Quay lại
-                    </button>
-                </div>
+                {/* header intentionally left minimal for checkout */}
 
                 <div className="payment-card">
                     {loading ? (
@@ -256,36 +252,6 @@ export default function Payment() {
                             )}
 
                             <div className="payment-methods">
-                                <div className="payment-method qr-method">
-                                    <h2 className="method-title">
-                                        <FaClock /> Quét mã QR
-                                    </h2>
-                                    <div className="qr-code-wrapper">
-                                        <img src={qrCode} alt="QR Code" className="qr-code" />
-                                    </div>
-
-                                    <div className="payment-logos">
-                                        <div className="payment-logo vietqr">VIETQR</div>
-                                        <div className="payment-logo napas">napas 247</div>
-                                    </div>
-
-                                    <div className="payment-instructions">
-                                        <div className="instruction-step">
-                                            <strong>Bước 1:</strong> Mở ứng dụng ngân hàng/ví điện tử
-                                        </div>
-                                        <div className="instruction-step">
-                                            <strong>Bước 2:</strong> Quét mã QR và xác nhận thanh toán
-                                        </div>
-                                        <div className="instruction-step">
-                                            <strong>Bước 3:</strong> Chờ hệ thống xác nhận (tự động)
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="payment-divider">
-                                    <span>HOẶC</span>
-                                </div>
-
                                 <div className="payment-method web-method">
                                     <h2 className="method-title">
                                         <FaCheckCircle /> Thanh toán trực tuyến

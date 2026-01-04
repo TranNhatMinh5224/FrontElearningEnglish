@@ -2,12 +2,15 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { MdArrowBack, MdDelete, MdEdit, MdPlayCircleOutline, MdFolder } from "react-icons/md";
 import { adminService } from "../../../../Services/adminService";
+import SuccessModal from "../../../../Components/Common/SuccessModal/SuccessModal";
 
 export default function AdminCourseDetail() {
   const { courseId } = useParams();
   const navigate = useNavigate();
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
 
   useEffect(() => {
     fetchCourseDetail();
@@ -28,12 +31,14 @@ export default function AdminCourseDetail() {
 
   const handleDelete = async () => {
       if(!window.confirm("Are you sure you want to delete this course?")) return;
-      try {
-          await adminService.deleteCourse(courseId);
-          alert("Course deleted");
-          navigate("/admin/courses");
+        try {
+        await adminService.deleteCourse(courseId);
+        setSuccessMessage("Course deleted");
+        setShowSuccessModal(true);
+        setTimeout(() => navigate("/admin/courses"), 500);
       } catch (error) {
-          alert("Failed to delete");
+        setSuccessMessage("Failed to delete");
+        setShowSuccessModal(true);
       }
   }
 
@@ -113,6 +118,12 @@ export default function AdminCourseDetail() {
             </div>
         </div>
       </div>
+      <SuccessModal
+        isOpen={showSuccessModal}
+        onClose={() => setShowSuccessModal(false)}
+        title="Thông báo"
+        message={successMessage}
+      />
     </div>
   );
 }
