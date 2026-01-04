@@ -61,6 +61,7 @@ import AdminQuizEssayManagement from "../Pages/Admin/AdminQuizEssayManagement/Ad
 import AdminQuizSectionManagement from "../Pages/Admin/AdminQuizSectionManagement/AdminQuizSectionManagement";
 import AdminQuestionManagement from "../Pages/Admin/AdminQuestionManagement/AdminQuestionManagement";
 import AdminSubmissionManagement from "../Pages/Admin/AdminSubmissionManagement/AdminSubmissionManagement";
+import PackageManagement from "../Pages/Admin/PackageManagement/PackageManagement";
 
 /**
  * Application Routes
@@ -143,6 +144,7 @@ export default function AppRoutes() {
         <Route path="courses/:courseId/lesson/:lessonId/module/:moduleId/assessment/:assessmentId/quiz/:quizId/sections" element={<AdminQuizSectionManagement />} />
         <Route path="courses/:courseId/lesson/:lessonId/module/:moduleId/assessment/:assessmentId/quiz/:quizId/section/:sectionId/questions" element={<AdminQuestionManagement />} />
         <Route path="users" element={<AdminUserList />} />
+        <Route path="packages" element={<PackageManagement />} />
         <Route path="finance" element={<AdminDashboard />} />
         <Route path="submission-management" element={<AdminSubmissionManagement />} />
       </Route>

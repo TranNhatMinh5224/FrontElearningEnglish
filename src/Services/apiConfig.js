@@ -53,6 +53,13 @@ export const API_ENDPOINTS = {
             UNBLOCK: (id) => `/admin/users/unblock/${id}`,
             UPGRADE_TEACHER: "/admin/users/upgrade-to-teacher"
         },
+        PACKAGES: {
+            GET_ALL: "/admin/teacher-packages",
+            GET_BY_ID: (id) => `/admin/teacher-packages/${id}`,
+            CREATE: "/admin/teacher-packages",
+            UPDATE: (id) => `/admin/teacher-packages/${id}`,
+            DELETE: (id) => `/admin/teacher-packages/${id}`,
+        },
         ASSESSMENTS: {
             CREATE: "/admin/assessments",
             GET_BY_MODULE: (moduleId) => `/admin/assessments/module/${moduleId}`,
