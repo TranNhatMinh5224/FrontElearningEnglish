@@ -24,13 +24,21 @@ export default function MatchingQuestion({ question, answer, onChange }) {
     let rightOptions = [];
 
     if (leftTexts.length > 0) {
-        // Cách 1: Dựa trên Metadata
+        // Cách 1: Dựa trên Metadata + isCorrect để đảm bảo chính xác (Fix bug trùng text)
         leftOptions = leftTexts.map(text => {
-            return options.find(o => (o.optionText || o.text || "").trim() === text.trim());
+            return options.find(o => {
+                const t = (o.optionText || o.text || o.Text || "").trim();
+                const isTrue = o.isCorrect === true || o.IsCorrect === true;
+                return t === text.trim() && isTrue;
+            });
         }).filter(Boolean);
 
         rightOptions = rightTexts.map(text => {
-            return options.find(o => (o.optionText || o.text || "").trim() === text.trim());
+            return options.find(o => {
+                const t = (o.optionText || o.text || o.Text || "").trim();
+                const isFalse = o.isCorrect === false || o.IsCorrect === false;
+                return t === text.trim() && isFalse;
+            });
         }).filter(Boolean);
     }
 

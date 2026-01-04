@@ -9,9 +9,8 @@ export const useQuestionTypes = () => {
 
     // Tạo object QUESTION_TYPES động từ enum
     const QUESTION_TYPES = questionTypes.reduce((acc, type) => {
-        // Convert name to constant case (e.g., "MultipleChoice" -> "MULTIPLE_CHOICE")
-        const key = type.name.replace(/([A-Z])/g, '_$1').toUpperCase().substring(1);
-        acc[key] = type.value;
+        // Use exact backend enum name (e.g., "MultipleChoice") to match component usage
+        acc[type.name] = type.value;
         return acc;
     }, {});
 
