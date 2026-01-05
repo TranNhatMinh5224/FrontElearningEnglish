@@ -1,0 +1,172 @@
+/* AdminDetailModal CSS - Clean white/gray design */
+/* Follow StudentDetailModal pattern for proper CSS override */
+
+/* Make modal wider - Override Bootstrap with highest specificity */
+.admin-detail-modal-dialog,
+.modal .admin-detail-modal-dialog,
+.modal.show .admin-detail-modal-dialog,
+.admin-detail-modal .modal-dialog.admin-detail-modal-dialog,
+.modal.admin-detail-modal .modal-dialog.admin-detail-modal-dialog,
+.modal.show.admin-detail-modal .modal-dialog.admin-detail-modal-dialog,
+body .modal .admin-detail-modal-dialog,
+body .modal.show .admin-detail-modal-dialog,
+body .admin-detail-modal .modal-dialog.admin-detail-modal-dialog,
+html body .modal .admin-detail-modal-dialog,
+html body .modal.show .admin-detail-modal-dialog {
+  max-width: 900px !important;
+  width: 90% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+body .modal.show .admin-detail-modal .modal-dialog.admin-detail-modal-dialog,
+body .modal.show.admin-detail-modal .modal-dialog.admin-detail-modal-dialog,
+html body .modal.show .admin-detail-modal-dialog,
+html body .modal.show .admin-detail-modal .modal-dialog.admin-detail-modal-dialog {
+  max-width: 900px !important;
+  width: 90% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  display: flex !important;
+  align-items: center !important;
+  min-height: calc(100% - 1rem) !important;
+}
+
+.admin-detail-modal-dialog.modal-dialog-centered,
+.modal.admin-detail-modal .modal-dialog.admin-detail-modal-dialog.modal-dialog-centered,
+body .admin-detail-modal .modal-dialog.admin-detail-modal-dialog.modal-dialog-centered,
+html body .admin-detail-modal-dialog.modal-dialog-centered,
+html body .modal.admin-detail-modal .modal-dialog.admin-detail-modal-dialog.modal-dialog-centered {
+  max-width: 900px !important;
+  width: 90% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  display: flex !important;
+  align-items: center !important;
+  min-height: calc(100% - 1rem) !important;
+}
+
+/* Modal Content - White background, no gradients */
+.admin-detail-modal > .modal-dialog > .modal-content,
+.modal.admin-detail-modal > .modal-dialog > .modal-content,
+html body .modal.admin-detail-modal > .modal-dialog > .modal-content,
+html body .admin-detail-modal > .modal-dialog > .modal-content {
+  background-color: #ffffff !important;
+  background-image: none !important;
+  background: #ffffff !important;
+  border-radius: 16px !important;
+  border: none !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15) !important;
+  max-width: none !important;
+  width: 100% !important;
+  max-height: 90vh !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+
+/* Modal Header - Gradient blue */
+.admin-detail-modal > .modal-dialog > .modal-content > .modal-header,
+.modal.admin-detail-modal > .modal-dialog > .modal-content > .modal-header,
+html body .modal.admin-detail-modal .modal-header.admin-modal-header,
+html body .admin-detail-modal .modal-header.admin-modal-header,
+.admin-modal-header {
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
+  background-image: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%) !important;
+  color: white !important;
+  border: none !important;
+  border-bottom: none !important;
+  border-top-left-radius: 16px !important;
+  border-top-right-radius: 16px !important;
+  padding: 24px 28px !important;
+}
+
+.admin-modal-header .btn-close,
+.admin-modal-header .btn-close:hover {
+  filter: brightness(0) invert(1) !important;
+  opacity: 1 !important;
+}
+
+.admin-modal-header .modal-title {
+  color: white !important;
+  font-size: 24px !important;
+  font-weight: 700 !important;
+}
+
+/* Modal Body - Light gray background */
+.admin-detail-modal > .modal-dialog > .modal-content > .modal-body,
+.modal.admin-detail-modal > .modal-dialog > .modal-content > .modal-body,
+html body .modal.admin-detail-modal .modal-body.admin-modal-body,
+html body .admin-detail-modal .modal-body.admin-modal-body,
+.admin-modal-body {
+  background-color: #f8f9fa !important;
+  background-image: none !important;
+  background: #f8f9fa !important;
+  padding: 28px !important;
+  overflow-y: auto !important;
+  flex: 1 !important;
+  max-height: calc(90vh - 140px) !important;
+}
+
+/* Info Cards - White background with rounded corners */
+.admin-info-card {
+  background-color: #ffffff !important;
+  background-image: none !important;
+  background: #ffffff !important;
+  border-radius: 12px !important;
+}
+
+/* Status Card - Light green background */
+.admin-status-card {
+  background-color: #f0fdf4 !important;
+  background-image: none !important;
+  background: #f0fdf4 !important;
+  border-radius: 12px !important;
+}
+
+/* Permissions Scroll Container */
+.permissions-scroll {
+  max-height: 200px !important;
+  overflow-y: auto !important;
+}
+
+/* Permission Badge - Small font */
+.permission-badge {
+  font-size: 0.7rem !important;
+}
+
+/* Modal Footer - White background */
+.admin-detail-modal > .modal-dialog > .modal-content > .modal-footer,
+.modal.admin-detail-modal > .modal-dialog > .modal-content > .modal-footer,
+html body .modal.admin-detail-modal .modal-footer.admin-modal-footer,
+html body .admin-detail-modal .modal-footer.admin-modal-footer,
+.admin-modal-footer {
+  background-color: #ffffff !important;
+  background-image: none !important;
+  background: #ffffff !important;
+  border: none !important;
+  border-top: 1px solid #dee2e6 !important;
+  border-bottom-left-radius: 16px !important;
+  border-bottom-right-radius: 16px !important;
+  padding: 20px 28px !important;
+}
+
+/* Modal Dialog - Transparent background */
+.admin-detail-modal .modal-dialog.admin-detail-modal-dialog,
+html body .admin-detail-modal .modal-dialog.admin-detail-modal-dialog {
+  background-color: transparent !important;
+  background-image: none !important;
+  background: transparent !important;
+}
+
+/* Modal Backdrop - Black with opacity */
+.modal-backdrop,
+.modal-backdrop.show,
+.modal-backdrop.fade,
+html body .modal-backdrop,
+html body .modal-backdrop.show {
+  opacity: 0.6 !important;
+  background-color: #000000 !important;
+  background-image: none !important;
+  background: #000000 !important;
+}

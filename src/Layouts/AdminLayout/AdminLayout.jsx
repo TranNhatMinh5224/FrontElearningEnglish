@@ -10,12 +10,12 @@ import {
   MdDashboard, 
   MdClass, 
   MdPeople, 
-  MdAttachMoney, 
   MdAssignment, 
   MdLogout,
   MdNotifications,
   MdSearch,
-  MdInventory
+  MdInventory,
+  MdAdminPanelSettings
 } from "react-icons/md";
 import { useAuth } from "../../Context/AuthContext";
 
@@ -111,17 +111,17 @@ export default function AdminLayout() {
           <NavLink 
             to="/admin/packages" 
             className={({ isActive }) => isActive ? "menu-item active" : "menu-item"}
-            onClick={(e) => handleNavClick(e, "/admin/packages", ["SuperAdmin", "ContentAdmin", "FinanceAdmin"], "Quản lý gói dịch vụ")}
+            onClick={(e) => handleNavClick(e, "/admin/packages", ["SuperAdmin", "FinanceAdmin"], "Quản lý gói dịch vụ")}
           >
             <MdInventory /> Package Management
           </NavLink>
 
           <NavLink 
-            to={ROUTE_PATHS.ADMIN.FINANCE} 
+            to="/admin/admin-management" 
             className={({ isActive }) => isActive ? "menu-item active" : "menu-item"}
-            onClick={(e) => handleNavClick(e, ROUTE_PATHS.ADMIN.FINANCE, ["SuperAdmin", "FinanceAdmin"], "Quản lý tài chính")}
+            onClick={(e) => handleNavClick(e, "/admin/admin-management", ["SuperAdmin"], "Admin Management")}
           >
-            <MdAttachMoney /> Finance
+            <MdAdminPanelSettings /> Admin Management
           </NavLink>
 
           <NavLink 

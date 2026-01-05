@@ -45,7 +45,8 @@ export default function EssaySubmissionDetailModal({ show, onClose, submission, 
       const submissionId = submission.submissionId || submission.SubmissionId;
       const gradeData = {
         score: parseFloat(score),
-        feedback: feedback?.trim() || null,
+        // Send empty string when feedback is blank so backend that doesn't accept null still works
+        feedback: (feedback?.trim() ?? ""),
       };
 
       const hasGrade = submission.teacherScore !== null && submission.teacherScore !== undefined;

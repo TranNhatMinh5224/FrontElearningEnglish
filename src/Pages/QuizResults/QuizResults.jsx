@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Container, Row, Col, Button, Card, Badge } from "react-bootstrap";
 import MainHeader from "../../Components/Header/MainHeader";
-import { useSubmissionStatus } from "../../hooks/useSubmissionStatus";
 import { quizAttemptService } from "../../Services/quizAttemptService";
 import { quizService } from "../../Services/quizService";
 import { FaCheckCircle, FaTimesCircle, FaClock, FaTrophy } from "react-icons/fa";
@@ -11,13 +10,11 @@ import "./QuizResults.css";
 export default function QuizResults() {
     const { courseId, lessonId, moduleId, attemptId } = useParams();
     const navigate = useNavigate();
-    const { isSubmitted } = useSubmissionStatus();
     
     const [result, setResult] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [assessmentId, setAssessmentId] = useState(null);
-    const [quizId, setQuizId] = useState(null);
 
     useEffect(() => {
         const fetchResults = async () => {
@@ -50,7 +47,6 @@ export default function QuizResults() {
                     // Extract quizId from result
                     const qId = attemptData.quizId || attemptData.QuizId;
                     if (qId) {
-                        setQuizId(qId);
                         // Fetch quiz info to get assessmentId
                         try {
                             const quizRes = await quizService.getById(qId);
@@ -109,28 +105,6 @@ export default function QuizResults() {
         });
     };
 
-    const parseCorrectAnswer = (correctOption) => {
-        if (typeof correctOption === 'string') {
-            // Try to parse JSON-like strings
-            if (correctOption.startsWith("Correct answer data: ")) {
-                try {
-                    const jsonStr = correctOption.replace("Correct answer data: ", "");
-                    return JSON.parse(jsonStr);
-                } catch (e) {
-                    return correctOption;
-                }
-            }
-            return correctOption;
-        }
-        if (Array.isArray(correctOption)) {
-            return correctOption;
-        }
-        if (typeof correctOption === 'object') {
-            return correctOption;
-        }
-        return [correctOption];
-    };
-
     const handleBack = () => {
         if (assessmentId) {
             navigate(`/course/${courseId}/lesson/${lessonId}/module/${moduleId}/assignment/${assessmentId}`);
@@ -179,7 +153,7 @@ export default function QuizResults() {
         );
     }
 
-    const { totalScore, percentage, isPassed, correctAnswers, submittedAt, timeSpentSeconds } = result;
+    const { totalScore, percentage, isPassed, questions, submittedAt, timeSpentSeconds } = result;
 
     // Tính toán tổng điểm tối đa dựa trên điểm đạt được và tỷ lệ %
     // MaxScore = (totalScore * 100) / percentage
@@ -254,59 +228,89 @@ export default function QuizResults() {
                                     </div>
 
                                     {/* Correct Answers */}
-                                    <div className="correct-answers-section">
-                                        <h3 className="section-title">Đáp án đúng</h3>
-                                        <div className="answers-list">
-                                            {correctAnswers && correctAnswers.map((item, index) => {
-                                                const correctOptions = parseCorrectAnswer(item.correctOptions || item.correctOption);
-                                                const isArray = Array.isArray(correctOptions);
-                                                const isObject = typeof correctOptions === 'object' && !isArray;
+                                    {questions && questions.length > 0 && (
+                                        <div className="correct-answers-section">
+                                            <h3 className="section-title">Đáp án đúng</h3>
+                                            <div className="answers-list">
+                                                {questions.map((question, index) => {
+                                                    // Parse correct answer
+                                                    const correctAnswer = question.correctAnswer || question.CorrectAnswer;
+                                                    const correctAnswerText = question.correctAnswerText || question.CorrectAnswerText;
+                                                    const userAnswer = question.userAnswer || question.UserAnswer;
+                                                    const isCorrect = question.isCorrect ?? question.IsCorrect ?? false;
+                                                    const questionText = question.questionText || question.QuestionText;
 
-                                                return (
-                                                    <Card key={item.questionId || index} className="answer-card">
-                                                        <Card.Body>
-                                                            <div className="answer-header">
-                                                                <Badge bg="primary" className="question-badge">
-                                                                    Câu {index + 1}
-                                                                </Badge>
-                                                            </div>
-                                                            <div className="question-text">
-                                                                {item.questionText || item.QuestionText}
-                                                            </div>
-                                                            <div className="correct-answer">
-                                                                <span className="answer-label">Đáp án đúng:</span>
-                                                                <div className="answer-content">
-                                                                    {isArray ? (
-                                                                        <div className="answer-list">
-                                                                            {correctOptions.map((opt, idx) => (
-                                                                                <Badge key={idx} bg="success" className="answer-badge">
-                                                                                    {opt}
-                                                                                </Badge>
-                                                                            ))}
-                                                                        </div>
-                                                                    ) : isObject ? (
-                                                                        <div className="answer-object">
-                                                                            {Object.entries(correctOptions).map(([key, value], idx) => (
-                                                                                <div key={idx} className="answer-pair">
-                                                                                    <Badge bg="info">{key}</Badge>
-                                                                                    <span className="arrow">→</span>
-                                                                                    <Badge bg="success">{value}</Badge>
-                                                                                </div>
-                                                                            ))}
-                                                                        </div>
-                                                                    ) : (
-                                                                        <Badge bg="success" className="answer-badge">
-                                                                            {correctOptions}
-                                                                        </Badge>
-                                                                    )}
+                                                    return (
+                                                        <Card key={question.questionId || index} className="answer-card">
+                                                            <Card.Body>
+                                                                <div className="answer-header">
+                                                                    <Badge bg="primary" className="question-badge">
+                                                                        Câu {index + 1}
+                                                                    </Badge>
+                                                                    <Badge bg={isCorrect ? "success" : "danger"} className="ms-2">
+                                                                        {isCorrect ? "Đúng" : "Sai"}
+                                                                    </Badge>
                                                                 </div>
-                                                            </div>
-                                                        </Card.Body>
-                                                    </Card>
-                                                );
-                                            })}
+                                                                <div className="question-text">
+                                                                    {questionText}
+                                                                </div>
+                                                                
+                                                                {/* User Answer */}
+                                                                {userAnswer !== null && userAnswer !== undefined && (
+                                                                    <div className="user-answer mb-2">
+                                                                        <span className="answer-label">Câu trả lời của bạn:</span>
+                                                                        <div className="answer-content">
+                                                                            <Badge bg={isCorrect ? "success" : "danger"} className="answer-badge">
+                                                                                {typeof userAnswer === 'object' ? JSON.stringify(userAnswer) : String(userAnswer)}
+                                                                            </Badge>
+                                                                        </div>
+                                                                    </div>
+                                                                )}
+                                                                
+                                                                {/* Correct Answer */}
+                                                                <div className="correct-answer">
+                                                                    <span className="answer-label">Đáp án đúng:</span>
+                                                                    <div className="answer-content">
+                                                                        {correctAnswerText ? (
+                                                                            <Badge bg="success" className="answer-badge">
+                                                                                {correctAnswerText}
+                                                                            </Badge>
+                                                                        ) : correctAnswer ? (
+                                                                            Array.isArray(correctAnswer) ? (
+                                                                                <div className="answer-list">
+                                                                                    {correctAnswer.map((opt, idx) => (
+                                                                                        <Badge key={idx} bg="success" className="answer-badge">
+                                                                                            {typeof opt === 'object' ? JSON.stringify(opt) : String(opt)}
+                                                                                        </Badge>
+                                                                                    ))}
+                                                                                </div>
+                                                                            ) : typeof correctAnswer === 'object' ? (
+                                                                                <div className="answer-object">
+                                                                                    {Object.entries(correctAnswer).map(([key, value], idx) => (
+                                                                                        <div key={idx} className="answer-pair">
+                                                                                            <Badge bg="info">{key}</Badge>
+                                                                                            <span className="arrow">→</span>
+                                                                                            <Badge bg="success">{String(value)}</Badge>
+                                                                                        </div>
+                                                                                    ))}
+                                                                                </div>
+                                                                            ) : (
+                                                                                <Badge bg="success" className="answer-badge">
+                                                                                    {String(correctAnswer)}
+                                                                                </Badge>
+                                                                            )
+                                                                        ) : (
+                                                                            <span className="text-muted">Không có thông tin</span>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                            </Card.Body>
+                                                        </Card>
+                                                    );
+                                                })}
+                                            </div>
                                         </div>
-                                    </div>
+                                    )}
 
                                     {/* Actions */}
                                     <div className="results-actions">

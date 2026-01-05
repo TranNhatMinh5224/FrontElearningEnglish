@@ -163,20 +163,6 @@ export default function TeacherStudentManagement() {
             </button>
           </div>
 
-          {/* Search bar */}
-          <form onSubmit={handleSearch} className="search-bar">
-            <input
-              type="text"
-              placeholder="Tìm kiếm học viên theo tên hoặc email..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="search-input"
-            />
-            <button type="submit" className="search-btn">
-              Tìm kiếm
-            </button>
-          </form>
-
           {loading ? (
             <div className="loading-message">Đang tải danh sách học viên...</div>
           ) : error ? (

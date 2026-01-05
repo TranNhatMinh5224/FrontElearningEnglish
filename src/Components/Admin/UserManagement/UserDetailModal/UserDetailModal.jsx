@@ -35,84 +35,68 @@ export default function UserDetailModal({ show, onClose, user }) {
           </div>
 
           <div className="modal-body p-4 bg-light">
-            <div className="row g-4">
+            <div className="card border-0 shadow-sm p-4" style={{ borderRadius: '12px' }}>
+              <h6 className="text-muted text-uppercase fw-bold small mb-4 border-bottom pb-2">
+                <MdPerson className="me-2" size={18}/>
+                Thông tin tài khoản
+              </h6>
               
-              {/* Account Info Section */}
-              <div className="col-md-7">
-                <div className="card border-0 shadow-sm p-3 h-100" style={{ borderRadius: '12px' }}>
-                  <h6 className="text-muted text-uppercase fw-bold small mb-3 border-bottom pb-2">Thông tin tài khoản</h6>
-                  <div className="d-flex align-items-center mb-3">
-                    <MdEmail className="text-primary me-3" size={20}/>
-                    <div>
-                      <small className="text-muted d-block">Email</small>
-                      <span className="fw-medium">{user.email}</span>
-                      {user.emailVerified && <MdVerifiedUser className="ms-2 text-success" title="Đã xác thực"/>}
+              <div className="row g-4">
+                {/* Email */}
+                <div className="col-md-6">
+                  <div className="d-flex align-items-start">
+                    <div className="icon-wrapper me-3" style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#e0e7ff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <MdEmail className="text-primary" size={20}/>
+                    </div>
+                    <div className="flex-grow-1">
+                      <small className="text-muted d-block mb-1">Email</small>
+                      <div className="d-flex align-items-center">
+                        <span className="fw-medium">{user.email}</span>
+                        {user.emailVerified && <MdVerifiedUser className="ms-2 text-success" size={16} title="Đã xác thực"/>}
+                      </div>
                     </div>
                   </div>
-                  <div className="d-flex align-items-center mb-3">
-                    <MdPhone className="text-primary me-3" size={20}/>
-                    <div>
-                      <small className="text-muted d-block">Số điện thoại</small>
+                </div>
+
+                {/* Phone */}
+                <div className="col-md-6">
+                  <div className="d-flex align-items-start">
+                    <div className="icon-wrapper me-3" style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#dbeafe', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <MdPhone className="text-primary" size={20}/>
+                    </div>
+                    <div className="flex-grow-1">
+                      <small className="text-muted d-block mb-1">Số điện thoại</small>
                       <span className="fw-medium">{user.phoneNumber || user.phone || "Chưa cập nhật"}</span>
                     </div>
                   </div>
-                  <div className="row">
-                    <div className="col-6">
-                      <div className="d-flex align-items-center mb-3">
-                        <MdWc className="text-primary me-3" size={20}/>
-                        <div>
-                          <small className="text-muted d-block">Giới tính</small>
-                          <span className="fw-medium">{user.isMale ? "Nam" : "Nữ"}</span>
-                        </div>
-                      </div>
+                </div>
+
+                {/* Gender */}
+                <div className="col-md-6">
+                  <div className="d-flex align-items-start">
+                    <div className="icon-wrapper me-3" style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#fce7f3', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <MdWc className="text-primary" size={20}/>
                     </div>
-                    <div className="col-6">
-                      <div className="d-flex align-items-center mb-3">
-                        <MdCake className="text-primary me-3" size={20}/>
-                        <div>
-                          <small className="text-muted d-block">Ngày sinh</small>
-                          <span className="fw-medium">{formatDate(user.dateOfBirth)}</span>
-                        </div>
-                      </div>
+                    <div className="flex-grow-1">
+                      <small className="text-muted d-block mb-1">Giới tính</small>
+                      <span className="fw-medium">{user.isMale ? "Nam" : "Nữ"}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Birthday */}
+                <div className="col-md-6">
+                  <div className="d-flex align-items-start">
+                    <div className="icon-wrapper me-3" style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#fef3c7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <MdCake className="text-primary" size={20}/>
+                    </div>
+                    <div className="flex-grow-1">
+                      <small className="text-muted d-block mb-1">Ngày sinh</small>
+                      <span className="fw-medium">{formatDate(user.dateOfBirth)}</span>
                     </div>
                   </div>
                 </div>
               </div>
-
-              {/* Stats & Subscription Section */}
-              <div className="col-md-5">
-                <div className="row g-3 h-100">
-                  {/* Streak Card */}
-                  <div className="col-12">
-                    <div className="card border-0 shadow-sm p-3 text-center" style={{ borderRadius: '12px', background: '#fff5f2' }}>
-                      <MdLocalFireDepartment className="text-danger mb-2" size={32}/>
-                      <h3 className="fw-bold mb-0">{user.streak?.currentStreak || 0}</h3>
-                      <small className="text-danger fw-bold">Ngày học liên tiếp</small>
-                    </div>
-                  </div>
-
-                  {/* Subscription Card */}
-                  <div className="col-12">
-                    <div className="card border-0 shadow-sm p-3" style={{ borderRadius: '12px', background: '#f0fdf4' }}>
-                      <div className="d-flex align-items-center mb-2">
-                        <MdCardMembership className="text-success me-2" size={24}/>
-                        <span className="fw-bold text-success small">GÓI DỊCH VỤ</span>
-                      </div>
-                      {user.teacherSubscription ? (
-                        <div>
-                          <div className="fw-bold text-dark">{user.teacherSubscription.packageName}</div>
-                          <small className="text-muted d-block mt-1">
-                            Hết hạn: {formatDate(user.teacherSubscription.endDate)}
-                          </small>
-                        </div>
-                      ) : (
-                        <span className="text-muted small">Chưa đăng ký gói Pro</span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
             </div>
           </div>
 
