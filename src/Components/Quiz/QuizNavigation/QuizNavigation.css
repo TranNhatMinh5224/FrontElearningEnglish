@@ -19,20 +19,60 @@
 .navigation-stats {
     display: flex;
     align-items: center;
-    gap: 4px;
-    font-size: 14px;
+    gap: 12px;
 }
 
-.answered-stat {
-    color: var(--color-status-success, #10b981);
-    font-weight: 600;
+/* Combined stat panel */
+.stat-panel {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 12px;
+    background: var(--color-bg-secondary, #f6f8fb);
+    padding: 10px 14px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.03);
 }
 
-.total-stat {
-    color: var(--color-text-secondary, #6b7280);
+.stat-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.stat-icon {
+    color: var(--color-status-success, #10b981);
+    font-size: 20px;
+}
+
+.stat-text {
+    color: var(--color-text-primary, #1f2937);
+    font-weight: 700;
+    font-size: 18px;
+}
+
+.stat-panel {
+    justify-content: center;
+}
+
+/* Higher-specificity override to ensure the quiz navigation icon stays small */
+.quiz-navigation .stat-panel .stat-icon {
+    font-size: 18px !important;
+    line-height: 1;
+    /* Override any global sizing that sets a large width/height and circular background */
+    width: 40px !important;
+    height: 40px !important;
+    padding: 0 !important;
+    border-radius: 8px !important;
+    background: transparent !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+/* Ensure the inner SVG scales to the font-size and fits inside the small container */
+.quiz-navigation .stat-panel .stat-icon svg {
+    width: 60% !important;
+    height: 60% !important;
 }
 
 .navigation-grid {
