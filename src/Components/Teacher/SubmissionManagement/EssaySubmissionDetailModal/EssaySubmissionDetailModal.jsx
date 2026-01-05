@@ -157,8 +157,6 @@ export default function EssaySubmissionDetailModal({ show, onClose, submission, 
   const textContent = submission.textContent || submission.TextContent || "";
   const attachmentUrl = submission.attachmentUrl || submission.AttachmentUrl;
   const maxScore = submission.maxScore !== undefined ? submission.maxScore : (submission.MaxScore !== undefined ? submission.MaxScore : 100);
-  const aiScore = submission.aiScore !== undefined ? submission.aiScore : (submission.AiScore !== undefined ? submission.AiScore : null);
-  const aiFeedback = submission.aiFeedback || submission.AiFeedback || "";
   const teacherScore = submission.teacherScore !== undefined ? submission.teacherScore : (submission.TeacherScore !== undefined ? submission.TeacherScore : null);
 
   return (
