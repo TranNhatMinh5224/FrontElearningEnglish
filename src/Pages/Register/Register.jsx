@@ -3,7 +3,7 @@ import "./Register.css";
 import Header from "../../Components/Header/LogoHeader";
 import { useNavigate } from "react-router-dom";
 import { authService } from "../../Services/authService";
-import { InputField, DatePicker, SelectField } from "../../Components/Auth";
+import { InputField, DatePicker } from "../../Components/Auth";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -40,9 +40,12 @@ export default function Register() {
     if (!email) {
       return "Vui lòng nhập email";
     }
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return "Email không hợp lệ, email phải có định dạng example@example.com";
+    const trimmed = email.trim();
+    const lower = trimmed.toLowerCase();
+      // Allow common TLDs (longer variants first)
+      const emailRegex = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.(?:com\.vn|org\.vn|edu\.vn|co\.uk|com|net|org|info|io|co|gov|edu|vn)$/i;
+      if (!emailRegex.test(lower)) {
+        return "Email không hợp lệ. Chấp nhận .com, .net, .org, .io, .vn, .com.vn, .co.uk...";
     }
     return "";
   };
@@ -232,12 +235,6 @@ export default function Register() {
     }
   };
 
-  // Gender options
-  const genderOptions = [
-    { value: "male", label: "Nam" },
-    { value: "female", label: "Nữ" },
-  ];
-
   return (
     <div className="auth-container">
       <Header />
@@ -256,7 +253,7 @@ export default function Register() {
             <InputField
               type="text"
               name="firstName"
-              placeholder="Tên"
+              placeholder="Họ"
               value={formData.firstName}
               onChange={handleInputChange}
               error={errors.firstName}
@@ -266,7 +263,7 @@ export default function Register() {
             <InputField
               type="text"
               name="lastName"
-              placeholder="Họ"
+              placeholder="Tên"
               value={formData.lastName}
               onChange={handleInputChange}
               error={errors.lastName}
@@ -284,6 +281,9 @@ export default function Register() {
             onChange={handleInputChange}
             error={errors.email}
             disabled={loading}
+            required
+            pattern="^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.(com\.vn|org\.vn|edu\.vn|co\.uk|com|net|org|info|io|co|gov|edu|vn)$"
+            title="Email phải có đuôi hợp lệ (ví dụ: .com, .net, .org, .io, .vn, .com.vn)"
           />
 
           {/* Password */}
@@ -299,6 +299,9 @@ export default function Register() {
             showPassword={showPassword}
             onTogglePassword={() => setShowPassword(!showPassword)}
           />
+          <p className="password-note">
+            * chú ý mật khẩu tối thiểu 6 ký tự bao gồm chữ hoa & ký tự đặc biệt!
+          </p>
 
           {/* Confirm Password */}
           <InputField
@@ -325,31 +328,49 @@ export default function Register() {
             disabled={loading}
           />
 
-          {/* Date of Birth and Gender Row */}
-          <div className="form-row date-gender-row">
-            <div className="date-picker-wrapper">
-              <DatePicker
-                value={formData.dateOfBirth}
-                onChange={handleDateChange}
-                disabled={loading}
-                hasError={!!errors.dateOfBirth}
-              />
-              {errors.dateOfBirth && (
-                <span className="input-field-error">{errors.dateOfBirth}</span>
-              )}
-            </div>
+          {/* Date of Birth */}
+          <div className="date-picker-wrapper">
+            <DatePicker
+              value={formData.dateOfBirth}
+              onChange={handleDateChange}
+              disabled={loading}
+              hasError={!!errors.dateOfBirth}
+            />
+            {errors.dateOfBirth && (
+              <span className="input-field-error">{errors.dateOfBirth}</span>
+            )}
+          </div>
 
-            <div className="gender-wrapper">
-              <SelectField
-                name="gender"
-                value={formData.gender}
-                onChange={handleGenderChange}
-                options={genderOptions}
-                placeholder="Giới tính"
-                error={errors.gender}
-                disabled={loading}
-              />
+          {/* Gender Radio Buttons */}
+          <div className="gender-radio-wrapper">
+            <div className="gender-radio-label">Giới tính</div>
+            <div className="gender-radio-group">
+              <label className="gender-radio-option">
+                <input
+                  type="radio"
+                  name="gender"
+                  value="female"
+                  checked={formData.gender === "female"}
+                  onChange={handleGenderChange}
+                  disabled={loading}
+                />
+                <span className="radio-label">Nữ</span>
+              </label>
+              <label className="gender-radio-option">
+                <input
+                  type="radio"
+                  name="gender"
+                  value="male"
+                  checked={formData.gender === "male"}
+                  onChange={handleGenderChange}
+                  disabled={loading}
+                />
+                <span className="radio-label">Nam</span>
+              </label>
             </div>
+            {errors.gender && (
+              <span className="input-field-error">{errors.gender}</span>
+            )}
           </div>
 
           {/* Submit Button */}

@@ -8,11 +8,6 @@
     width: 100%;
 }
 
-.select-field-container.error .scroll-picker-container {
-    border-color: #ef4444;
-    background: #fef2f2;
-}
-
 .select-field-error {
     display: block;
     color: #ef4444;

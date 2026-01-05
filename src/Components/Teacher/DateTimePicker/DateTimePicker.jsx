@@ -13,7 +13,8 @@ export default function DateTimePicker({
   hasError = false,
   disabled = false,
   label = "",
-  required = false
+  required = false,
+  dateOnly = false
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [date, setDate] = useState("");
@@ -34,20 +35,29 @@ export default function DateTimePicker({
         const year = dateObj.getFullYear();
         const formattedDate = `${day}/${month}/${year}`;
         
-        // Format time: 12-hour format with AM/PM
-        let hours = dateObj.getHours();
-        const minutes = dateObj.getMinutes();
-        const isPM = hours >= 12;
-        if (hours === 0) hours = 12;
-        else if (hours > 12) hours = hours - 12;
-        
-        setDate(formattedDate);
-        setHour(hours.toString());
-        setMinute(String(minutes).padStart(2, "0"));
-        setAmpm(isPM ? "PM" : "AM");
-        
-        const formattedTime = `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")} ${isPM ? "PM" : "AM"}`;
-        setDisplayValue(`${formattedDate} ${formattedTime}`);
+        if (dateOnly) {
+          // Date only mode
+          setDate(formattedDate);
+          setDisplayValue(formattedDate);
+          setHour("");
+          setMinute("");
+          setAmpm("");
+        } else {
+          // Format time: 12-hour format with AM/PM
+          let hours = dateObj.getHours();
+          const minutes = dateObj.getMinutes();
+          const isPM = hours >= 12;
+          if (hours === 0) hours = 12;
+          else if (hours > 12) hours = hours - 12;
+          
+          setDate(formattedDate);
+          setHour(hours.toString());
+          setMinute(String(minutes).padStart(2, "0"));
+          setAmpm(isPM ? "PM" : "AM");
+          
+          const formattedTime = `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")} ${isPM ? "PM" : "AM"}`;
+          setDisplayValue(`${formattedDate} ${formattedTime}`);
+        }
       } else {
         setDate("");
         setHour("");
@@ -62,7 +72,7 @@ export default function DateTimePicker({
       setAmpm("");
       setDisplayValue("");
     }
-  }, [value]);
+  }, [value, dateOnly]);
 
   // Close picker when clicking outside
   useEffect(() => {
@@ -120,21 +130,35 @@ export default function DateTimePicker({
       const formattedDate = `${day}/${month}/${year}`;
       setDate(formattedDate);
       
-      if (hour && minute && ampm) {
-        const dateTime = combineDateTime(formattedDate, hour, minute, ampm);
-        if (dateTime) {
-          const formattedTime = `${String(hour).padStart(2, "0")}:${minute} ${ampm}`;
-          setDisplayValue(`${formattedDate} ${formattedTime}`);
-          onChange(dateTime);
+      if (dateOnly) {
+        // Date only mode: set to start of day
+        const dateObj = parseDate(formattedDate);
+        if (dateObj) {
+          dateObj.setHours(0, 0, 0, 0);
+          setDisplayValue(formattedDate);
+          onChange(dateObj);
         }
       } else {
-        setDisplayValue(formattedDate);
-        onChange(null);
+        if (hour && minute && ampm) {
+          const dateTime = combineDateTime(formattedDate, hour, minute, ampm);
+          if (dateTime) {
+            const formattedTime = `${String(hour).padStart(2, "0")}:${minute} ${ampm}`;
+            setDisplayValue(`${formattedDate} ${formattedTime}`);
+            onChange(dateTime);
+          }
+        } else {
+          setDisplayValue(formattedDate);
+          onChange(null);
+        }
       }
     } else {
       setDate("");
-      const timePart = hour && minute && ampm ? `${String(hour).padStart(2, "0")}:${minute} ${ampm}` : "";
-      setDisplayValue(timePart);
+      if (dateOnly) {
+        setDisplayValue("");
+      } else {
+        const timePart = hour && minute && ampm ? `${String(hour).padStart(2, "0")}:${minute} ${ampm}` : "";
+        setDisplayValue(timePart);
+      }
       onChange(null);
     }
   };
@@ -273,20 +297,72 @@ export default function DateTimePicker({
               <span>Chọn ngày</span>
             </div>
             <input
-              type="date"
+              type="text"
               className="datetime-picker-date-input"
-              value={formatDateForInput(date)}
-              onChange={handleDateInputChange}
-              min={getMinDate()}
-              max={getMaxDate()}
+              value={date}
+              onChange={(e) => {
+                const input = e.target.value;
+                // Auto-format as user types: dd/mm/yyyy
+                let formatted = input.replace(/[^\d]/g, ''); // Remove non-digits
+                
+                if (formatted.length >= 2) {
+                  formatted = formatted.slice(0, 2) + '/' + formatted.slice(2);
+                }
+                if (formatted.length >= 5) {
+                  formatted = formatted.slice(0, 5) + '/' + formatted.slice(5);
+                }
+                if (formatted.length > 10) {
+                  formatted = formatted.slice(0, 10);
+                }
+                
+                setDate(formatted);
+                
+                // Try to parse and set date if valid
+                if (formatted.length === 10) {
+                  const parts = formatted.split('/');
+                  if (parts.length === 3) {
+                    const [day, month, year] = parts.map(Number);
+                    if (!isNaN(day) && !isNaN(month) && !isNaN(year) && 
+                        day >= 1 && day <= 31 && 
+                        month >= 1 && month <= 12 && 
+                        year >= 1900 && year <= 2100) {
+                      const dateObj = new Date(year, month - 1, day);
+                      if (!isNaN(dateObj.getTime())) {
+                        if (dateOnly) {
+                          dateObj.setHours(0, 0, 0, 0);
+                          setDisplayValue(formatted);
+                          onChange(dateObj);
+                        } else {
+                          if (hour && minute && ampm) {
+                            const dateTime = combineDateTime(formatted, hour, minute, ampm);
+                            if (dateTime) {
+                              const formattedTime = `${String(hour).padStart(2, "0")}:${minute} ${ampm}`;
+                              setDisplayValue(`${formatted} ${formattedTime}`);
+                              onChange(dateTime);
+                            }
+                          } else {
+                            setDisplayValue(formatted);
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }}
+              placeholder="dd/mm/yyyy"
+              maxLength={10}
             />
+            <div style={{ fontSize: "0.8em", color: "#6c757d", marginTop: "4px" }}>
+              Nhập theo định dạng: ngày/tháng/năm (ví dụ: 05/01/2026)
+            </div>
           </div>
           
-          <div className="datetime-picker-section">
-            <div className="datetime-picker-section-header">
-              <FaClock />
-              <span>Chọn giờ</span>
-            </div>
+          {!dateOnly && (
+            <div className="datetime-picker-section">
+              <div className="datetime-picker-section-header">
+                <FaClock />
+                <span>Chọn giờ</span>
+              </div>
             <Row className="datetime-picker-time-row">
               <Col className="datetime-picker-time-col">
                 <ScrollPicker
@@ -320,6 +396,7 @@ export default function DateTimePicker({
               </Col>
             </Row>
           </div>
+          )}
           
           <div className="datetime-picker-actions">
             <button

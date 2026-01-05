@@ -376,6 +376,35 @@
     color: var(--color-status-error, #ef4444);
 }
 
+/* Graded Essay View */
+.graded-essay-view {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    min-height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.graded-essay-view h2 {
+    color: #1f2937;
+    font-weight: 700;
+}
+
+.graded-essay-view .btn-success {
+    padding: 12px 32px;
+    font-size: 18px;
+    font-weight: 600;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.graded-essay-view .btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+}
+
 @media (max-width: 1200px) {
     .essay-detail-container {
         padding: 30px 60px;

@@ -5,7 +5,7 @@ import MainHeader from "../../Components/Header/MainHeader";
 import { useAuth } from "../../Context/AuthContext";
 import { authService } from "../../Services/authService";
 import { fileService } from "../../Services/fileService";
-import { FaArrowLeft, FaPencilAlt } from "react-icons/fa";
+import { FaPencilAlt } from "react-icons/fa";
 
 export default function Profile() {
     const navigate = useNavigate();
@@ -125,28 +125,48 @@ export default function Profile() {
         <>
             <MainHeader />
             <div className="profile-container">
-                <div className="profile-header">
-                    <button className="back-button" onClick={() => navigate("/home")}>
-                        <FaArrowLeft /> Quay về trang chủ
-                    </button>
-                    <h1>Thông tin User</h1>
-                </div>
+                    <div className="profile-header">
+                        <h1>Thông tin User</h1>
+                    </div>
 
                 <div className="profile-card">
                     {/* Avatar Section */}
                     <div className="avatar-section">
                         <div className="avatar-wrapper">
-                            {uploading ? (
-                                <div className="avatar-placeholder avatar-loading">
-                                    <div className="spinner"></div>
-                                </div>
-                            ) : user.avatarUrl ? (
-                                <img src={user.avatarUrl} alt="Avatar" className="avatar-image" />
-                            ) : (
-                                <div className="avatar-placeholder">
-                                    {user.fullName?.charAt(0) || "U"}
-                                </div>
-                            )}
+                            <div
+                                className="avatar-inner"
+                                onClick={() => { if (!uploading) handleAvatarClick(); }}
+                                role="button"
+                                tabIndex={0}
+                                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); if (!uploading) handleAvatarClick(); } }}
+                            >
+                                {uploading ? (
+                                    <div className="avatar-placeholder avatar-loading">
+                                        <div className="spinner"></div>
+                                    </div>
+                                ) : user.avatarUrl ? (
+                                    <img src={user.avatarUrl} alt="Avatar" className="avatar-image" />
+                                ) : (
+                                    <div className="avatar-placeholder">
+                                        {user.fullName?.charAt(0) || "U"}
+                                    </div>
+                                )}
+
+                                {
+                                    !user.avatarUrl && (
+                                        <button
+                                            className="avatar-edit-overlay"
+                                            title="Chỉnh sửa avatar"
+                                            onClick={(e) => { e.stopPropagation(); handleAvatarClick(); }}
+                                            disabled={uploading}
+                                            aria-label="Chỉnh sửa avatar"
+                                        >
+                                            <span className="pencil-circle"><FaPencilAlt /></span>
+                                        </button>
+                                    )
+                                }
+                            </div>
+
                             <input
                                 type="file"
                                 ref={fileInputRef}
@@ -154,14 +174,6 @@ export default function Profile() {
                                 accept="image/*"
                                 style={{ display: "none" }}
                             />
-                            <button
-                                className="avatar-edit-btn"
-                                title="Chỉnh sửa avatar"
-                                onClick={handleAvatarClick}
-                                disabled={uploading}
-                            >
-                                <FaPencilAlt />
-                            </button>
                         </div>
                     </div>
 

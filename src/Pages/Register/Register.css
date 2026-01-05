@@ -4,7 +4,7 @@
 
 .auth-container {
   min-height: 100vh;
-  background: #f8dede;
+  background: linear-gradient(135deg, #932da3 0%, #ffffff 100%);
   padding: 40px 60px;
   box-sizing: border-box;
 }
@@ -66,17 +66,9 @@
    DATE PICKER WRAPPER
 =========================== */
 
-.date-gender-row {
-  align-items: flex-start;
-  margin-bottom: 30px;
-  gap: 8px;
-}
-
 .date-picker-wrapper {
-  flex: 3;
   position: relative;
-  margin-bottom: 0;
-  min-width: 0;
+  margin-bottom: 15px;
   display: flex;
   flex-direction: column;
 }
@@ -94,6 +86,13 @@
 .date-picker-wrapper .date-picker-container > * {
   padding: 0 !important;
   margin: 0 !important;
+  flex: 1 !important;
+  min-width: 0;
+}
+
+.date-picker-wrapper .date-picker-container .select-field-wrapper {
+  width: 100% !important;
+  margin-bottom: 0 !important;
 }
 
 .date-picker-wrapper .date-picker-scroll-wrapper {
@@ -162,72 +161,85 @@
   min-height: 20px;
 }
 
+/* ===========================
+   GENDER RADIO BUTTONS
+=========================== */
 
-
-/* Gender wrapper styling */
-.gender-wrapper {
-  flex: 1;
-  margin-bottom: 0;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
+.gender-radio-wrapper {
+  margin-bottom: 15px;
+  width: 100%;
 }
 
-.gender-wrapper .select-field-wrapper {
-  margin-bottom: 0;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
+.gender-radio-label {
+  font-size: 15px;
+  font-weight: 500;
+  color: #1f2937;
+  margin-bottom: 12px;
+  text-align: left;
 }
 
-.gender-wrapper .select-field-error {
+.gender-radio-group {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.gender-radio-option {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+.gender-radio-option input[type="radio"] {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  margin-right: 8px;
+  cursor: pointer;
+  accent-color: #7a3df0;
+}
+
+.gender-radio-option input[type="radio"]:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.gender-radio-option .radio-label {
+  font-size: 15px;
+  color: #1f2937;
+  cursor: pointer;
+}
+
+.gender-radio-option:has(input[type="radio"]:disabled) .radio-label {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.gender-radio-wrapper .input-field-error {
   display: block;
   margin-top: 8px;
   margin-left: 0;
   font-size: 13px;
   color: #ef4444;
-  text-align: center;
+  text-align: left;
   width: 100%;
   min-height: 20px;
 }
 
-.gender-wrapper .scroll-picker-container {
-  width: 100% !important;
-  height: 100px;
-}
+/* ===========================
+   PASSWORD NOTE
+=========================== */
 
-.gender-wrapper .scroll-picker-wrapper {
-  padding: 25px 0;
-}
-
-/* Keep item height 50px to match ScrollPicker logic, but make selected bigger visually */
-.gender-wrapper .scroll-picker-item {
-  height: 50px;
-  font-size: 14px;
-  padding: 0 8px;
-}
-
-.gender-wrapper .scroll-picker-item.selected {
-  font-size: 26px;
-  font-weight: 700;
-  color: #1f2937;
-  height: 50px;
-  background: rgba(122, 61, 240, 0.05);
-  border: none;
-  border-radius: 10px;
-  box-shadow: none;
-  z-index: 10;
-  position: relative;
-}
-
-.gender-wrapper .scroll-picker-overlay-top,
-.gender-wrapper .scroll-picker-overlay-bottom {
-  height: 25px;
-}
-
-.gender-wrapper .scroll-picker-container::before {
-  top: 25px;
-  bottom: 25px;
+.password-note {
+  font-size: 10.5px;
+  color: #9ca3af;
+  text-align: left;
+  margin-top: 8px;
+  margin-bottom: 12px;
+  padding-left: 4px;
+  line-height: 1.3;
+  opacity: 0.85;
 }
 
 /* ===========================

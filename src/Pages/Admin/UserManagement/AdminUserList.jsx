@@ -6,6 +6,7 @@ import UserTable from "../../../Components/Admin/UserManagement/UserTable/UserTa
 import UpgradeUserModal from "../../../Components/Admin/UserManagement/UpgradeUserModal/UpgradeUserModal";
 import UserDetailModal from "../../../Components/Admin/UserManagement/UserDetailModal/UserDetailModal";
 import "./AdminUserList.css";
+import SuccessModal from "../../../Components/Common/SuccessModal/SuccessModal";
 
 export default function AdminUserList() {
   const [activeTab, setActiveTab] = useState("all"); 
@@ -20,6 +21,8 @@ export default function AdminUserList() {
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [upgradePackageId, setUpgradePackageId] = useState(1); 
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
 
   useEffect(() => {
     fetchUserStats();
@@ -109,7 +112,8 @@ export default function AdminUserList() {
         email: selectedUser.email,
         teacherPackageId: parseInt(upgradePackageId)
       });
-      alert("User upgraded to Teacher successfully!");
+      setSuccessMessage("User upgraded to Teacher successfully!");
+      setShowSuccessModal(true);
       setShowUpgradeModal(false);
       fetchUsers();
       fetchUserStats();
@@ -163,6 +167,12 @@ export default function AdminUserList() {
         show={showDetailModal} 
         onClose={() => setShowDetailModal(false)} 
         user={selectedUser} 
+      />
+      <SuccessModal
+        isOpen={showSuccessModal}
+        onClose={() => setShowSuccessModal(false)}
+        title="Thành công"
+        message={successMessage}
       />
     </div>
   );

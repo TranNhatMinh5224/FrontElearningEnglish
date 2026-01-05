@@ -1,23 +1,28 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useLocation } from "react-router-dom";
 import { useParams, useNavigate } from "react-router-dom";
 import { Container, Row, Col, Button, Form } from "react-bootstrap";
 import MainHeader from "../../Components/Header/MainHeader";
 import NotificationModal from "../../Components/Common/NotificationModal/NotificationModal";
 import ConfirmModal from "../../Components/Common/ConfirmModal/ConfirmModal";
+import StudentEssayResultModal from "../../Components/Common/StudentEssayResultModal/StudentEssayResultModal";
 import { essayService } from "../../Services/essayService";
 import { essaySubmissionService } from "../../Services/essaySubmissionService";
 import { fileService } from "../../Services/fileService";
 import { moduleService } from "../../Services/moduleService";
 import { courseService } from "../../Services/courseService";
 import { lessonService } from "../../Services/lessonService";
-import { FaFileUpload, FaTimes, FaEdit, FaClock, FaCheckCircle, FaTimesCircle, FaVolumeUp } from "react-icons/fa";
+import { assessmentService } from "../../Services/assessmentService";
+import { FaFileUpload, FaTimes, FaEdit, FaClock, FaCheckCircle, FaTimesCircle, FaStar } from "react-icons/fa";
 import "./EssayDetail.css";
 
 export default function EssayDetail() {
     const { courseId, lessonId, moduleId, essayId } = useParams();
     const navigate = useNavigate();
+    const location = useLocation();
 
     const [essay, setEssay] = useState(null);
+    const [assessment, setAssessment] = useState(null);
     const [course, setCourse] = useState(null);
     const [lesson, setLesson] = useState(null);
     const [module, setModule] = useState(null);
@@ -42,10 +47,13 @@ export default function EssayDetail() {
     const [notification, setNotification] = useState({ isOpen: false, type: "info", message: "" });
     const [showSubmitModal, setShowSubmitModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [showResultModal, setShowResultModal] = useState(false);
 
     const fileInputRef = useRef(null);
     const moduleStartedRef = useRef(false);
     const audioRef = useRef(null);
+    const [audioLoading, setAudioLoading] = useState(false);
+    const [audioBlobUrl, setAudioBlobUrl] = useState(null);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -89,40 +97,79 @@ export default function EssayDetail() {
                     if (essayResponse.data?.success && essayResponse.data?.data) {
                         setEssay(essayResponse.data.data);
 
+                        // Fetch assessment info to get DueAt
+                        const essayData = essayResponse.data.data;
+                        const assessmentId = essayData.assessmentId || essayData.AssessmentId;
+                        if (assessmentId) {
+                            try {
+                                const assessmentResponse = await assessmentService.getById(assessmentId);
+                                if (assessmentResponse.data?.success && assessmentResponse.data?.data) {
+                                    setAssessment(assessmentResponse.data.data);
+                                    console.log("✅ [EssayDetail] Loaded assessment info:", assessmentResponse.data.data);
+                                }
+                            } catch (err) {
+                                console.log("⚠️ [EssayDetail] Could not load assessment info:", err);
+                            }
+                        }
+
+                        // Load audio if available
+                        const audioUrl = essayData?.audioUrl || essayData?.AudioUrl;
+                        if (audioUrl) {
+                            // Load audio as blob
+                            (async () => {
+                                try {
+                                    const response = await fetch(audioUrl, {
+                                        method: 'GET',
+                                        headers: { 'Accept': 'audio/mpeg, audio/*' },
+                                        mode: 'cors',
+                                        credentials: 'include',
+                                    });
+                                    
+                                    if (response.ok) {
+                                        const blob = await response.blob();
+                                        const blobUrl = URL.createObjectURL(blob);
+                                        setAudioBlobUrl(blobUrl);
+                                    } else {
+                                        setAudioBlobUrl(audioUrl);
+                                    }
+                                } catch {
+                                    setAudioBlobUrl(audioUrl);
+                                }
+                            })();
+                        }
+
                         // Check if user has already submitted this essay
-                        try {
-                            const statusResponse = await essaySubmissionService.getSubmissionStatus(essayId);
-                            if (statusResponse?.data?.success && statusResponse?.data?.data) {
-                                const submissionData = statusResponse.data.data;
-                                const submissionId = submissionData?.submissionId || submissionData?.SubmissionId;
-
-                                if (submissionId) {
-                                    // Fetch full submission details
-                                    const submissionResponse = await essaySubmissionService.getById(submissionId);
-                                    if (submissionResponse?.data?.success && submissionResponse?.data?.data) {
-                                        const submission = submissionResponse.data.data;
-                                        if (submission) {
-                                            setCurrentSubmission(submission);
-
-                                            // Load submission data into form
-                                            const content = submission?.textContent || submission?.TextContent || "";
-                                            setTextContent(content);
-
-                                            // Load attachment if exists
-                                            const attachmentUrl = submission?.attachmentUrl || submission?.AttachmentUrl;
-                                            if (attachmentUrl) {
-                                                setExistingAttachmentUrl(attachmentUrl);
+                                try {
+                                    // If navigation provided full submission in state, use it directly (faster, reliable)
+                                    const submissionFromState = location?.state?.submission;
+                                    if (submissionFromState) {
+                                        setCurrentSubmission(submissionFromState);
+                                        const content = submissionFromState?.textContent || submissionFromState?.TextContent || "";
+                                        setTextContent(content);
+                                        const attachmentUrl = submissionFromState?.attachmentUrl || submissionFromState?.AttachmentUrl;
+                                        if (attachmentUrl) setExistingAttachmentUrl(attachmentUrl);
+                                        console.log("✅ [EssayDetail] Loaded submission from navigation state:", submissionFromState);
+                                    } else {
+                                        // Fallback: call status API which returns full submission object in data
+                                        const statusResponse = await essaySubmissionService.getSubmissionStatus(essayId);
+                                        if (statusResponse?.data?.success && statusResponse?.data?.data) {
+                                            const submission = statusResponse.data.data;
+                                            // Backend returns full submission object (textContent, attachmentUrl, etc.) directly
+                                            if (submission && (submission.submissionId || submission.SubmissionId)) {
+                                                setCurrentSubmission(submission);
+                                                const content = submission?.textContent || submission?.TextContent || "";
+                                                setTextContent(content);
+                                                const attachmentUrl = submission?.attachmentUrl || submission?.AttachmentUrl;
+                                                if (attachmentUrl) {
+                                                    setExistingAttachmentUrl(attachmentUrl);
+                                                }
+                                                console.log("✅ [EssayDetail] Loaded existing submission from status API:", submission);
                                             }
-
-                                            console.log("✅ [EssayDetail] Loaded existing submission:", submission);
                                         }
                                     }
+                                } catch (statusErr) {
+                                    console.log("ℹ️ [EssayDetail] No existing submission found or error:", statusErr);
                                 }
-                            }
-                        } catch (statusErr) {
-                            // If no submission exists, that's fine - user hasn't submitted yet
-                            console.log("ℹ️ [EssayDetail] No existing submission found:", statusErr);
-                        }
                     } else {
                         setError(essayResponse.data?.message || "Không thể tải thông tin essay");
                     }
@@ -190,109 +237,25 @@ export default function EssayDetail() {
         }
     };
 
-    const handleAudioClick = async (e) => {
-        e.stopPropagation();
-        const audioUrl = essay?.audioUrl || essay?.AudioUrl;
-        if (!audioUrl) {
-            console.warn("No audio URL provided");
-            return;
-        }
-
-        try {
-            // Stop any currently playing audio
+    // Cleanup on unmount
+    useEffect(() => {
+        return () => {
+            if (audioBlobUrl) {
+                URL.revokeObjectURL(audioBlobUrl);
+            }
             if (audioRef.current) {
                 audioRef.current.pause();
                 audioRef.current.src = "";
-                audioRef.current = null;
             }
-            
-            // Try fetching audio as blob first (to bypass CORS and handle 403)
-            // Similar to FlashCardViewer approach
-            try {
-                const response = await fetch(audioUrl, {
-                    method: 'GET',
-                    headers: {
-                        'Accept': 'audio/mpeg, audio/*',
-                    },
-                    mode: 'cors',
-                    credentials: 'include', // Include credentials (cookies/auth headers) for authenticated requests
-                });
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                const blob = await response.blob();
-                const blobUrl = URL.createObjectURL(blob);
-                const audio = new Audio(blobUrl);
-                
-                audio.onended = () => {
-                    // Clean up blob URL when audio ends
-                    URL.revokeObjectURL(blobUrl);
-                    audioRef.current = null;
-                };
-                
-                audio.onerror = (err) => {
-                    console.error("Error playing audio from blob:", err);
-                    URL.revokeObjectURL(blobUrl);
-                    audioRef.current = null;
-                    setNotification({
-                        isOpen: true,
-                        type: "error",
-                        message: "Không thể phát âm thanh. Vui lòng thử lại."
-                    });
-                };
-                
-                audioRef.current = audio;
-                await audio.play();
-                console.log("Audio playing successfully via blob");
-            } catch (fetchError) {
-                // If fetch fails (403, CORS, etc.), try direct audio URL as fallback
-                console.log("Fetch failed, trying direct audio URL:", fetchError);
-                try {
-                    const audio = new Audio(audioUrl);
-                    audioRef.current = audio;
-                    
-                    // Set crossOrigin to anonymous to allow CORS
-                    audio.crossOrigin = "anonymous";
-                    
-                    audio.onended = () => {
-                        audioRef.current = null;
-                    };
-                    
-                    audio.onerror = (err) => {
-                        console.error("Error playing audio from direct URL:", err);
-                        audioRef.current = null;
-                        setNotification({
-                            isOpen: true,
-                            type: "error",
-                            message: "Không thể phát âm thanh. Vui lòng thử lại."
-                        });
-                    };
-                    
-                    await audio.play();
-                    console.log("Audio playing successfully via direct URL");
-                } catch (directError) {
-                    console.error("Both blob fetch and direct URL failed:", directError);
-                    setNotification({
-                        isOpen: true,
-                        type: "error",
-                        message: "Không thể phát âm thanh. Vui lòng thử lại."
-                    });
-                }
-            }
-        } catch (err) {
-            console.error("Error playing audio:", err);
-            console.error("Error name:", err.name);
-            console.error("Error message:", err.message);
-            console.error("Audio URL:", audioUrl);
-            setNotification({
-                isOpen: true,
-                type: "error",
-                message: "Không thể phát âm thanh. Vui lòng thử lại."
-            });
+        };
+    }, [audioBlobUrl]);
+
+    // Update audio src when blob URL is ready
+    useEffect(() => {
+        if (audioRef.current && audioBlobUrl) {
+            audioRef.current.src = audioBlobUrl;
         }
-    };
+    }, [audioBlobUrl]);
 
     const handleUploadFile = async () => {
         if (!selectedFile) return;
@@ -301,7 +264,6 @@ export default function EssayDetail() {
             setUploadingFile(true);
             console.log("📤 [EssayDetail] Uploading file to temp storage...");
 
-            // Upload file to temp storage
             const uploadResponse = await fileService.uploadTempFile(
                 selectedFile,
                 "essay-attachments",
@@ -311,7 +273,6 @@ export default function EssayDetail() {
             console.log("📥 [EssayDetail] Upload response:", uploadResponse.data);
 
             if (uploadResponse.data?.success && uploadResponse.data?.data) {
-                // Backend trả về ResultUploadDto với PascalCase: TempKey, ImageUrl, ImageType
                 const resultData = uploadResponse.data.data;
                 const tempKey = resultData.TempKey || resultData.tempKey;
                 const imageUrl = resultData.ImageUrl || resultData.imageUrl;
@@ -404,12 +365,15 @@ export default function EssayDetail() {
             return;
         }
 
-        // Validate text content
-        if (!textContent.trim()) {
+        // Validate: must have either text content OR file attachment
+        const hasTextContent = textContent.trim().length > 0;
+        const hasAttachment = attachmentTempKey || existingAttachmentUrl;
+        
+        if (!hasTextContent && !hasAttachment) {
             setNotification({
                 isOpen: true,
                 type: "error",
-                message: "Vui lòng nhập nội dung essay"
+                message: "Vui lòng nhập nội dung essay hoặc đính kèm file"
             });
             return;
         }
@@ -448,7 +412,7 @@ export default function EssayDetail() {
                 console.log("📤 [EssayDetail] Updating submission...");
                 console.log("📝 [EssayDetail] Update data (PascalCase):", updateData);
 
-                const updateResponse = await essaySubmissionService.update(submissionId, updateData);
+                const updateResponse = await essaySubmissionService.updateSubmission(submissionId, updateData);
                 console.log("📥 [EssayDetail] Update response:", updateResponse.data);
 
                 if (updateResponse.data?.success) {
@@ -459,7 +423,7 @@ export default function EssayDetail() {
                     });
 
                     // Reload submission data
-                    const submissionResponse = await essaySubmissionService.getById(submissionId);
+                    const submissionResponse = await essaySubmissionService.getSubmissionById(submissionId);
                     if (submissionResponse.data?.success && submissionResponse.data?.data) {
                         setCurrentSubmission(submissionResponse.data.data);
                         setExistingAttachmentUrl(submissionResponse.data.data.attachmentUrl || submissionResponse.data.data.AttachmentUrl);
@@ -583,7 +547,7 @@ export default function EssayDetail() {
 
             console.log("🗑️ [EssayDetail] Deleting submission:", submissionId);
 
-            const deleteResponse = await essaySubmissionService.delete(submissionId);
+            const deleteResponse = await essaySubmissionService.deleteSubmission(submissionId);
             console.log("📥 [EssayDetail] Delete response:", deleteResponse.data);
 
             if (deleteResponse.data?.success) {
@@ -646,6 +610,22 @@ export default function EssayDetail() {
 
     const handleBackClick = () => {
         navigate(`/course/${courseId}/lesson/${lessonId}/module/${moduleId}/assignment`);
+    };
+
+    const isPastDue = () => {
+        if (!assessment) {
+            return false;
+        }
+        const dueDate = assessment?.dueAt || assessment?.DueAt;
+        if (!dueDate) {
+            return false;
+        }
+        
+        const due = new Date(dueDate);
+        const now = new Date();
+        const isPast = now > due;
+        
+        return isPast;
     };
 
     if (loading) {
@@ -724,20 +704,22 @@ export default function EssayDetail() {
                     <Row>
                         <Col>
                             <div className="essay-header">
-                                <div className="essay-title-wrapper">
-                                    <h1 className="essay-title">{essayTitle}</h1>
-                                    {essay?.audioUrl && (
-                                        <button 
-                                            className="essay-audio-icon-btn"
-                                            onClick={handleAudioClick}
-                                            title="Nghe đề bài"
-                                        >
-                                            <FaVolumeUp />
-                                        </button>
-                                    )}
-                                </div>
+                                <h1 className="essay-title">{essayTitle}</h1>
                                 {essay?.description && (
                                     <p className="essay-description">{essay.description || essay.Description}</p>
+                                )}
+                                {essay?.audioUrl && (
+                                    <div className="essay-audio-player" style={{ marginTop: '16px', marginBottom: '20px' }}>
+                                        <audio 
+                                            ref={audioRef}
+                                            controls 
+                                            controlsList="nodownload"
+                                            style={{ width: '100%', maxWidth: '500px' }}
+                                            src={audioBlobUrl || essay.audioUrl || essay.AudioUrl}
+                                        >
+                                            Trình duyệt của bạn không hỗ trợ phát audio.
+                                        </audio>
+                                    </div>
                                 )}
                                 {essay?.imageUrl && (
                                     <div className="essay-image-container">
@@ -755,6 +737,33 @@ export default function EssayDetail() {
                     <Row>
                         <Col lg={8}>
                             <div className="essay-form-section">
+                                {/* Check if student has been graded */}
+                                {currentSubmission && (currentSubmission.teacherScore !== null && currentSubmission.teacherScore !== undefined || 
+                                 currentSubmission.TeacherScore !== null && currentSubmission.TeacherScore !== undefined ||
+                                 currentSubmission.score !== null && currentSubmission.score !== undefined ||
+                                 currentSubmission.Score !== null && currentSubmission.Score !== undefined) ? (
+                                    // Student has been graded - Show result view
+                                    <div className="graded-essay-view">
+                                        <div className="text-center p-5">
+                                            <FaStar size={64} className="text-warning mb-3" />
+                                            <h2 className="mb-3">Bài essay của bạn đã được chấm điểm!</h2>
+                                            <p className="text-muted mb-4">
+                                                Nhấn vào nút bên dưới để xem kết quả chi tiết
+                                            </p>
+                                            <Button
+                                                variant="success"
+                                                size="lg"
+                                                onClick={() => setShowResultModal(true)}
+                                                className="px-5"
+                                            >
+                                                <FaStar className="me-2" />
+                                                Xem điểm và nhận xét
+                                            </Button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    // Student hasn't been graded - Show normal form
+                                    <>
                                 <h2 className="section-title">
                                     {currentSubmission ? "Cập nhật bài Essay" : "Nộp bài Essay"}
                                 </h2>
@@ -879,27 +888,31 @@ export default function EssayDetail() {
                                             )}
                                         </div>
                                     </Form.Group>
+                                </Form>
 
+                                {!isPastDue() ? (
                                     <div className="essay-submit-section d-flex gap-2">
                                         <Button
                                             variant="primary"
                                             size="lg"
                                             className="submit-essay-btn"
                                             onClick={() => setShowSubmitModal(true)}
-                                            disabled={(submitting || isUpdating) || !textContent.trim()}
+                                            disabled={(submitting || isUpdating) || (!textContent.trim() && !attachmentTempKey && !existingAttachmentUrl)}
                                             style={{
                                                 backgroundColor: '#41d6e3',
                                                 borderColor: '#41d6e3',
                                                 color: '#fff'
                                             }}
                                             onMouseEnter={(e) => {
-                                                if (!submitting && !isUpdating && textContent.trim()) {
+                                                const canSubmit = textContent.trim() || attachmentTempKey || existingAttachmentUrl;
+                                                if (!submitting && !isUpdating && canSubmit) {
                                                     e.target.style.backgroundColor = '#35b8c4';
                                                     e.target.style.borderColor = '#35b8c4';
                                                 }
                                             }}
                                             onMouseLeave={(e) => {
-                                                if (!submitting && !isUpdating && textContent.trim()) {
+                                                const canSubmit = textContent.trim() || attachmentTempKey || existingAttachmentUrl;
+                                                if (!submitting && !isUpdating && canSubmit) {
                                                     e.target.style.backgroundColor = '#41d6e3';
                                                     e.target.style.borderColor = '#41d6e3';
                                                 }
@@ -918,7 +931,14 @@ export default function EssayDetail() {
                                             </Button>
                                         )}
                                     </div>
-                                </Form>
+                                ) : (
+                                    <div className="alert alert-warning mt-3" role="alert">
+                                        <FaTimesCircle className="me-2" />
+                                        Đã quá hạn nộp bài. Bạn không thể nộp hoặc cập nhật bài essay này.
+                                    </div>
+                                )}
+                            </>
+                            )}
                             </div>
                         </Col>
 
@@ -931,10 +951,25 @@ export default function EssayDetail() {
                                     <div className="info-content">
                                         <div className="info-label">Hạn nộp</div>
                                         <div className="info-value">
-                                            {essay?.assessment?.dueAt
-                                                ? formatDate(essay?.assessment?.dueAt)
+                                            {assessment?.dueAt || assessment?.DueAt
+                                                ? formatDate(assessment?.dueAt || assessment?.DueAt)
                                                 : "Không có hạn nộp"}
                                         </div>
+                                        {assessment?.dueAt || assessment?.DueAt ? (
+                                            <div className="info-value" style={{ marginTop: "4px", fontSize: "0.85em" }}>
+                                                {isPastDue() ? (
+                                                    <span className="text-danger">
+                                                        <FaTimesCircle className="me-1" />
+                                                        Đã quá hạn
+                                                    </span>
+                                                ) : (
+                                                    <span className="text-success">
+                                                        <FaCheckCircle className="me-1" />
+                                                        Còn hạn nộp
+                                                    </span>
+                                                )}
+                                            </div>
+                                        ) : null}
                                     </div>
                                 </div>
 
@@ -1008,6 +1043,12 @@ export default function EssayDetail() {
                 onClose={() => setNotification({ ...notification, isOpen: false })}
                 type={notification.type}
                 message={notification.message}
+            />
+
+            <StudentEssayResultModal
+                show={showResultModal}
+                onClose={() => setShowResultModal(false)}
+                submission={currentSubmission}
             />
         </>
     );

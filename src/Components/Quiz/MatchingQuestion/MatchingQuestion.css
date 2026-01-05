@@ -20,12 +20,24 @@
     gap: 20px;
     display: flex;
     align-items: flex-start;
+    flex-wrap: wrap; /* allow stacking on small screens */
 }
 
 .matching-column {
     display: flex;
     flex-direction: column;
     gap: 12px;
+}
+
+/* Ensure columns sit side-by-side on wider screens */
+@media (min-width: 768px) {
+    .matching-container {
+        flex-wrap: nowrap;
+    }
+    .matching-column {
+        flex: 1 1 50%;
+        min-width: 0;
+    }
 }
 
 .column-title {
@@ -94,6 +106,38 @@
     font-size: 15px;
     color: var(--color-text-primary, #1f2937);
     line-height: 1.5;
+}
+
+/* Ensure the content inside matching items aligns to the left edge */
+.matching-column {
+    align-items: stretch;
+}
+
+.matching-column .matching-item {
+    width: 100%;
+    justify-content: flex-start; /* place badge + text to the left */
+}
+
+.matching-column .matching-item .fw-medium,
+.matching-column .matching-item .item-text {
+    text-align: left;
+}
+
+/* Override bootstrap utility that sets justify-content-between on Card.Body */
+.matching-column .matching-item .card-body {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start !important;
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+    gap: 12px;
+    width: 100%;
+}
+
+/* Ensure inner left wrapper doesn't center its content */
+.matching-column .matching-item .card-body > .d-flex {
+    width: 100%;
+    justify-content: flex-start;
 }
 
 .match-indicator {

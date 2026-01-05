@@ -1,7 +1,1 @@
-
-
-.date-picker-label {
-  font-size: 12px;
-  color: #6b7280;
-  font-weight: 500;
-}
+/* DatePicker styles are now handled by SelectField and Bootstrap Grid */

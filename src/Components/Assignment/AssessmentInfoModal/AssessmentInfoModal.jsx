@@ -4,6 +4,7 @@ import { FaQuestionCircle, FaEdit, FaClock, FaCheckCircle, FaTimesCircle, FaList
 import { useSubmissionStatus } from "../../../hooks/useSubmissionStatus";
 import { quizAttemptService } from "../../../Services/quizAttemptService";
 import { essayService } from "../../../Services/essayService";
+import { essaySubmissionService } from "../../../Services/essaySubmissionService";
 import { quizService } from "../../../Services/quizService";
 import "./AssessmentInfoModal.css";
 
@@ -21,6 +22,8 @@ export default function AssessmentInfoModal({
     const [error, setError] = useState("");
     const [inProgressAttempt, setInProgressAttempt] = useState(null);
     const [checkingProgress, setCheckingProgress] = useState(false);
+    const [essayHasSubmission, setEssayHasSubmission] = useState(false);
+    const [showCannotStartModal, setShowCannotStartModal] = useState(false);
 
     useEffect(() => {
         if (isOpen && assessment) {
@@ -84,6 +87,17 @@ export default function AssessmentInfoModal({
 
                         if (targetEssay) {
                             setEssay(targetEssay);
+                            // Check if user already submitted this essay
+                            try {
+                                const statusResp = await essaySubmissionService.getSubmissionStatus(targetEssay.essayId || targetEssay.EssayId);
+                                if (statusResp?.data?.success && statusResp.data?.data) {
+                                    setEssayHasSubmission(true);
+                                } else {
+                                    setEssayHasSubmission(false);
+                                }
+                            } catch (e) {
+                                setEssayHasSubmission(false);
+                            }
                         } else {
                             setError("Không tìm thấy thông tin essay");
                         }
@@ -115,17 +129,20 @@ export default function AssessmentInfoModal({
             const response = await quizAttemptService.checkActiveAttempt(quizId);
             console.log("📥 [AssessmentInfoModal] CheckActive API Response:", response.data);
 
-            if (response.data?.success && response.data?.data) {
+            // Only treat as in-progress when backend explicitly reports hasActiveAttempt === true
+            if (response.data?.success && response.data?.data && response.data.data.hasActiveAttempt) {
                 const activeAttempt = response.data.data;
                 const status = activeAttempt.Status !== undefined ? activeAttempt.Status : activeAttempt.status;
-                
+
                 console.log("✅ [AssessmentInfoModal] Active attempt found in DB:", activeAttempt);
-                
-                // If backend returns an active attempt, we show the Continue button
+
                 setInProgressAttempt({
                     attemptId: activeAttempt.attemptId || activeAttempt.AttemptId,
                     quizId: activeAttempt.quizId || activeAttempt.QuizId || quizId,
-                    status: status
+                    status: status,
+                    startedAt: activeAttempt.startedAt || activeAttempt.StartedAt || null,
+                    endTime: activeAttempt.endTime || activeAttempt.EndTime || null,
+                    timeRemainingSeconds: activeAttempt.timeRemainingSeconds ?? activeAttempt.TimeRemainingSeconds ?? null
                 });
             } else {
                 console.log("ℹ️ [AssessmentInfoModal] No active attempt found for this user/quiz.");
@@ -209,6 +226,13 @@ export default function AssessmentInfoModal({
             try {
                 setLoading(true);
                 
+                // If user requested to start a NEW attempt but there is an active attempt, show card instead
+                if (isNewAttempt && inProgressAttempt && inProgressAttempt.attemptId) {
+                    setShowCannotStartModal(true);
+                    setLoading(false);
+                    return;
+                }
+
                 // Nếu không phải attempt mới và có in-progress attempt, dùng nó
                 if (!isNewAttempt && inProgressAttempt && inProgressAttempt.attemptId) {
                     console.log("▶️ [AssessmentInfoModal] Continuing in-progress attempt:", inProgressAttempt.attemptId);
@@ -238,12 +262,19 @@ export default function AssessmentInfoModal({
                     });
                     onClose();
                 } else {
-                    setError(response.data?.message || "Không thể bắt đầu làm quiz");
+                    // If backend rejects starting a new attempt, prefer showing the cannot-start modal
+                    setShowCannotStartModal(true);
                     setLoading(false);
                 }
             } catch (err) {
                 console.error("❌ [AssessmentInfoModal] Error starting quiz:", err);
-                setError(err.response?.data?.message || "Không thể bắt đầu làm quiz");
+                // If backend returns an active-attempt error, show the card; otherwise show generic error
+                const msg = err.response?.data?.message || "Không thể bắt đầu làm quiz";
+                if (msg && /active|already|đang làm|đã có/i.test(msg)) {
+                    setShowCannotStartModal(true);
+                } else {
+                    setError(msg);
+                }
                 setLoading(false);
             }
         } else if (essay) {
@@ -440,23 +471,23 @@ export default function AssessmentInfoModal({
 
                         <div className="assessment-info-footer">
                             <div className="footer-buttons-vertical">
-                                {isQuiz && (
-                                    <Button
-                                        variant="outline-primary"
-                                        className="assessment-continue-btn w-100 mb-2"
-                                        onClick={() => handleStart(false)}
-                                        disabled={loading || checkingProgress || !inProgressAttempt}
-                                    >
-                                        {loading || checkingProgress ? "Đang tải..." : "Tiếp tục bài đang làm"}
-                                    </Button>
-                                )}
+                                {isQuiz && inProgressAttempt && (
+                                        <Button
+                                            variant="outline-primary"
+                                            className="assessment-continue-btn w-100 mb-2"
+                                            onClick={() => handleStart(false)}
+                                            disabled={loading || checkingProgress}
+                                        >
+                                            {loading || checkingProgress ? "Đang tải..." : "Tiếp tục bài đang làm"}
+                                        </Button>
+                                    )}
                                 <Button
                                     variant="primary"
                                     className={`assessment-start-btn ${isQuiz ? "btn-quiz" : "btn-essay"} w-100`}
                                     onClick={() => handleStart(true)}
                                     disabled={loading || checkingProgress || (!quiz && !essay)}
                                 >
-                                    {loading || checkingProgress ? "Đang tải..." : (isQuiz ? "Bắt đầu làm bài mới" : "Bắt đầu viết Essay")}
+                                    {loading || checkingProgress ? "Đang tải..." : (isQuiz ? "Bắt đầu làm bài mới" : (essayHasSubmission ? "Cập nhật Essay" : "Bắt đầu viết Essay"))}
                                 </Button>
                                 <Button
                                     variant="outline-secondary"
@@ -470,6 +501,19 @@ export default function AssessmentInfoModal({
                     </>
                 )}
             </div>
+            {/* Centered modal shown when user tries to start a new quiz but has an active attempt */}
+            {showCannotStartModal && (
+                <div className="cannot-start-modal-overlay" onClick={() => setShowCannotStartModal(false)}>
+                    <div className="cannot-start-modal-content" onClick={(e) => e.stopPropagation()}>
+                        <h4>Bạn không thể bắt đầu bài quiz mới</h4>
+                        <p className="text-muted">Bạn đang có một bài quiz chưa hoàn thành. Vui lòng tiếp tục bài đang làm hoặc nộp bài trước khi bắt đầu bài mới.</p>
+                        <div className="d-flex gap-2 mt-3 justify-content-end">
+                            <Button variant="outline-secondary" onClick={() => setShowCannotStartModal(false)}>Đóng</Button>
+                            <Button variant="primary" onClick={() => { setShowCannotStartModal(false); handleStart(false); }}>Tiếp tục bài đang làm</Button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

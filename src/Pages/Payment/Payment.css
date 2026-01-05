@@ -131,13 +131,13 @@
 }
 
 .package-info h3 {
-    font-size: 24px;
+    font-size: 18px;
     font-weight: 700;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
 }
 
 .package-price {
-    font-size: 32px;
+    font-size: 22px;
     font-weight: 700;
     margin: 0;
 }

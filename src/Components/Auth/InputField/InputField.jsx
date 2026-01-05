@@ -14,6 +14,7 @@ export default function InputField({
     showPassword = false,
     name,
     maxLength,
+    ...rest
 }) {
     const containerClasses = [
         "input-field-container",
@@ -33,6 +34,7 @@ export default function InputField({
                     disabled={disabled}
                     name={name}
                     maxLength={maxLength !== undefined ? maxLength : (showPasswordToggle ? 20 : undefined)}
+                    {...rest}
                 />
                 {showPasswordToggle && (
                     <button

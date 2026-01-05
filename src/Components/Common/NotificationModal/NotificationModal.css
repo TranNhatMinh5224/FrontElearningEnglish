@@ -1,10 +1,48 @@
 .notification-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
     z-index: 2000;
+    padding: 20px;
 }
 
-.notification-modal-content {
+.notification-modal-overlay .notification-modal-content {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
     max-width: 450px;
+    min-width: 300px;
+    width: 100%;
     text-align: center;
+    padding: 32px;
+    word-wrap: break-word;
+    animation: modalFadeIn 0.3s ease-out;
+    position: relative;
+    overflow: visible;
+}
+
+/* Ensure no pseudo-elements create triangles */
+.notification-modal-overlay .notification-modal-content::before,
+.notification-modal-overlay .notification-modal-content::after {
+    display: none !important;
+    content: none !important;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 .notification-modal-header {
@@ -41,6 +79,15 @@
 
 .notification-modal-body {
     margin-bottom: 24px;
+    position: relative;
+    z-index: 1;
+}
+
+/* Remove any pseudo-elements from body */
+.notification-modal-body::before,
+.notification-modal-body::after {
+    display: none !important;
+    content: none !important;
 }
 
 .notification-message {
@@ -48,6 +95,19 @@
     color: var(--color-text-secondary, #6b7280);
     line-height: 1.6;
     margin: 0;
+    word-wrap: break-word;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+    position: relative;
+    z-index: 2;
+}
+
+/* Ensure no pseudo-elements on message */
+.notification-message::before,
+.notification-message::after {
+    display: none !important;
+    content: none !important;
 }
 
 .notification-modal-footer {

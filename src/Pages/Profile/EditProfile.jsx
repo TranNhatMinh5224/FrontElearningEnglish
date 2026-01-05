@@ -3,14 +3,19 @@ import { useNavigate } from "react-router-dom";
 import "./EditProfile.css";
 import MainHeader from "../../Components/Header/MainHeader";
 import { useAuth } from "../../Context/AuthContext";
+import SuccessModal from "../../Components/Common/SuccessModal/SuccessModal";
 import { authService } from "../../Services/authService";
-import { FaArrowLeft } from "react-icons/fa";
+// FaArrowLeft removed: back button hidden per UX request
 
 export default function EditProfile() {
     const navigate = useNavigate();
+    const { refreshUser } = useAuth();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [success, setSuccess] = useState(false);
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [successMessage, setSuccessMessage] = useState("");
+    const [successOnCloseNavigate, setSuccessOnCloseNavigate] = useState(false);
 
     const [formData, setFormData] = useState({
         lastName: "",
@@ -95,8 +100,12 @@ export default function EditProfile() {
             const updatedUser = response.data.data;
             updatedUser.fullName = updatedUser.displayName || updatedUser.fullName || `${updatedUser.firstName} ${updatedUser.lastName}`.trim();
 
-            // Show success message and stay on the page
+            // Refresh global user (updates header/avatar) and show success modal
+            await refreshUser?.();
             setSuccess(true);
+            setSuccessMessage("Lưu thông tin thành công!");
+            setSuccessOnCloseNavigate(true);
+            setShowSuccessModal(true);
         } catch (error) {
             setError(
                 error.response?.data?.message || "Có lỗi xảy ra khi cập nhật thông tin"
@@ -115,16 +124,24 @@ export default function EditProfile() {
             <MainHeader />
             <div className="edit-profile-container">
                 <div className="edit-profile-header">
-                    <button className="back-button" onClick={() => navigate("/profile")}>
-                        <FaArrowLeft /> Quay lại profile
-                    </button>
+                    {/* Back button removed — streamlined header */}
                 </div>
 
                 <div className="edit-profile-card">
                     <h1>Thay đổi thông tin</h1>
 
                     {error && <div className="error-message">{error}</div>}
-                    {success && <div className="success-message">Lưu thông tin thành công!</div>}
+                    <SuccessModal
+                        isOpen={showSuccessModal}
+                        onClose={() => {
+                            setShowSuccessModal(false);
+                            if (successOnCloseNavigate) navigate("/profile");
+                        }}
+                        title="Thành công"
+                        message={successMessage}
+                        autoClose={true}
+                        autoCloseDelay={1500}
+                    />
 
                     <form onSubmit={handleSubmit}>
                         <div className="form-group">

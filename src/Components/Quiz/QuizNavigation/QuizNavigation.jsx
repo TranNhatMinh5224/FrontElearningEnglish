@@ -14,18 +14,35 @@ export default function QuizNavigation({ questions, currentIndex, answers, onGoT
         return "unanswered";
     };
 
+    const countAnswered = (answersObj) => {
+        if (!answersObj) return 0;
+        try {
+            return Object.values(answersObj).filter(v => {
+                if (v === null || v === undefined) return false;
+                if (Array.isArray(v)) return v.length > 0;
+                if (typeof v === 'object') return Object.keys(v).length > 0;
+                if (typeof v === 'string') return v.trim() !== "";
+                return true; // number/boolean treated as answered
+            }).length;
+        } catch (e) {
+            return 0;
+        }
+    };
+
+    const answeredCount = countAnswered(answers);
+
     return (
         <Card className="quiz-navigation">
             <Card.Body>
                 <div className="navigation-header">
                     <h4 className="navigation-title">Danh sách câu hỏi</h4>
                     <div className="navigation-stats">
-                        <span className="stat-item answered-stat">
-                            <FaCheckCircle /> {Object.keys(answers).length}
-                        </span>
-                        <span className="stat-item total-stat">
-                            / {questions.length}
-                        </span>
+                        <div className="stat-panel">
+                                <div className="stat-content">
+                                    <FaCheckCircle className="stat-icon" />
+                                    <span className="stat-text">{answeredCount}/{questions ? questions.length : 0}</span>
+                                </div>
+                        </div>
                     </div>
                 </div>
                 <div className="navigation-grid">

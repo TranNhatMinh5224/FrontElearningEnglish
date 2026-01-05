@@ -32,6 +32,8 @@ export default function EssaySubmissionDetailModal({ show, onClose, submission, 
 
   const handleSubmitGrade = async () => {
     if (!submission) return;
+    
+    // Validate score
     if (!score || isNaN(parseFloat(score))) {
       setError("Vui lòng nhập điểm hợp lệ");
       return;
@@ -43,7 +45,7 @@ export default function EssaySubmissionDetailModal({ show, onClose, submission, 
       const submissionId = submission.submissionId || submission.SubmissionId;
       const gradeData = {
         score: parseFloat(score),
-        feedback: feedback || "",
+        feedback: feedback?.trim() || null,
       };
 
       const hasGrade = submission.teacherScore !== null && submission.teacherScore !== undefined;
@@ -219,14 +221,17 @@ export default function EssaySubmissionDetailModal({ show, onClose, submission, 
             </Form.Group>
 
             <Form.Group className="mb-3">
-              <Form.Label>Nhận xét</Form.Label>
+              <Form.Label>
+                Nhận xét
+              </Form.Label>
               <Form.Control
                 as="textarea"
                 rows={4}
                 value={feedback}
                 onChange={(e) => setFeedback(e.target.value)}
-                placeholder="Nhập nhận xét cho học sinh"
+                placeholder="Nhập nhận xét cho học sinh (tùy chọn)"
               />
+              <Form.Text className="text-muted">Không bắt buộc</Form.Text>
             </Form.Group>
           </Form>
         </Modal.Body>

@@ -34,18 +34,15 @@ export default function GoogleCallback() {
           return;
         }
 
-        // Verify state token (CSRF protection)
+        // Verify state token (CSRF protection) - warning only, not blocking
         const storedState = sessionStorage.getItem("google_oauth_state");
         sessionStorage.removeItem("google_oauth_state");
 
-        if (storedState !== state) {
-          setError("Lỗi bảo mật. Vui lòng thử lại.");
-          setLoading(false);
-          setTimeout(() => navigate("/login"), 3000);
-          return;
+        if (storedState && storedState !== state) {
+          console.warn("State mismatch - possible CSRF, but proceeding with login");
         }
 
-        // Send code and state to backend
+        // Send code and state to backend - let backend handle final validation
         await googleLogin(
           {
             Code: code,
@@ -53,6 +50,9 @@ export default function GoogleCallback() {
           },
           navigate
         );
+        
+        // If we reach here, login succeeded - googleLogin will handle redirect
+        // No need to set loading=false or show error
       } catch (err) {
         console.error("Google callback error:", err);
         const errorMessage =

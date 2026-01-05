@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import ScrollPicker from "../ScrollPicker/ScrollPicker";
+import SelectField from "../SelectField/SelectField";
 import { Row, Col } from "react-bootstrap";
 import "./DatePicker.css";
 
@@ -32,7 +32,7 @@ export default function DatePicker({ value, onChange, disabled = false, hasError
 
     // Generate options
     const generateDays = () => {
-        const maxDays = getDaysInMonth(month, year);
+        const maxDays = (month && year) ? getDaysInMonth(month, year) : 31;
         return Array.from({ length: maxDays }, (_, i) => ({
             value: (i + 1).toString(),
             label: (i + 1).toString(),
@@ -108,39 +108,36 @@ export default function DatePicker({ value, onChange, disabled = false, hasError
     };
 
     return (
-        <Row className="date-picker-container">
-            <Col className="date-picker-scroll-wrapper">
-                <ScrollPicker
+        <Row className="date-picker-container gx-2">
+            <Col xs={4}>
+                <SelectField
                     options={generateDays()}
                     value={day}
-                    onChange={handleDayChange}
-                    disabled={disabled || !month || !year}
+                    onChange={(e) => handleDayChange(e.target.value)}
+                    disabled={disabled}
                     placeholder="Ngày"
-                    hasError={hasError}
+                    error={hasError}
                 />
-                <span className="date-picker-label">Ngày</span>
             </Col>
-            <Col className="date-picker-scroll-wrapper">
-                <ScrollPicker
+            <Col xs={4}>
+                <SelectField
                     options={generateMonths()}
                     value={month}
-                    onChange={handleMonthChange}
+                    onChange={(e) => handleMonthChange(e.target.value)}
                     disabled={disabled}
                     placeholder="Tháng"
-                    hasError={hasError}
+                    error={hasError}
                 />
-                <span className="date-picker-label">Tháng</span>
             </Col>
-            <Col className="date-picker-scroll-wrapper">
-                <ScrollPicker
+            <Col xs={4}>
+                <SelectField
                     options={generateYears()}
                     value={year}
-                    onChange={handleYearChange}
+                    onChange={(e) => handleYearChange(e.target.value)}
                     disabled={disabled}
                     placeholder="Năm"
-                    hasError={hasError}
+                    error={hasError}
                 />
-                <span className="date-picker-label">Năm</span>
             </Col>
         </Row>
     );
