@@ -5,6 +5,7 @@ import { Container, Row, Col, Button, Form } from "react-bootstrap";
 import MainHeader from "../../Components/Header/MainHeader";
 import NotificationModal from "../../Components/Common/NotificationModal/NotificationModal";
 import ConfirmModal from "../../Components/Common/ConfirmModal/ConfirmModal";
+import StudentEssayResultModal from "../../Components/Common/StudentEssayResultModal/StudentEssayResultModal";
 import { essayService } from "../../Services/essayService";
 import { essaySubmissionService } from "../../Services/essaySubmissionService";
 import { fileService } from "../../Services/fileService";
@@ -12,7 +13,7 @@ import { moduleService } from "../../Services/moduleService";
 import { courseService } from "../../Services/courseService";
 import { lessonService } from "../../Services/lessonService";
 import { assessmentService } from "../../Services/assessmentService";
-import { FaFileUpload, FaTimes, FaEdit, FaClock, FaCheckCircle, FaTimesCircle } from "react-icons/fa";
+import { FaFileUpload, FaTimes, FaEdit, FaClock, FaCheckCircle, FaTimesCircle, FaStar } from "react-icons/fa";
 import "./EssayDetail.css";
 
 export default function EssayDetail() {
@@ -46,6 +47,7 @@ export default function EssayDetail() {
     const [notification, setNotification] = useState({ isOpen: false, type: "info", message: "" });
     const [showSubmitModal, setShowSubmitModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [showResultModal, setShowResultModal] = useState(false);
 
     const fileInputRef = useRef(null);
     const moduleStartedRef = useRef(false);
@@ -735,6 +737,33 @@ export default function EssayDetail() {
                     <Row>
                         <Col lg={8}>
                             <div className="essay-form-section">
+                                {/* Check if student has been graded */}
+                                {currentSubmission && (currentSubmission.teacherScore !== null && currentSubmission.teacherScore !== undefined || 
+                                 currentSubmission.TeacherScore !== null && currentSubmission.TeacherScore !== undefined ||
+                                 currentSubmission.score !== null && currentSubmission.score !== undefined ||
+                                 currentSubmission.Score !== null && currentSubmission.Score !== undefined) ? (
+                                    // Student has been graded - Show result view
+                                    <div className="graded-essay-view">
+                                        <div className="text-center p-5">
+                                            <FaStar size={64} className="text-warning mb-3" />
+                                            <h2 className="mb-3">Bài essay của bạn đã được chấm điểm!</h2>
+                                            <p className="text-muted mb-4">
+                                                Nhấn vào nút bên dưới để xem kết quả chi tiết
+                                            </p>
+                                            <Button
+                                                variant="success"
+                                                size="lg"
+                                                onClick={() => setShowResultModal(true)}
+                                                className="px-5"
+                                            >
+                                                <FaStar className="me-2" />
+                                                Xem điểm và nhận xét
+                                            </Button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    // Student hasn't been graded - Show normal form
+                                    <>
                                 <h2 className="section-title">
                                     {currentSubmission ? "Cập nhật bài Essay" : "Nộp bài Essay"}
                                 </h2>
@@ -859,55 +888,57 @@ export default function EssayDetail() {
                                             )}
                                         </div>
                                     </Form.Group>
-
-                                    {!isPastDue() ? (
-                                        <div className="essay-submit-section d-flex gap-2">
-                                            <Button
-                                                variant="primary"
-                                                size="lg"
-                                                className="submit-essay-btn"
-                                                onClick={() => setShowSubmitModal(true)}
-                                                disabled={(submitting || isUpdating) || (!textContent.trim() && !attachmentTempKey && !existingAttachmentUrl)}
-                                                style={{
-                                                    backgroundColor: '#41d6e3',
-                                                    borderColor: '#41d6e3',
-                                                    color: '#fff'
-                                                }}
-                                                onMouseEnter={(e) => {
-                                                    const canSubmit = textContent.trim() || attachmentTempKey || existingAttachmentUrl;
-                                                    if (!submitting && !isUpdating && canSubmit) {
-                                                        e.target.style.backgroundColor = '#35b8c4';
-                                                        e.target.style.borderColor = '#35b8c4';
-                                                    }
-                                                }}
-                                                onMouseLeave={(e) => {
-                                                    const canSubmit = textContent.trim() || attachmentTempKey || existingAttachmentUrl;
-                                                    if (!submitting && !isUpdating && canSubmit) {
-                                                        e.target.style.backgroundColor = '#41d6e3';
-                                                        e.target.style.borderColor = '#41d6e3';
-                                                    }
-                                                }}
-                                            >
-                                                {isUpdating ? "Đang cập nhật..." : submitting ? "Đang nộp bài..." : currentSubmission ? "Cập nhật bài" : "Nộp bài"}
-                                            </Button>
-                                            {currentSubmission && (
-                                                <Button
-                                                    variant="outline-danger"
-                                                    size="lg"
-                                                    onClick={() => setShowDeleteModal(true)}
-                                                    disabled={isDeleting}
-                                                >
-                                                    {isDeleting ? "Đang xóa..." : "Xóa bài"}
-                                                </Button>
-                                            )}
-                                        </div>
-                                    ) : (
-                                        <div className="alert alert-warning mt-3" role="alert">
-                                            <FaTimesCircle className="me-2" />
-                                            Đã quá hạn nộp bài. Bạn không thể nộp hoặc cập nhật bài essay này.
-                                        </div>
-                                    )}
                                 </Form>
+
+                                {!isPastDue() ? (
+                                    <div className="essay-submit-section d-flex gap-2">
+                                        <Button
+                                            variant="primary"
+                                            size="lg"
+                                            className="submit-essay-btn"
+                                            onClick={() => setShowSubmitModal(true)}
+                                            disabled={(submitting || isUpdating) || (!textContent.trim() && !attachmentTempKey && !existingAttachmentUrl)}
+                                            style={{
+                                                backgroundColor: '#41d6e3',
+                                                borderColor: '#41d6e3',
+                                                color: '#fff'
+                                            }}
+                                            onMouseEnter={(e) => {
+                                                const canSubmit = textContent.trim() || attachmentTempKey || existingAttachmentUrl;
+                                                if (!submitting && !isUpdating && canSubmit) {
+                                                    e.target.style.backgroundColor = '#35b8c4';
+                                                    e.target.style.borderColor = '#35b8c4';
+                                                }
+                                            }}
+                                            onMouseLeave={(e) => {
+                                                const canSubmit = textContent.trim() || attachmentTempKey || existingAttachmentUrl;
+                                                if (!submitting && !isUpdating && canSubmit) {
+                                                    e.target.style.backgroundColor = '#41d6e3';
+                                                    e.target.style.borderColor = '#41d6e3';
+                                                }
+                                            }}
+                                        >
+                                            {isUpdating ? "Đang cập nhật..." : submitting ? "Đang nộp bài..." : currentSubmission ? "Cập nhật bài" : "Nộp bài"}
+                                        </Button>
+                                        {currentSubmission && (
+                                            <Button
+                                                variant="outline-danger"
+                                                size="lg"
+                                                onClick={() => setShowDeleteModal(true)}
+                                                disabled={isDeleting}
+                                            >
+                                                {isDeleting ? "Đang xóa..." : "Xóa bài"}
+                                            </Button>
+                                        )}
+                                    </div>
+                                ) : (
+                                    <div className="alert alert-warning mt-3" role="alert">
+                                        <FaTimesCircle className="me-2" />
+                                        Đã quá hạn nộp bài. Bạn không thể nộp hoặc cập nhật bài essay này.
+                                    </div>
+                                )}
+                            </>
+                            )}
                             </div>
                         </Col>
 
@@ -1012,6 +1043,12 @@ export default function EssayDetail() {
                 onClose={() => setNotification({ ...notification, isOpen: false })}
                 type={notification.type}
                 message={notification.message}
+            />
+
+            <StudentEssayResultModal
+                show={showResultModal}
+                onClose={() => setShowResultModal(false)}
+                submission={currentSubmission}
             />
         </>
     );

@@ -252,6 +252,19 @@ export default function MyCourses() {
             return;
         }
 
+        // Kiểm tra nếu user đã là giáo viên
+        const teacherSubscription = user?.teacherSubscription || user?.TeacherSubscription;
+        const isTeacher = teacherSubscription?.isTeacher || teacherSubscription?.IsTeacher;
+        
+        if (isTeacher === true) {
+            setNotification({
+                isOpen: true,
+                type: "info",
+                message: "Gói giáo viên hiện tại của bạn đang hoạt động, vui lòng chờ đến khi hết hạn để kích hoạt gói giáo viên mới!"
+            });
+            return;
+        }
+
         navigate(`/payment?packageId=${teacherPackageId}&package=${packageType}`);
     };
 

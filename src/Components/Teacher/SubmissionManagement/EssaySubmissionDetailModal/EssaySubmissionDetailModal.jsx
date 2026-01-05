@@ -39,19 +39,13 @@ export default function EssaySubmissionDetailModal({ show, onClose, submission, 
       return;
     }
 
-    // Validate feedback - bắt buộc phải có nhận xét
-    if (!feedback || !feedback.trim()) {
-      setError("Vui lòng nhập nhận xét cho học sinh");
-      return;
-    }
-
     try {
       setGrading(true);
       setError("");
       const submissionId = submission.submissionId || submission.SubmissionId;
       const gradeData = {
         score: parseFloat(score),
-        feedback: feedback.trim(),
+        feedback: feedback?.trim() || null,
       };
 
       const hasGrade = submission.teacherScore !== null && submission.teacherScore !== undefined;
@@ -228,17 +222,16 @@ export default function EssaySubmissionDetailModal({ show, onClose, submission, 
 
             <Form.Group className="mb-3">
               <Form.Label>
-                Nhận xét <span className="text-danger">*</span>
+                Nhận xét
               </Form.Label>
               <Form.Control
                 as="textarea"
                 rows={4}
                 value={feedback}
                 onChange={(e) => setFeedback(e.target.value)}
-                placeholder="Nhập nhận xét cho học sinh (bắt buộc)"
-                required
+                placeholder="Nhập nhận xét cho học sinh (tùy chọn)"
               />
-              <Form.Text className="text-muted">*Bắt buộc</Form.Text>
+              <Form.Text className="text-muted">Không bắt buộc</Form.Text>
             </Form.Group>
           </Form>
         </Modal.Body>

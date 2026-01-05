@@ -77,6 +77,18 @@
     transform: translateY(0);
 }
 
+.essay-score-badge {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 16px;
+    color: #92400e;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border: 2px solid #fbbf24;
+}
+
 @media (max-width: 768px) {
     .essay-card-content {
         flex-direction: column;

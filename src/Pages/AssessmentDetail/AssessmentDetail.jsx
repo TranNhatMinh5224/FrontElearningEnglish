@@ -7,6 +7,7 @@ import QuizCard from "../../Components/Assignment/QuizCard/QuizCard";
 import EssayCard from "../../Components/Assignment/EssayCard/EssayCard";
 import AssessmentInfoModal from "../../Components/Assignment/AssessmentInfoModal/AssessmentInfoModal";
 import NotificationModal from "../../Components/Common/NotificationModal/NotificationModal";
+import StudentEssayResultModal from "../../Components/Common/StudentEssayResultModal/StudentEssayResultModal";
 import { assessmentService } from "../../Services/assessmentService";
 import { courseService } from "../../Services/courseService";
 import { lessonService } from "../../Services/lessonService";
@@ -38,6 +39,8 @@ export default function AssessmentDetail() {
     const [notification, setNotification] = useState({ isOpen: false, type: "info", message: "" });
     const [inProgressQuizzes, setInProgressQuizzes] = useState({});
     const [essaySubmissionsMap, setEssaySubmissionsMap] = useState({});
+    const [showResultModal, setShowResultModal] = useState(false);
+    const [selectedSubmission, setSelectedSubmission] = useState(null);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -80,7 +83,8 @@ export default function AssessmentDetail() {
                         try {
                             const res = await (await import('../../Services/essaySubmissionService')).essaySubmissionService.getSubmissionStatus(es.essayId || es.EssayId);
                             if (res?.data?.success && res.data?.data) {
-                                submissionMap[es.essayId || es.EssayId] = res.data.data.submissionId || res.data.data.SubmissionId || true;
+                                // Store full submission data including scores
+                                submissionMap[es.essayId || es.EssayId] = res.data.data;
                             }
                         } catch (e) {
                             // ignore
@@ -229,7 +233,11 @@ export default function AssessmentDetail() {
                                         key={e.essayId} 
                                         assessment={e} 
                                         onClick={() => handleEssayClick(e)}
-                                        hasSubmission={!!essaySubmissionsMap[e.essayId || e.EssayId]}
+                                        submission={essaySubmissionsMap[e.essayId || e.EssayId]}
+                                        onViewResult={(submission) => {
+                                            setSelectedSubmission(submission);
+                                            setShowResultModal(true);
+                                        }}
                                     />
                                 ))
                             ) : (
@@ -246,6 +254,15 @@ export default function AssessmentDetail() {
                 assessment={selectedAssessment}
                 onStartQuiz={handleStartQuiz}
                 onStartEssay={handleStartEssay}
+            />
+
+            <StudentEssayResultModal
+                show={showResultModal}
+                onClose={() => {
+                    setShowResultModal(false);
+                    setSelectedSubmission(null);
+                }}
+                submission={selectedSubmission}
             />
         </>
     );

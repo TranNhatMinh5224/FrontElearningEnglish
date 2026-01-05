@@ -560,19 +560,17 @@ export default function QuizDetail() {
                 return;
             }
             
-            // Calculate endTime = startedAt + Duration (minutes) + 10 seconds buffer
-            // Thêm 10 giây buffer để tối ưu trải nghiệm người dùng
+            // Calculate endTime = startedAt + Duration (minutes)
+            // Use exact duration from backend (no extra buffer)
             const durationMs = Number(quizDuration) * 60 * 1000;
-            const bufferMs = 10 * 1000; // 10 seconds buffer
-            const endTime = new Date(startedAt.getTime() + durationMs + bufferMs);
+            const endTime = new Date(startedAt.getTime() + durationMs);
             endTimeRef.current = endTime;
             
             console.log("✅ === Timer Calculation ===");
             console.log("StartedAt:", startedAt.toISOString());
             console.log("Duration:", quizDuration, "minutes");
             console.log("Duration (ms):", durationMs);
-            console.log("Buffer: 10 seconds");
-            console.log("EndTime (with buffer):", endTime.toISOString());
+            console.log("EndTime:", endTime.toISOString());
             console.log("Now:", new Date().toISOString());
             console.log("============================");
         } catch (err) {

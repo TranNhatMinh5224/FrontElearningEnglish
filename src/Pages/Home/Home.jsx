@@ -12,12 +12,14 @@ import {
 } from "../../Components/Home";
 import WelcomeFooter from "../../Components/Welcome/WelcomeFooter";
 import LoginRequiredModal from "../../Components/Common/LoginRequiredModal/LoginRequiredModal";
+import NotificationModal from "../../Components/Common/NotificationModal/NotificationModal";
 
 export default function Home() {
   const { user, isGuest, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [selectedPackage, setSelectedPackage] = useState(null); // null hoặc teacherPackageId
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [notification, setNotification] = useState({ isOpen: false, type: "info", message: "" });
 
   const displayName = isGuest ? "bạn" : user?.fullName || "bạn";
 
@@ -35,6 +37,19 @@ export default function Home() {
     // Kiểm tra đăng nhập trước khi navigate
     if (!isAuthenticated) {
       setShowLoginModal(true);
+      return;
+    }
+
+    // Kiểm tra nếu user đã là giáo viên
+    const teacherSubscription = user?.teacherSubscription || user?.TeacherSubscription;
+    const isTeacher = teacherSubscription?.isTeacher || teacherSubscription?.IsTeacher;
+    
+    if (isTeacher === true) {
+      setNotification({
+        isOpen: true,
+        type: "info",
+        message: "Gói giáo viên hiện tại của bạn đang hoạt động, vui lòng chờ đến khi hết hạn để kích hoạt gói giáo viên mới!"
+      });
       return;
     }
 
@@ -71,6 +86,13 @@ export default function Home() {
       <LoginRequiredModal
         isOpen={showLoginModal}
         onClose={() => setShowLoginModal(false)}
+      />
+
+      <NotificationModal
+        isOpen={notification.isOpen}
+        onClose={() => setNotification({ isOpen: false, type: "info", message: "" })}
+        type={notification.type}
+        message={notification.message}
       />
     </>
   );
