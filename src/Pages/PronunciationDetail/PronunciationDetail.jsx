@@ -7,7 +7,6 @@ import { pronunciationService } from "../../Services/pronunciationService";
 import { moduleService } from "../../Services/moduleService";
 import { lessonService } from "../../Services/lessonService";
 import { courseService } from "../../Services/courseService";
-import { fileService } from "../../Services/fileService";
 import "./PronunciationDetail.css";
 
 export default function PronunciationDetail() {
@@ -16,9 +15,7 @@ export default function PronunciationDetail() {
 
     const [flashcards, setFlashcards] = useState([]);
     const [currentIndex, setCurrentIndex] = useState(0);
-    const [module, setModule] = useState(null);
-    const [lesson, setLesson] = useState(null);
-    const [course, setCourse] = useState(null);
+    // module / lesson / course state removed (not used in this component)
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
     const [summary, setSummary] = useState(null);
@@ -36,21 +33,15 @@ export default function PronunciationDetail() {
 
                 // Fetch course info
                 const courseResponse = await courseService.getCourseById(courseId);
-                if (courseResponse.data?.success && courseResponse.data?.data) {
-                    setCourse(courseResponse.data.data);
-                }
+                // course info fetched but not stored (not required in UI)
 
                 // Fetch lesson info
                 const lessonResponse = await lessonService.getLessonById(lessonId);
-                if (lessonResponse.data?.success && lessonResponse.data?.data) {
-                    setLesson(lessonResponse.data.data);
-                }
+                // lesson info fetched but not stored (not required in UI)
 
                 // Fetch module info
                 const moduleResponse = await moduleService.getModuleById(moduleId);
-                if (moduleResponse.data?.success && moduleResponse.data?.data) {
-                    setModule(moduleResponse.data.data);
-                }
+                // module info fetched but not stored (not required in UI)
 
                 // Fetch flashcards with pronunciation progress
                 const flashcardsResponse = await pronunciationService.getByModule(moduleId);
@@ -219,13 +210,6 @@ export default function PronunciationDetail() {
                     <Row>
                         <Col>
                             <div className="pronunciation-header">
-                                <Button
-                                    variant="link"
-                                    onClick={handleBackClick}
-                                    className="back-button"
-                                >
-                                    ← Quay lại
-                                </Button>
                                 <h1 className="pronunciation-title">Luyện Phát Âm</h1>
                             </div>
                         </Col>
