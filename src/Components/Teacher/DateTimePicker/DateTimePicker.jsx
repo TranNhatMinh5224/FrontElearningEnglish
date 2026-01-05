@@ -297,13 +297,64 @@ export default function DateTimePicker({
               <span>Chọn ngày</span>
             </div>
             <input
-              type="date"
+              type="text"
               className="datetime-picker-date-input"
-              value={formatDateForInput(date)}
-              onChange={handleDateInputChange}
-              min={getMinDate()}
-              max={getMaxDate()}
+              value={date}
+              onChange={(e) => {
+                const input = e.target.value;
+                // Auto-format as user types: dd/mm/yyyy
+                let formatted = input.replace(/[^\d]/g, ''); // Remove non-digits
+                
+                if (formatted.length >= 2) {
+                  formatted = formatted.slice(0, 2) + '/' + formatted.slice(2);
+                }
+                if (formatted.length >= 5) {
+                  formatted = formatted.slice(0, 5) + '/' + formatted.slice(5);
+                }
+                if (formatted.length > 10) {
+                  formatted = formatted.slice(0, 10);
+                }
+                
+                setDate(formatted);
+                
+                // Try to parse and set date if valid
+                if (formatted.length === 10) {
+                  const parts = formatted.split('/');
+                  if (parts.length === 3) {
+                    const [day, month, year] = parts.map(Number);
+                    if (!isNaN(day) && !isNaN(month) && !isNaN(year) && 
+                        day >= 1 && day <= 31 && 
+                        month >= 1 && month <= 12 && 
+                        year >= 1900 && year <= 2100) {
+                      const dateObj = new Date(year, month - 1, day);
+                      if (!isNaN(dateObj.getTime())) {
+                        if (dateOnly) {
+                          dateObj.setHours(0, 0, 0, 0);
+                          setDisplayValue(formatted);
+                          onChange(dateObj);
+                        } else {
+                          if (hour && minute && ampm) {
+                            const dateTime = combineDateTime(formatted, hour, minute, ampm);
+                            if (dateTime) {
+                              const formattedTime = `${String(hour).padStart(2, "0")}:${minute} ${ampm}`;
+                              setDisplayValue(`${formatted} ${formattedTime}`);
+                              onChange(dateTime);
+                            }
+                          } else {
+                            setDisplayValue(formatted);
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }}
+              placeholder="dd/mm/yyyy"
+              maxLength={10}
             />
+            <div style={{ fontSize: "0.8em", color: "#6c757d", marginTop: "4px" }}>
+              Nhập theo định dạng: ngày/tháng/năm (ví dụ: 05/01/2026)
+            </div>
           </div>
           
           {!dateOnly && (

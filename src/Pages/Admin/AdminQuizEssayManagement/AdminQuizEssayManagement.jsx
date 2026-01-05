@@ -218,12 +218,6 @@ export default function AdminQuizEssayManagement() {
       <Container>
         {/* Header */}
         <div className="mb-5">
-          <button 
-            className="btn btn-outline-secondary mb-3"
-            onClick={() => navigate(`/admin/courses/${courseId}/lesson/${lessonId}`)}
-          >
-            ← Quay lại
-          </button>
           <h1 className="mb-0 fw-bold text-primary text-center">Quản lý bài kiểm tra</h1>
         </div>
 

@@ -18,7 +18,6 @@ export default function CreateAssessmentModal({
   const [description, setDescription] = useState("");
   const [openAt, setOpenAt] = useState(null); // Date object
   const [dueAt, setDueAt] = useState(null); // Date object
-  const [timeLimit, setTimeLimit] = useState("");
   const [isPublished, setIsPublished] = useState(false);
 
   // Validation errors
@@ -34,7 +33,6 @@ export default function CreateAssessmentModal({
       setLoading(true);
       const assessmentTitle = assessmentData.title || assessmentData.Title || "";
       const assessmentDescription = assessmentData.description || assessmentData.Description || "";
-      const assessmentTimeLimit = assessmentData.timeLimit || assessmentData.TimeLimit || "";
       const assessmentIsPublished = assessmentData.isPublished !== undefined 
         ? assessmentData.isPublished 
         : assessmentData.IsPublished !== undefined 
@@ -61,7 +59,6 @@ export default function CreateAssessmentModal({
       setDescription(assessmentDescription || "");
       setOpenAt(parsedOpenAt);
       setDueAt(parsedDueAt);
-      setTimeLimit(assessmentTimeLimit || "");
       setIsPublished(assessmentIsPublished);
       setLoading(false);
     }
@@ -74,35 +71,10 @@ export default function CreateAssessmentModal({
       setDescription("");
       setOpenAt(null);
       setDueAt(null);
-      setTimeLimit("");
       setIsPublished(false);
       setErrors({});
     }
   }, [show]);
-
-  // Format time limit to HH:MM:SS
-  const formatTimeLimit = (value) => {
-    // Remove all non-digit characters
-    const digits = value.replace(/\D/g, "");
-    
-    // Format as HH:MM:SS
-    if (digits.length <= 2) {
-      return digits;
-    } else if (digits.length <= 4) {
-      return `${digits.slice(0, 2)}:${digits.slice(2)}`;
-    } else if (digits.length <= 6) {
-      return `${digits.slice(0, 2)}:${digits.slice(2, 4)}:${digits.slice(4)}`;
-    } else {
-      return `${digits.slice(0, 2)}:${digits.slice(2, 4)}:${digits.slice(4, 6)}`;
-    }
-  };
-
-  const handleTimeLimitChange = (e) => {
-    const value = e.target.value;
-    const formatted = formatTimeLimit(value);
-    setTimeLimit(formatted);
-    setErrors({ ...errors, timeLimit: null });
-  };
 
   const validateForm = () => {
     const newErrors = {};
@@ -132,23 +104,6 @@ export default function CreateAssessmentModal({
       }
     }
 
-    if (!timeLimit) {
-      newErrors.timeLimit = "Thời gian giới hạn là bắt buộc";
-    } else {
-      // Validate time limit format (HH:MM:SS)
-      const timeLimitRegex = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/;
-      if (!timeLimitRegex.test(timeLimit)) {
-        newErrors.timeLimit = "Thời gian giới hạn phải có định dạng HH:MM:SS (ví dụ: 01:30:00)";
-      } else {
-        // Validate that time limit is greater than 0
-        const [hours, minutes, seconds] = timeLimit.split(":").map(Number);
-        const totalSeconds = hours * 3600 + minutes * 60 + seconds;
-        if (totalSeconds <= 0) {
-          newErrors.timeLimit = "Thời gian giới hạn phải lớn hơn 0";
-        }
-      }
-    }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -173,7 +128,7 @@ export default function CreateAssessmentModal({
         description: description.trim() || null,
         openAt: openAtDate,
         dueAt: dueAtDate,
-        timeLimit: timeLimit.trim(),
+        timeLimit: "01:00:00", // Default 1 hour
         isPublished: isPublished,
       };
 
@@ -212,7 +167,7 @@ export default function CreateAssessmentModal({
   const now = new Date();
   now.setSeconds(0, 0); // Reset seconds and milliseconds
 
-  const isFormValid = title.trim() && openAt && dueAt && timeLimit;
+  const isFormValid = title.trim() && openAt && dueAt;
 
   return (
     <Modal 
@@ -301,21 +256,6 @@ export default function CreateAssessmentModal({
             />
             {errors.dueAt && <div className="invalid-feedback" style={{ marginTop: "4px" }}>{errors.dueAt}</div>}
             <div className="form-hint">*Bắt buộc (phải sau thời gian mở)</div>
-          </div>
-
-          {/* Thời gian giới hạn */}
-          <div className="form-group">
-            <label className="form-label required">Thời gian giới hạn</label>
-            <input
-              type="text"
-              className={`form-control ${errors.timeLimit ? "is-invalid" : ""}`}
-              value={timeLimit}
-              onChange={handleTimeLimitChange}
-              placeholder="HH:MM:SS (ví dụ: 01:30:00 cho 1 giờ 30 phút)"
-              maxLength={8}
-            />
-            {errors.timeLimit && <div className="invalid-feedback">{errors.timeLimit}</div>}
-            <div className="form-hint">*Bắt buộc (định dạng HH:MM:SS)</div>
           </div>
 
           {/* Trạng thái xuất bản */}

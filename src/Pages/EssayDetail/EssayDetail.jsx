@@ -12,7 +12,7 @@ import { moduleService } from "../../Services/moduleService";
 import { courseService } from "../../Services/courseService";
 import { lessonService } from "../../Services/lessonService";
 import { assessmentService } from "../../Services/assessmentService";
-import { FaFileUpload, FaTimes, FaEdit, FaClock, FaCheckCircle, FaTimesCircle, FaVolumeUp } from "react-icons/fa";
+import { FaFileUpload, FaTimes, FaEdit, FaClock, FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 import "./EssayDetail.css";
 
 export default function EssayDetail() {
@@ -50,6 +50,8 @@ export default function EssayDetail() {
     const fileInputRef = useRef(null);
     const moduleStartedRef = useRef(false);
     const audioRef = useRef(null);
+    const [audioLoading, setAudioLoading] = useState(false);
+    const [audioBlobUrl, setAudioBlobUrl] = useState(null);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -106,6 +108,32 @@ export default function EssayDetail() {
                             } catch (err) {
                                 console.log("⚠️ [EssayDetail] Could not load assessment info:", err);
                             }
+                        }
+
+                        // Load audio if available
+                        const audioUrl = essayData?.audioUrl || essayData?.AudioUrl;
+                        if (audioUrl) {
+                            // Load audio as blob
+                            (async () => {
+                                try {
+                                    const response = await fetch(audioUrl, {
+                                        method: 'GET',
+                                        headers: { 'Accept': 'audio/mpeg, audio/*' },
+                                        mode: 'cors',
+                                        credentials: 'include',
+                                    });
+                                    
+                                    if (response.ok) {
+                                        const blob = await response.blob();
+                                        const blobUrl = URL.createObjectURL(blob);
+                                        setAudioBlobUrl(blobUrl);
+                                    } else {
+                                        setAudioBlobUrl(audioUrl);
+                                    }
+                                } catch {
+                                    setAudioBlobUrl(audioUrl);
+                                }
+                            })();
                         }
 
                         // Check if user has already submitted this essay
@@ -207,109 +235,25 @@ export default function EssayDetail() {
         }
     };
 
-    const handleAudioClick = async (e) => {
-        e.stopPropagation();
-        const audioUrl = essay?.audioUrl || essay?.AudioUrl;
-        if (!audioUrl) {
-            console.warn("No audio URL provided");
-            return;
-        }
-
-        try {
-            // Stop any currently playing audio
+    // Cleanup on unmount
+    useEffect(() => {
+        return () => {
+            if (audioBlobUrl) {
+                URL.revokeObjectURL(audioBlobUrl);
+            }
             if (audioRef.current) {
                 audioRef.current.pause();
                 audioRef.current.src = "";
-                audioRef.current = null;
             }
-            
-            // Try fetching audio as blob first (to bypass CORS and handle 403)
-            // Similar to FlashCardViewer approach
-            try {
-                const response = await fetch(audioUrl, {
-                    method: 'GET',
-                    headers: {
-                        'Accept': 'audio/mpeg, audio/*',
-                    },
-                    mode: 'cors',
-                    credentials: 'include', // Include credentials (cookies/auth headers) for authenticated requests
-                });
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                const blob = await response.blob();
-                const blobUrl = URL.createObjectURL(blob);
-                const audio = new Audio(blobUrl);
-                
-                audio.onended = () => {
-                    // Clean up blob URL when audio ends
-                    URL.revokeObjectURL(blobUrl);
-                    audioRef.current = null;
-                };
-                
-                audio.onerror = (err) => {
-                    console.error("Error playing audio from blob:", err);
-                    URL.revokeObjectURL(blobUrl);
-                    audioRef.current = null;
-                    setNotification({
-                        isOpen: true,
-                        type: "error",
-                        message: "Không thể phát âm thanh. Vui lòng thử lại."
-                    });
-                };
-                
-                audioRef.current = audio;
-                await audio.play();
-                console.log("Audio playing successfully via blob");
-            } catch (fetchError) {
-                // If fetch fails (403, CORS, etc.), try direct audio URL as fallback
-                console.log("Fetch failed, trying direct audio URL:", fetchError);
-                try {
-                    const audio = new Audio(audioUrl);
-                    audioRef.current = audio;
-                    
-                    // Set crossOrigin to anonymous to allow CORS
-                    audio.crossOrigin = "anonymous";
-                    
-                    audio.onended = () => {
-                        audioRef.current = null;
-                    };
-                    
-                    audio.onerror = (err) => {
-                        console.error("Error playing audio from direct URL:", err);
-                        audioRef.current = null;
-                        setNotification({
-                            isOpen: true,
-                            type: "error",
-                            message: "Không thể phát âm thanh. Vui lòng thử lại."
-                        });
-                    };
-                    
-                    await audio.play();
-                    console.log("Audio playing successfully via direct URL");
-                } catch (directError) {
-                    console.error("Both blob fetch and direct URL failed:", directError);
-                    setNotification({
-                        isOpen: true,
-                        type: "error",
-                        message: "Không thể phát âm thanh. Vui lòng thử lại."
-                    });
-                }
-            }
-        } catch (err) {
-            console.error("Error playing audio:", err);
-            console.error("Error name:", err.name);
-            console.error("Error message:", err.message);
-            console.error("Audio URL:", audioUrl);
-            setNotification({
-                isOpen: true,
-                type: "error",
-                message: "Không thể phát âm thanh. Vui lòng thử lại."
-            });
+        };
+    }, [audioBlobUrl]);
+
+    // Update audio src when blob URL is ready
+    useEffect(() => {
+        if (audioRef.current && audioBlobUrl) {
+            audioRef.current.src = audioBlobUrl;
         }
-    };
+    }, [audioBlobUrl]);
 
     const handleUploadFile = async () => {
         if (!selectedFile) return;
@@ -318,7 +262,6 @@ export default function EssayDetail() {
             setUploadingFile(true);
             console.log("📤 [EssayDetail] Uploading file to temp storage...");
 
-            // Upload file to temp storage
             const uploadResponse = await fileService.uploadTempFile(
                 selectedFile,
                 "essay-attachments",
@@ -328,7 +271,6 @@ export default function EssayDetail() {
             console.log("📥 [EssayDetail] Upload response:", uploadResponse.data);
 
             if (uploadResponse.data?.success && uploadResponse.data?.data) {
-                // Backend trả về ResultUploadDto với PascalCase: TempKey, ImageUrl, ImageType
                 const resultData = uploadResponse.data.data;
                 const tempKey = resultData.TempKey || resultData.tempKey;
                 const imageUrl = resultData.ImageUrl || resultData.imageUrl;
@@ -421,12 +363,15 @@ export default function EssayDetail() {
             return;
         }
 
-        // Validate text content
-        if (!textContent.trim()) {
+        // Validate: must have either text content OR file attachment
+        const hasTextContent = textContent.trim().length > 0;
+        const hasAttachment = attachmentTempKey || existingAttachmentUrl;
+        
+        if (!hasTextContent && !hasAttachment) {
             setNotification({
                 isOpen: true,
                 type: "error",
-                message: "Vui lòng nhập nội dung essay"
+                message: "Vui lòng nhập nội dung essay hoặc đính kèm file"
             });
             return;
         }
@@ -757,20 +702,22 @@ export default function EssayDetail() {
                     <Row>
                         <Col>
                             <div className="essay-header">
-                                <div className="essay-title-wrapper">
-                                    <h1 className="essay-title">{essayTitle}</h1>
-                                    {essay?.audioUrl && (
-                                        <button 
-                                            className="essay-audio-icon-btn"
-                                            onClick={handleAudioClick}
-                                            title="Nghe đề bài"
-                                        >
-                                            <FaVolumeUp />
-                                        </button>
-                                    )}
-                                </div>
+                                <h1 className="essay-title">{essayTitle}</h1>
                                 {essay?.description && (
                                     <p className="essay-description">{essay.description || essay.Description}</p>
+                                )}
+                                {essay?.audioUrl && (
+                                    <div className="essay-audio-player" style={{ marginTop: '16px', marginBottom: '20px' }}>
+                                        <audio 
+                                            ref={audioRef}
+                                            controls 
+                                            controlsList="nodownload"
+                                            style={{ width: '100%', maxWidth: '500px' }}
+                                            src={audioBlobUrl || essay.audioUrl || essay.AudioUrl}
+                                        >
+                                            Trình duyệt của bạn không hỗ trợ phát audio.
+                                        </audio>
+                                    </div>
                                 )}
                                 {essay?.imageUrl && (
                                     <div className="essay-image-container">
@@ -920,20 +867,22 @@ export default function EssayDetail() {
                                                 size="lg"
                                                 className="submit-essay-btn"
                                                 onClick={() => setShowSubmitModal(true)}
-                                                disabled={(submitting || isUpdating) || !textContent.trim()}
+                                                disabled={(submitting || isUpdating) || (!textContent.trim() && !attachmentTempKey && !existingAttachmentUrl)}
                                                 style={{
                                                     backgroundColor: '#41d6e3',
                                                     borderColor: '#41d6e3',
                                                     color: '#fff'
                                                 }}
                                                 onMouseEnter={(e) => {
-                                                    if (!submitting && !isUpdating && textContent.trim()) {
+                                                    const canSubmit = textContent.trim() || attachmentTempKey || existingAttachmentUrl;
+                                                    if (!submitting && !isUpdating && canSubmit) {
                                                         e.target.style.backgroundColor = '#35b8c4';
                                                         e.target.style.borderColor = '#35b8c4';
                                                     }
                                                 }}
                                                 onMouseLeave={(e) => {
-                                                    if (!submitting && !isUpdating && textContent.trim()) {
+                                                    const canSubmit = textContent.trim() || attachmentTempKey || existingAttachmentUrl;
+                                                    if (!submitting && !isUpdating && canSubmit) {
                                                         e.target.style.backgroundColor = '#41d6e3';
                                                         e.target.style.borderColor = '#41d6e3';
                                                     }

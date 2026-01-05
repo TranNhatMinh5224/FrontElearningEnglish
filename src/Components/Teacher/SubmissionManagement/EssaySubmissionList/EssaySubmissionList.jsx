@@ -200,7 +200,6 @@ export default function EssaySubmissionList({ essayId, essayTitle, onBack, isAdm
                 <thead>
                   <tr>
                     <th>Học sinh</th>
-                    <th>Email</th>
                     <th>Ngày nộp</th>
                     <th>Trạng thái</th>
                     <th>Điểm</th>
@@ -211,7 +210,6 @@ export default function EssaySubmissionList({ essayId, essayTitle, onBack, isAdm
                   {submissions.map((submission) => {
                     const submissionId = submission.submissionId || submission.SubmissionId;
                     const userName = submission.userName || submission.UserName || "N/A";
-                    const userEmail = submission.userEmail || submission.UserEmail || "N/A";
                     const submittedAt = submission.submittedAt || submission.SubmittedAt;
                     const status = submission.status !== undefined ? submission.status : (submission.Status !== undefined ? submission.Status : null);
                     // Score: TeacherScore takes priority over AiScore
@@ -226,7 +224,6 @@ export default function EssaySubmissionList({ essayId, essayTitle, onBack, isAdm
                     return (
                       <tr key={submissionId}>
                         <td>{userName}</td>
-                        <td>{userEmail}</td>
                         <td>{submittedAt ? new Date(submittedAt).toLocaleString("vi-VN") : "N/A"}</td>
                         <td>{getStatusBadge(status)}</td>
                         <td>
