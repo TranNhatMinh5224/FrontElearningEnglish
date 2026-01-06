@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Container, Row, Col, Button } from "react-bootstrap";
 import MainHeader from "../../Components/Header/MainHeader";
@@ -158,7 +158,7 @@ export default function QuizDetail() {
 
             // Loose check for status 0 or 1, OR if status is missing (assume active)
             // Backend Enum: 0=Started, 1=InProgress
-            if (status == 0 || status == 1 || status === undefined) {
+            if (status === 0 || status === 1 || status === undefined) {
                 const aId = quizAttempt.attemptId || quizAttempt.AttemptId || attemptId;
                 const qId = quizAttempt.quizId || quizAttempt.QuizId || quizId;
                 
@@ -503,150 +503,7 @@ export default function QuizDetail() {
         // isFetchingRef được reset trong useEffect's finally
     };
 
-    const startTimer = () => {
-        // Clear existing timer if any
-        if (timerIntervalRef.current) {
-            clearInterval(timerIntervalRef.current);
-        }
-        
-        // Start timer to update remainingTime every second
-        timerIntervalRef.current = setInterval(() => {
-            timeSpentRef.current += 1;
-            
-            // Update remainingTime real-time
-            calculateAndUpdateRemainingTime();
-        }, 1000);
-        
-        console.log("✅ Timer started");
-    };
-
-    // Function to calculate and set endTime from startedAt + Duration
-    const calculateEndTime = () => {
-        console.log("🔍 calculateEndTime called");
-        console.log("quizAttempt:", quizAttempt);
-        console.log("quiz:", quiz);
-        
-        if (!quizAttempt || !quiz) {
-            console.warn("⚠️ Missing quizAttempt or quiz");
-            endTimeRef.current = null;
-            return;
-        }
-
-        // Get quiz duration (in minutes) - handle both camelCase and PascalCase
-        const quizDuration = quiz.Duration !== undefined ? quiz.Duration : (quiz.duration !== undefined ? quiz.duration : null);
-        console.log("📊 Quiz Duration:", quizDuration, "type:", typeof quizDuration);
-        
-        if (quizDuration === null || quizDuration === undefined || isNaN(quizDuration) || quizDuration <= 0) {
-            console.warn("⚠️ Invalid or missing quizDuration:", quizDuration);
-            endTimeRef.current = null; // No time limit
-            return;
-        }
-
-        // Get StartedAt from attempt - handle both camelCase and PascalCase
-        const startedAtStr = quizAttempt.StartedAt || quizAttempt.startedAt;
-        console.log("📅 StartedAt string:", startedAtStr);
-        
-        if (!startedAtStr) {
-            console.warn("⚠️ StartedAt not found in quizAttempt");
-            endTimeRef.current = null;
-            return;
-        }
-
-        try {
-            const startedAt = new Date(startedAtStr);
-            if (isNaN(startedAt.getTime())) {
-                console.error("❌ Invalid StartedAt date:", startedAtStr);
-                endTimeRef.current = null;
-                return;
-            }
-            
-            // Calculate endTime = startedAt + Duration (minutes)
-            // Use exact duration from backend (no extra buffer)
-            const durationMs = Number(quizDuration) * 60 * 1000;
-            const endTime = new Date(startedAt.getTime() + durationMs);
-            endTimeRef.current = endTime;
-            
-            console.log("✅ === Timer Calculation ===");
-            console.log("StartedAt:", startedAt.toISOString());
-            console.log("Duration:", quizDuration, "minutes");
-            console.log("Duration (ms):", durationMs);
-            console.log("EndTime:", endTime.toISOString());
-            console.log("Now:", new Date().toISOString());
-            console.log("============================");
-        } catch (err) {
-            console.error("❌ Error calculating endTime:", err);
-            endTimeRef.current = null;
-        }
-    };
-
-    // Function to calculate remaining time from endTime (real-time)
-    const calculateAndUpdateRemainingTime = () => {
-        if (!endTimeRef.current) {
-            console.log("⚠️ endTimeRef.current is null, cannot calculate remaining time");
-            setRemainingTime(null);
-            return;
-        }
-
-        try {
-            const now = new Date();
-            const endTime = endTimeRef.current;
-            
-            // Calculate remaining time in seconds (real-time)
-            const remaining = Math.max(0, Math.floor((endTime - now) / 1000));
-            
-            setRemainingTime(remaining);
-            
-            // Auto-submit if time is up (chỉ submit một lần)
-            if (remaining <= 0 && !autoSubmitCalledRef.current && !submitting) {
-                console.log("⏰ Time is up! Auto-submitting quiz...");
-                autoSubmitCalledRef.current = true; // Đánh dấu đã gọi để tránh gọi lại
-                
-                if (timerIntervalRef.current) {
-                    clearInterval(timerIntervalRef.current);
-                    timerIntervalRef.current = null;
-                }
-                
-                // Call handleSubmitQuiz to auto-submit (chỉ gọi một lần)
-                handleSubmitQuiz();
-            }
-        } catch (err) {
-            console.error("Error calculating remaining time:", err);
-            setRemainingTime(null);
-        }
-    };
-
-    // Calculate endTime when quizAttempt or quiz changes
-    useEffect(() => {
-        if (quizAttempt && quiz) {
-            console.log("🔄 Calculating endTime and starting timer...");
-            calculateEndTime();
-            // Calculate remaining time immediately
-            calculateAndUpdateRemainingTime();
-            
-            // Start timer if not already started
-            if (!timerIntervalRef.current) {
-                startTimer();
-            }
-        }
-        
-        // Cleanup timer on unmount
-        return () => {
-            if (timerIntervalRef.current) {
-                clearInterval(timerIntervalRef.current);
-                timerIntervalRef.current = null;
-            }
-        };
-    }, [quizAttempt, quiz]);
-
-    const handleAnswerChange = (questionId, answer) => {
-        // Chỉ cập nhật local state, chưa submit lên API
-        setAnswers(prev => ({
-            ...prev,
-            [questionId]: answer
-        }));
-    };
-
-    const handleSubmitAnswer = async (questionId, answer) => {
+    const handleSubmitAnswer = useCallback(async (questionId, answer) => {
         try {
             // Call API to submit answer - use attemptId from quizAttempt if available
             const currentAttemptId = quizAttempt?.attemptId || quizAttempt?.AttemptId || attemptId;
@@ -679,61 +536,9 @@ export default function QuizDetail() {
                 message: "Không thể lưu câu trả lời"
             });
         }
-    };
+    }, [quizAttempt, attemptId]);
 
-    const handleNext = async () => {
-        // Submit answer của câu hiện tại trước khi chuyển câu
-        if (currentQuestion) {
-            const questionId = currentQuestion.questionId || currentQuestion.QuestionId;
-            const currentAnswer = answers[questionId];
-            
-            // Nếu có đáp án, submit lên API
-            if (currentAnswer !== undefined && currentAnswer !== null) {
-                await handleSubmitAnswer(questionId, currentAnswer);
-            }
-        }
-
-        // Chuyển sang câu tiếp theo
-        if (currentQuestionIndex < questions.length - 1) {
-            setCurrentQuestionIndex(prev => prev + 1);
-        }
-    };
-
-    const handlePrevious = async () => {
-        // Submit answer của câu hiện tại trước khi chuyển câu
-        if (currentQuestion) {
-            const questionId = currentQuestion.questionId || currentQuestion.QuestionId;
-            const currentAnswer = answers[questionId];
-            
-            // Nếu có đáp án, submit lên API
-            if (currentAnswer !== undefined && currentAnswer !== null) {
-                await handleSubmitAnswer(questionId, currentAnswer);
-            }
-        }
-
-        // Chuyển sang câu trước
-        if (currentQuestionIndex > 0) {
-            setCurrentQuestionIndex(prev => prev - 1);
-        }
-    };
-
-    const handleGoToQuestion = async (index) => {
-        // Submit answer của câu hiện tại trước khi chuyển câu
-        if (currentQuestion && index !== currentQuestionIndex) {
-            const questionId = currentQuestion.questionId || currentQuestion.QuestionId;
-            const currentAnswer = answers[questionId];
-            
-            // Nếu có đáp án, submit lên API
-            if (currentAnswer !== undefined && currentAnswer !== null) {
-                await handleSubmitAnswer(questionId, currentAnswer);
-            }
-        }
-
-        // Chuyển sang câu được chọn
-        setCurrentQuestionIndex(index);
-    };
-
-    const handleSubmitQuiz = async () => {
+    const handleSubmitQuiz = useCallback(async () => {
         // Prevent multiple submissions
         if (submitting) {
             console.log("Already submitting, skipping...");
@@ -860,16 +665,199 @@ export default function QuizDetail() {
         } finally {
             setShowSubmitModal(false);
         }
+    }, [submitting, currentQuestion, answers, handleSubmitAnswer, quizAttempt, attemptId, quizId, courseId, lessonId, moduleId, navigate]);
+
+    const calculateAndUpdateRemainingTime = useCallback(() => {
+        if (!endTimeRef.current) {
+            console.log("⚠️ endTimeRef.current is null, cannot calculate remaining time");
+            setRemainingTime(null);
+            return;
+        }
+
+        try {
+            const now = new Date();
+            const endTime = endTimeRef.current;
+            
+            // Calculate remaining time in seconds (real-time)
+            const remaining = Math.max(0, Math.floor((endTime - now) / 1000));
+            setRemainingTime(remaining);
+
+            // Auto-submit if time is up (chỉ submit một lần)
+            if (remaining <= 0 && !autoSubmitCalledRef.current && !submitting) {
+                console.log("⏰ Time is up! Auto-submitting quiz...");
+                autoSubmitCalledRef.current = true; // Đánh dấu đã gọi để tránh gọi lại
+                
+                if (timerIntervalRef.current) {
+                    clearInterval(timerIntervalRef.current);
+                    timerIntervalRef.current = null;
+                }
+                
+                // Call handleSubmitQuiz to auto-submit (chỉ gọi một lần)
+                handleSubmitQuiz();
+            }
+        } catch (error) {
+            console.error("❌ Error calculating remaining time:", error);
+            setRemainingTime(null);
+        }
+    }, [submitting, handleSubmitQuiz]);
+
+    const startTimer = useCallback(() => {
+        // Clear existing timer if any
+        if (timerIntervalRef.current) {
+            clearInterval(timerIntervalRef.current);
+        }
+        
+        // Start timer to update remainingTime every second
+        timerIntervalRef.current = setInterval(() => {
+            timeSpentRef.current += 1;
+            
+            // Update remainingTime real-time
+            calculateAndUpdateRemainingTime();
+        }, 1000);
+        
+        console.log("✅ Timer started");
+    }, [calculateAndUpdateRemainingTime]);
+
+    // Function to calculate and set endTime from startedAt + Duration
+    const calculateEndTime = useCallback(() => {
+        console.log("🔍 calculateEndTime called");
+        console.log("quizAttempt:", quizAttempt);
+        console.log("quiz:", quiz);
+        
+        if (!quizAttempt || !quiz) {
+            console.warn("⚠️ Missing quizAttempt or quiz");
+            endTimeRef.current = null;
+            return;
+        }
+
+        // Get quiz duration (in minutes) - handle both camelCase and PascalCase
+        const quizDuration = quiz.Duration !== undefined ? quiz.Duration : (quiz.duration !== undefined ? quiz.duration : null);
+        console.log("📊 Quiz Duration:", quizDuration, "type:", typeof quizDuration);
+        
+        if (quizDuration === null || quizDuration === undefined || isNaN(quizDuration) || quizDuration <= 0) {
+            console.warn("⚠️ Invalid or missing quizDuration:", quizDuration);
+            endTimeRef.current = null; // No time limit
+            return;
+        }
+
+        // Get StartedAt from attempt - handle both camelCase and PascalCase
+        const startedAtStr = quizAttempt.StartedAt || quizAttempt.startedAt;
+        console.log("📅 StartedAt string:", startedAtStr);
+        
+        if (!startedAtStr) {
+            console.warn("⚠️ StartedAt not found in quizAttempt");
+            endTimeRef.current = null;
+            return;
+        }
+
+        try {
+            const startedAt = new Date(startedAtStr);
+            if (isNaN(startedAt.getTime())) {
+                console.error("❌ Invalid StartedAt date:", startedAtStr);
+                endTimeRef.current = null;
+                return;
+            }
+            
+            // Calculate endTime = startedAt + Duration (minutes)
+            // Use exact duration from backend (no extra buffer)
+            const durationMs = Number(quizDuration) * 60 * 1000;
+            const endTime = new Date(startedAt.getTime() + durationMs);
+            endTimeRef.current = endTime;
+            
+            console.log("✅ === Timer Calculation ===");
+            console.log("StartedAt:", startedAt.toISOString());
+            console.log("Duration:", quizDuration, "minutes");
+            console.log("Duration (ms):", durationMs);
+            console.log("EndTime:", endTime.toISOString());
+            console.log("Now:", new Date().toISOString());
+            console.log("============================");
+        } catch (err) {
+            console.error("❌ Error calculating endTime:", err);
+            endTimeRef.current = null;
+        }
+    }, [quizAttempt, quiz]);
+
+    // Calculate endTime when quizAttempt or quiz changes
+    useEffect(() => {
+        if (quizAttempt && quiz) {
+            console.log("🔄 Calculating endTime and starting timer...");
+            calculateEndTime();
+            // Calculate remaining time immediately
+            calculateAndUpdateRemainingTime();
+            
+            // Start timer if not already started
+            if (!timerIntervalRef.current) {
+                startTimer();
+            }
+        }
+        
+        // Cleanup timer on unmount
+        return () => {
+            if (timerIntervalRef.current) {
+                clearInterval(timerIntervalRef.current);
+                timerIntervalRef.current = null;
+            }
+        };
+    }, [quizAttempt, quiz, calculateEndTime, calculateAndUpdateRemainingTime, startTimer]);
+
+    const handleAnswerChange = (questionId, answer) => {
+        // Chỉ cập nhật local state, chưa submit lên API
+        setAnswers(prev => ({
+            ...prev,
+            [questionId]: answer
+        }));
     };
 
-    const formatTime = (seconds) => {
-        const hours = Math.floor(seconds / 3600);
-        const minutes = Math.floor((seconds % 3600) / 60);
-        const secs = seconds % 60;
-        if (hours > 0) {
-            return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    const handleNext = async () => {
+        // Submit answer của câu hiện tại trước khi chuyển câu
+        if (currentQuestion) {
+            const questionId = currentQuestion.questionId || currentQuestion.QuestionId;
+            const currentAnswer = answers[questionId];
+            
+            // Nếu có đáp án, submit lên API
+            if (currentAnswer !== undefined && currentAnswer !== null) {
+                await handleSubmitAnswer(questionId, currentAnswer);
+            }
         }
-        return `${minutes}:${secs.toString().padStart(2, '0')}`;
+
+        // Chuyển sang câu tiếp theo
+        if (currentQuestionIndex < questions.length - 1) {
+            setCurrentQuestionIndex(prev => prev + 1);
+        }
+    };
+
+    const handlePrevious = async () => {
+        // Submit answer của câu hiện tại trước khi chuyển câu
+        if (currentQuestion) {
+            const questionId = currentQuestion.questionId || currentQuestion.QuestionId;
+            const currentAnswer = answers[questionId];
+            
+            // Nếu có đáp án, submit lên API
+            if (currentAnswer !== undefined && currentAnswer !== null) {
+                await handleSubmitAnswer(questionId, currentAnswer);
+            }
+        }
+
+        // Chuyển sang câu trước
+        if (currentQuestionIndex > 0) {
+            setCurrentQuestionIndex(prev => prev - 1);
+        }
+    };
+
+    const handleGoToQuestion = async (index) => {
+        // Submit answer của câu hiện tại trước khi chuyển câu
+        if (currentQuestion && index !== currentQuestionIndex) {
+            const questionId = currentQuestion.questionId || currentQuestion.QuestionId;
+            const currentAnswer = answers[questionId];
+            
+            // Nếu có đáp án, submit lên API
+            if (currentAnswer !== undefined && currentAnswer !== null) {
+                await handleSubmitAnswer(questionId, currentAnswer);
+            }
+        }
+
+        // Chuyển sang câu được chọn
+        setCurrentQuestionIndex(index);
     };
 
     if (loading) {
