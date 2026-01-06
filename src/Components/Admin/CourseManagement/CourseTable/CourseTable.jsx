@@ -112,7 +112,10 @@ export default function CourseTable({
                       <button 
                         className="action-btn action-delete" 
                         title="Delete"
-                        onClick={() => onDelete(course.courseId)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onDelete(course.courseId);
+                        }}
                       >
                         <MdDelete />
                       </button>

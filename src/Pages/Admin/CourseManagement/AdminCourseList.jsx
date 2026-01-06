@@ -6,6 +6,7 @@ import CourseFilters from "../../../Components/Admin/CourseManagement/CourseFilt
 import CourseTable from "../../../Components/Admin/CourseManagement/CourseTable/CourseTable";
 import CourseFormModal from "../../../Components/Admin/CourseManagement/CourseFormModal/CourseFormModal";
 import SuccessModal from "../../../Components/Common/SuccessModal/SuccessModal";
+import ConfirmModal from "../../../Components/Common/ConfirmModal/ConfirmModal";
 import UnauthorizedModal from "../../../Components/Common/UnauthorizedModal/UnauthorizedModal";
 import { usePermission } from "../../../hooks/usePermission";
 import "./AdminCourseList.css";
@@ -26,6 +27,11 @@ export default function AdminCourseList() {
   // Success Modal State
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
+
+  // Confirm delete modal state
+  const [showConfirmDelete, setShowConfirmDelete] = useState(false);
+  const [deletingCourseId, setDeletingCourseId] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   const fetchCourses = useCallback(async () => {
     setLoading(true);
@@ -75,22 +81,33 @@ export default function AdminCourseList() {
     });
   };
 
-  const handleDeleteCourse = async (courseId) => {
-      checkPermission("course_delete", async () => {
-        if (!window.confirm("Are you sure you want to delete this course? This action cannot be undone.")) return;
-        try {
-            const response = await adminService.deleteCourse(courseId);
-            if (response.data.success) {
-              setSuccessMessage("Course deleted successfully");
-              setShowSuccessModal(true);
-              fetchCourses();
-            }
-        } catch (error) {
-            console.error(error);
-            alert("Failed to delete course");
-        }
+  const handleDeleteCourse = (courseId) => {
+      checkPermission("course_delete", () => {
+        setDeletingCourseId(courseId);
+        setShowConfirmDelete(true);
       });
   }
+
+  const handleConfirmDelete = async () => {
+    if (!deletingCourseId) return;
+    setDeleting(true);
+    try {
+      const response = await adminService.deleteCourse(deletingCourseId);
+      if (response.data && response.data.success) {
+        setSuccessMessage("Course deleted successfully");
+        setShowSuccessModal(true);
+        fetchCourses();
+      } else {
+        console.error('Delete failed', response);
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setDeleting(false);
+      setShowConfirmDelete(false);
+      setDeletingCourseId(null);
+    }
+  };
 
   const handleFormSubmit = (courseData) => {
     // Modal đã đóng, chỉ cần refresh và hiện success
@@ -162,6 +179,19 @@ export default function AdminCourseList() {
         message={successMessage}
         autoClose={true}
         autoCloseDelay={1500}
+      />
+
+      {/* CONFIRM DELETE MODAL */}
+      <ConfirmModal
+        isOpen={showConfirmDelete}
+        onClose={() => { if (!deleting) { setShowConfirmDelete(false); setDeletingCourseId(null); } }}
+        onConfirm={handleConfirmDelete}
+        title="Xác nhận xóa khóa học"
+        message="Bạn có chắc chắn muốn xóa khóa học này? Hành động không thể hoàn tác."
+        confirmText={deleting ? "Đang xóa..." : "Xác nhận"}
+        cancelText="Hủy"
+        type="delete"
+        loading={deleting}
       />
 
       {/* UNAUTHORIZED MODAL */}

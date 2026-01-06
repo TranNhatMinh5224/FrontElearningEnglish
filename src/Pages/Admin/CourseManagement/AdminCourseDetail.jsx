@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Container, Row, Col } from "react-bootstrap";
 import "./AdminCourseDetail.css";
@@ -9,6 +9,7 @@ import CourseFormModal from "../../../Components/Admin/CourseManagement/CourseFo
 import CreateLessonModal from "../../../Components/Teacher/CreateLessonModal/CreateLessonModal";
 import SuccessModal from "../../../Components/Common/SuccessModal/SuccessModal";
 import ConfirmModal from "../../../Components/Common/ConfirmModal/ConfirmModal";
+import CourseDescription from "../../../Components/Courses/CourseDescription/CourseDescription";
 import { FaPlus, FaArrowLeft, FaTrash } from "react-icons/fa";
 
 export default function AdminCourseDetail() {
@@ -30,18 +31,7 @@ export default function AdminCourseDetail() {
 
   const isAdmin = roles.some(role => ["SuperAdmin", "ContentAdmin"].includes(role));
 
-  useEffect(() => {
-    if (!isAuthenticated || !isAdmin) {
-      navigate("/home");
-      return;
-    }
-
-    fetchCourseDetail();
-    fetchLessons();
-    fetchStudentCount();
-  }, [isAuthenticated, isAdmin, navigate, courseId]);
-
-  const fetchCourseDetail = async () => {
+  const fetchCourseDetail = useCallback(async () => {
     try {
       setLoading(true);
       setError("");
@@ -51,7 +41,6 @@ export default function AdminCourseDetail() {
 
       if (response.data?.success && response.data?.data) {
         const courseData = response.data.data;
-        console.log("Course detail response:", courseData);
         setCourse(courseData);
       } else {
         setError("Không thể tải thông tin khóa học");
@@ -62,9 +51,9 @@ export default function AdminCourseDetail() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [courseId]);
 
-  const fetchLessons = async () => {
+  const fetchLessons = useCallback(async () => {
     try {
       const response = await adminService.getLessonsByCourse(courseId);
       if (response.data?.success && response.data?.data) {
@@ -77,9 +66,9 @@ export default function AdminCourseDetail() {
       console.error("Error fetching lessons:", err);
       setLessons([]);
     }
-  };
+  }, [courseId]);
 
-  const fetchStudentCount = async () => {
+  const fetchStudentCount = useCallback(async () => {
     try {
       const response = await adminService.getCourseStudents(courseId, { pageNumber: 1, pageSize: 1 });
       if (response.data?.success && response.data?.data) {
@@ -90,7 +79,18 @@ export default function AdminCourseDetail() {
       console.error("Error fetching student count:", err);
       setStudentCount(0);
     }
-  };
+  }, [courseId]);
+
+  useEffect(() => {
+    if (!isAuthenticated || !isAdmin) {
+      navigate("/home");
+      return;
+    }
+
+    fetchCourseDetail();
+    fetchLessons();
+    fetchStudentCount();
+  }, [isAuthenticated, isAdmin, navigate, courseId, fetchCourseDetail, fetchLessons, fetchStudentCount]);
 
   const handleUpdateSuccess = () => {
     setSuccessMessage("Cập nhật khóa học thành công!");
@@ -164,8 +164,6 @@ export default function AdminCourseDetail() {
   const courseImage = course.imageUrl || course.ImageUrl || mochiCourseTeacher;
   const coursePrice = course.price || course.Price || 0;
   const totalLessons = course.totalLessons || course.TotalLessons || 0;
-  const courseType = course.type || course.Type;
-  const courseTypeName = courseType === 1 ? "System Course" : "Teacher Course";
   const isFeatured = course.isFeatured || course.IsFeatured || false;
 
   return (
@@ -198,16 +196,11 @@ export default function AdminCourseDetail() {
               </div>
               <div className="course-info-content">
                 <h2 className="course-title">{courseTitle}</h2>
-                <p className="course-description">{courseDescription}</p>
+                <div className="course-info-subsection">
+                  <CourseDescription description={courseDescription} />
+                </div>
 
                 <div className="course-details">
-                  <div className="course-detail-item">
-                    <label>Loại khóa học:</label>
-                    <span className={`course-type-badge ${courseType === 1 ? 'system' : 'teacher'}`}>
-                      {courseTypeName}
-                    </span>
-                  </div>
-
                   <div className="course-detail-item">
                     <label>Giá:</label>
                     <span className="course-stat-value">
