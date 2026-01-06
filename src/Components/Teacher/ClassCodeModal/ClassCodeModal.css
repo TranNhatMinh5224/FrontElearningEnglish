@@ -1,0 +1,114 @@
+/* Class Code Modal */
+.class-code-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+}
+
+.class-code-modal-content {
+  background: #f8f9fa;
+  border-radius: 20px;
+  padding: 48px;
+  width: 90%;
+  max-width: 600px;
+  position: relative;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  text-align: center;
+}
+
+.class-code-modal-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: none;
+  border: none;
+  font-size: 32px;
+  color: #666;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+.class-code-modal-close:hover {
+  color: #333;
+}
+
+.class-code-modal-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 32px;
+}
+
+.class-code-display {
+  font-size: 80px;
+  font-weight: 700;
+  color: #333;
+  letter-spacing: 8px;
+  margin: 32px 0;
+  font-family: monospace;
+}
+
+.class-code-info {
+  margin: 24px 0;
+}
+
+.class-code-label {
+  font-size: 18px;
+  color: #666;
+  font-weight: 500;
+}
+
+.class-code-copy-btn {
+  background: #41d6e3;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 14px 32px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  margin-top: 16px;
+}
+
+.class-code-copy-btn:hover {
+  background: #35bac6;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(65, 214, 227, 0.3);
+}
+
+.class-code-expand-btn {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  background: transparent;
+  border: none;
+  color: #999;
+  font-size: 20px;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+.class-code-expand-btn:hover {
+  color: #666;
+}

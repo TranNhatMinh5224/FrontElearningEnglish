@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Container, Row, Col } from "react-bootstrap";
 import "./TeacherCourseDetail.css";
@@ -12,7 +12,8 @@ import CreateLessonModal from "../../../Components/Teacher/CreateLessonModal/Cre
 import SuccessModal from "../../../Components/Common/SuccessModal/SuccessModal";
 import ConfirmModal from "../../../Components/Common/ConfirmModal/ConfirmModal";
 import LessonLimitModal from "../../../Components/Common/LessonLimitModal/LessonLimitModal";
-import { FaPlus, FaTrash } from "react-icons/fa";
+import ClassCodeModal from "../../../Components/Teacher/ClassCodeModal/ClassCodeModal";
+import { FaPlus, FaTrash, FaExpand } from "react-icons/fa";
 import { ROUTE_PATHS } from "../../../Routes/Paths";
 
 export default function TeacherCourseDetail() {
@@ -33,20 +34,11 @@ export default function TeacherCourseDetail() {
   const [lessonToDelete, setLessonToDelete] = useState(null);
   const [deletingLesson, setDeletingLesson] = useState(false);
   const [showDeleteSuccessModal, setShowDeleteSuccessModal] = useState(false);
+  const [showClassCodeModal, setShowClassCodeModal] = useState(false);
 
   const isTeacher = roles.includes("Teacher") || user?.teacherSubscription?.isTeacher === true;
 
-  useEffect(() => {
-    if (!isAuthenticated || !isTeacher) {
-      navigate("/home");
-      return;
-    }
-
-    fetchCourseDetail();
-    fetchLessons();
-  }, [isAuthenticated, isTeacher, navigate, courseId]);
-
-  const fetchCourseDetail = async () => {
+  const fetchCourseDetail = useCallback(async () => {
     try {
       setLoading(true);
       setError("");
@@ -67,9 +59,9 @@ export default function TeacherCourseDetail() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [courseId]);
 
-  const fetchLessons = async () => {
+  const fetchLessons = useCallback(async () => {
     try {
       const response = await teacherService.getLessonsByCourse(courseId);
       if (response.data?.success && response.data?.data) {
@@ -82,7 +74,17 @@ export default function TeacherCourseDetail() {
       console.error("Error fetching lessons:", err);
       setLessons([]);
     }
-  };
+  }, [courseId]);
+
+  useEffect(() => {
+    if (!isAuthenticated || !isTeacher) {
+      navigate("/home");
+      return;
+    }
+
+    fetchCourseDetail();
+    fetchLessons();
+  }, [isAuthenticated, isTeacher, navigate, fetchCourseDetail, fetchLessons]);
 
   const handleUpdateSuccess = () => {
     setShowUpdateModal(false);
@@ -244,12 +246,21 @@ export default function TeacherCourseDetail() {
                   <div className="course-details">
                     <div className="course-detail-item">
                       <label>Mã khóa học:</label>
-                      <input
-                        type="text"
-                        value={classCode}
-                        readOnly
-                        className="course-code-input"
-                      />
+                      <div className="course-code-wrapper">
+                        <input
+                          type="text"
+                          value={classCode}
+                          readOnly
+                          className="course-code-input"
+                        />
+                        <button 
+                          className="expand-code-btn"
+                          onClick={() => setShowClassCodeModal(true)}
+                          title="Hiển thị mã lớp"
+                        >
+                          <FaExpand />
+                        </button>
+                      </div>
                     </div>
 
                     <div className="course-detail-item">
@@ -414,6 +425,15 @@ export default function TeacherCourseDetail() {
         message="Bài học đã được xóa thành công!"
         autoClose={true}
         autoCloseDelay={1500}
+      />
+      {/* Class Code Modal */}
+
+      {/* Class Code Modal */}
+      <ClassCodeModal
+        isOpen={showClassCodeModal}
+        onClose={() => setShowClassCodeModal(false)}
+        classCode={classCode}
+        courseTitle={courseTitle}
       />
     </>
   );

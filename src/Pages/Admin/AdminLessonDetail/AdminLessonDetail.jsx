@@ -16,12 +16,12 @@ import CreateModuleModal from "../../../Components/Teacher/CreateModuleModal/Cre
 import CreateAssessmentModal from "../../../Components/Teacher/CreateAssessmentModal/CreateAssessmentModal";
 import SuccessModal from "../../../Components/Common/SuccessModal/SuccessModal";
 import ConfirmModal from "../../../Components/Common/ConfirmModal/ConfirmModal";
-import { FaPlus, FaArrowLeft, FaEdit, FaTrash } from "react-icons/fa";
+import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
 
 export default function AdminLessonDetail() {
   const { courseId, lessonId } = useParams();
   const navigate = useNavigate();
-  const { user, roles, isAuthenticated } = useAuth();
+  const { roles, isAuthenticated } = useAuth();
   const { isLecture, isFlashCard, isAssessment, isClickable, getModuleTypePath } = useModuleTypes();
   const [course, setCourse] = useState(null);
   const [lesson, setLesson] = useState(null);
@@ -231,14 +231,6 @@ export default function AdminLessonDetail() {
     } finally {
       setLoadingContent(false);
     }
-  };
-
-  // Handle back to modules list
-  const handleBackToModules = () => {
-    setSelectedModule(null);
-    setModuleContent([]);
-    setContentError("");
-    setAssessmentTypes({});
   };
 
   // Handle edit lecture

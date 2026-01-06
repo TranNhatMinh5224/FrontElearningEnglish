@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Container } from "react-bootstrap";
 import { FaEdit, FaTrash, FaList } from "react-icons/fa";
@@ -12,10 +12,9 @@ import "./AdminQuizSectionManagement.css";
 export default function AdminQuizSectionManagement() {
   const { courseId, lessonId, moduleId, assessmentId, quizId } = useParams();
   const navigate = useNavigate();
-  const { user, roles, isAuthenticated } = useAuth();
+  const { roles, isAuthenticated } = useAuth();
   const [quiz, setQuiz] = useState(null);
   const [sections, setSections] = useState([]);
-  const [sectionGroups, setSectionGroups] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -32,16 +31,7 @@ export default function AdminQuizSectionManagement() {
 
   const isAdmin = roles?.some(role => ["SuperAdmin", "ContentAdmin"].includes(role));
 
-  useEffect(() => {
-    if (!isAuthenticated || !isAdmin) {
-      navigate("/home");
-      return;
-    }
-
-    fetchData();
-  }, [isAuthenticated, isAdmin, navigate, quizId]);
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true);
       setError("");
@@ -57,23 +47,6 @@ export default function AdminQuizSectionManagement() {
       if (sectionsRes.data?.success) {
         const sectionsData = sectionsRes.data.data || [];
         setSections(sectionsData);
-
-        // Fetch groups for each section
-        const groupsPromises = sectionsData.map(async (section) => {
-          const sectionId = section.quizSectionId || section.QuizSectionId;
-          const groupsRes = await quizService.getAdminQuizGroupsBySection(sectionId);
-          if (groupsRes.data?.success) {
-            return { sectionId, groups: groupsRes.data.data || [] };
-          }
-          return { sectionId, groups: [] };
-        });
-
-        const groupsResults = await Promise.all(groupsPromises);
-        const groupsMap = {};
-        groupsResults.forEach(({ sectionId, groups }) => {
-          groupsMap[sectionId] = groups;
-        });
-        setSectionGroups(groupsMap);
       }
     } catch (err) {
       console.error("Error fetching data:", err);
@@ -81,7 +54,16 @@ export default function AdminQuizSectionManagement() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [quizId]);
+
+  useEffect(() => {
+    if (!isAuthenticated || !isAdmin) {
+      navigate("/home");
+      return;
+    }
+
+    fetchData();
+  }, [isAuthenticated, isAdmin, navigate, fetchData]);
 
   // Navigation handlers
   const handleManageQuestionsSection = (sectionId) => {

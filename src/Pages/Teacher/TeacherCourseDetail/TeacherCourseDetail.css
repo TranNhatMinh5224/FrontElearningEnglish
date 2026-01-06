@@ -301,3 +301,33 @@
   }
 }
 
+/* Class Code Wrapper */
+.course-code-wrapper {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.course-code-wrapper .course-code-input {
+  flex: 1;
+}
+
+.expand-code-btn {
+  width: 40px;
+  height: 40px;
+  background: #f0f0f0;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: #666;
+}
+
+.expand-code-btn:hover {
+  background: #e0e0e0;
+  border-color: #41d6e3;
+  color: #41d6e3;
+}

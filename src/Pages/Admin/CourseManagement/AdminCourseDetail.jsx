@@ -10,7 +10,7 @@ import CreateLessonModal from "../../../Components/Teacher/CreateLessonModal/Cre
 import SuccessModal from "../../../Components/Common/SuccessModal/SuccessModal";
 import ConfirmModal from "../../../Components/Common/ConfirmModal/ConfirmModal";
 import CourseDescription from "../../../Components/Courses/CourseDescription/CourseDescription";
-import { FaPlus, FaArrowLeft, FaTrash } from "react-icons/fa";
+import { FaPlus, FaTrash } from "react-icons/fa";
 
 export default function AdminCourseDetail() {
   const { courseId } = useParams();
